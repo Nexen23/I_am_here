@@ -7,8 +7,9 @@ import android.view.View;
 import android.widget.ListView;
 
 import alex.imhere.R;
+import alex.imhere.activity.provider.MainActivityProvider;
 import alex.imhere.adapter.UsersListAdapter;
-import alex.imhere.fragment.provider.DummyContent;
+import alex.imhere.entity.User;
 
 public class UsersListFragment extends ListFragment {
 	private static final String ARG_DUMMY_PARAM = "param";
@@ -37,8 +38,8 @@ public class UsersListFragment extends ListFragment {
 		}
 
 //		setListAdapter(new ArrayAdapter<>(getActivity(),
-//				android.R.layout.simple_list_item_1, android.R.id.text1, DummyContent.ITEMS));
-		setListAdapter(new UsersListAdapter (getActivity(), R.layout.item_user, DummyContent.ITEMS));
+//				android.R.layout.simple_list_item_1, android.R.id.text1, MainActivityProvider.ITEMS));
+		setListAdapter(new UsersListAdapter (getActivity(), R.layout.item_user, MainActivityProvider.ITEMS));
 	}
 
 
@@ -64,13 +65,13 @@ public class UsersListFragment extends ListFragment {
 		super.onListItemClick(l, v, position, id);
 
 		if (null != mListener) {
-			mListener.onUserClick(DummyContent.ITEMS.get(position).id);
+			mListener.onUserClick(MainActivityProvider.ITEMS.get(position));
 		}
 	}
 
 
 	public interface OnFragmentInteractionListener {
-		void onUserClick(String id);
+		void onUserClick(User user);
 	}
 
 }

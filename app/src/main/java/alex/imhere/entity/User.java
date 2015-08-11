@@ -4,7 +4,12 @@ import java.util.Date;
 
 public class User {
 	private String name;
-	private Date signedIn;
+	private Date signedInDate;
+
+	public User(String name, Date signedIn) {
+		this.name = name;
+		this.signedInDate = signedIn;
+	}
 
 	public String getName() {
 		return name;
@@ -14,11 +19,11 @@ public class User {
 		this.name = name;
 	}
 
-	public Date getSignedIn() {
-		return signedIn;
+	public Date getSignedInDate() {
+		return signedInDate;
 	}
 
-	public void setSignedIn(Date signedIn) {
-		this.signedIn = signedIn;
+	public void setSignedInDate(Date signedInDate) {
+		this.signedInDate = signedInDate;
 	}
 }

@@ -11,13 +11,13 @@ import java.util.List;
 
 import alex.imhere.R;
 
-import alex.imhere.fragment.provider.DummyContent.DummyItem;
+import alex.imhere.entity.User;
 
-public class UsersListAdapter extends ArrayAdapter<DummyItem> {
+public class UsersListAdapter extends ArrayAdapter<User> {
 	private final int resourceId;
 	private Context context;
 
-	public UsersListAdapter(Context context, int item_user, List<DummyItem> items) {
+	public UsersListAdapter(Context context, int item_user, List<User> items) {
 		super(context, item_user, items);
 
 		this.context = context;
@@ -26,25 +26,25 @@ public class UsersListAdapter extends ArrayAdapter<DummyItem> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View itemView = convertView;
-		if (itemView == null)
+		View userView = convertView;
+		if (userView == null)
 		{
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			itemView = inflater.inflate(resourceId, parent, false);
+			userView = inflater.inflate(resourceId, parent, false);
 		}
 
-		DummyItem item = getItem(position);
-		if (item != null)
+		User user = getItem(position);
+		if (user != null)
 		{
-			fillViewWithItem(itemView, item);
+			fillViewWithUser(userView, user);
 		}
 
-		return itemView;
+		return userView;
 	}
 
-	private void fillViewWithItem(View itemView, DummyItem item)
+	private void fillViewWithUser(View userView, User user)
 	{
-		TextView tv_name = (TextView) itemView.findViewById(R.id.tv_name);
-		tv_name.setText(item.id + " - " + item.content);
+		TextView tv_name = (TextView) userView.findViewById(R.id.tv_name);
+		tv_name.setText(user.getName());
 	}
 }

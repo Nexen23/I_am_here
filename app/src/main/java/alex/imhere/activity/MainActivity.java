@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import alex.imhere.R;
+import alex.imhere.entity.User;
 import alex.imhere.fragment.ImhereFragment;
 import alex.imhere.fragment.UsersListFragment;
 
@@ -49,7 +50,7 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	@Override
-	public void onUserClick(String id) {
-		Toast.makeText(MainActivity.this, "onUserClick from Activity", Toast.LENGTH_SHORT).show();
+	public void onUserClick(User user) {
+		Toast.makeText(MainActivity.this, String.format("onUserClick(%s | %s) from Activity", user.getName(), user.getSignedInDate()), Toast.LENGTH_SHORT).show();
 	}
 }

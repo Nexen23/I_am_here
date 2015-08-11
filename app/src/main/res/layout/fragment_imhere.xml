@@ -4,12 +4,12 @@
              android:layout_height="match_parent"
              tools:context=".ImhereFragment">
 
-    <com.google.android.gms.plus.PlusOneButton
-        xmlns:plus="http://schemas.android.com/apk/lib/com.google.android.gms.plus"
-        android:id="@+id/plus_one_button"
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        plus:size="standard"
-        plus:annotation="inline"/>
-
+        android:text="New Button"
+        android:id="@+id/b_imhere"
+        android:layout_gravity="center"
+        android:clickable="true"
+        />
 </FrameLayout>

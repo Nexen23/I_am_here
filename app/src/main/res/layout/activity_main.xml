@@ -1,7 +1,26 @@
-<fragment xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          android:id="@+id/fragment"
-          android:name="alex.imhere.MainActivityFragment"
-          tools:layout="@layout/fragment_main"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="fill_parent"
+              android:layout_height="fill_parent"
+              android:baselineAligned="false"
+              android:orientation="horizontal" >
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/fragment_imhere"
+              android:name="alex.imhere.ImhereFragment"
+              tools:layout="@layout/fragment_imhere"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_weight="1"/>
+
+    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:id="@+id/fragment_users_list"
+              android:name="alex.imhere.UsersListFragment"
+              tools:layout="@layout/fragment_users_list"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:layout_weight="1"/>
+
+</LinearLayout>

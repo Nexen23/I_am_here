@@ -16,8 +16,10 @@ public class MainActivityProvider {
 
 	static {
 		// Add 3 sample items.
-		ITEMS.add(new User("User 1", new Date()));
-		ITEMS.add(new User("User 2", new Date()));
-		ITEMS.add(new User("User 3", new Date()));
+		Calendar calendar = Calendar.getInstance();
+		for (int i = 1; i < 16; ++i) {
+			calendar.add(Calendar.SECOND, 3);
+			ITEMS.add(new User(String.format("User %d", i), calendar.getTime()));
+		}
 	}
 }

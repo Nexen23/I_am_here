@@ -1,12 +1,14 @@
 package alex.imhere.adapter;
 
 import android.content.Context;
+import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import alex.imhere.R;
@@ -46,5 +48,9 @@ public class UsersListAdapter extends ArrayAdapter<User> {
 	{
 		TextView tv_name = (TextView) userView.findViewById(R.id.tv_name);
 		tv_name.setText(user.getName());
+
+		TextView tv_singed_in_date = (TextView) userView.findViewById(R.id.tv_singed_in_date);
+		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss (dd-MM-yyyy)");
+		tv_singed_in_date.setText(sdf.format(user.getSignedInDate()));
 	}
 }

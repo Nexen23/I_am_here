@@ -1,14 +1,14 @@
-package alex.imhere;
+package alex.imhere.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.app.ListFragment;
 import android.view.View;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import alex.imhere.R;
 import alex.imhere.adapter.UsersListAdapter;
-import alex.imhere.dummy.DummyContent;
+import alex.imhere.fragment.provider.DummyContent;
 
 public class UsersListFragment extends ListFragment {
 	private static final String ARG_DUMMY_PARAM = "param";

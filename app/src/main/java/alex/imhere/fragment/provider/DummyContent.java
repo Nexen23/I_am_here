@@ -1,4 +1,4 @@
-package alex.imhere.dummy;
+package alex.imhere.fragment.provider;
 
 import java.util.ArrayList;
 import java.util.HashMap;

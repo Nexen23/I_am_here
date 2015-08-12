@@ -2,6 +2,7 @@ package alex.imhere.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -60,9 +61,10 @@ public class ImhereFragment extends Fragment {
 	}
 
 	public void onButtonPressed(View v) {
-		Toast.makeText(getActivity(), "onButtonPressed", Toast.LENGTH_SHORT).show();
+		//Toast.makeText(getActivity(), "onButtonPressed", Toast.LENGTH_SHORT).show();
 		if (mListener != null) {
-			mListener.onImherePress(v);
+			String username = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
+			mListener.onImherePress(username);
 		}
 	}
 
@@ -84,7 +86,7 @@ public class ImhereFragment extends Fragment {
 	}
 
 	public interface OnFragmentInteractionListener {
-		void onImherePress(View view);
+		void onImherePress(final String username);
 	}
 
 }

@@ -1,13 +1,15 @@
 package alex.imhere.activity;
 
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.Toast;
 
-import com.parse.ParseObject;
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
 
 import alex.imhere.R;
 import alex.imhere.entity.User;
@@ -47,12 +49,26 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	@Override
-	public void onImherePress(View view) {
-		Toast.makeText(MainActivity.this, "onImherePress from Activity", Toast.LENGTH_SHORT).show();
+	public void onImherePress(final String username) {
+		ParseUser.getCurrentUser().logOut();
+		ParseUser parseUser = new ParseUser();
+		parseUser.setUsername(username);
+		parseUser.setPassword(username);
+
+		parseUser.signUpInBackground(new SignUpCallback() {
+			@Override
+			public void done(ParseException e) {
+				if (e == null) {
+					Toast.makeText(getApplicationContext(), String.format("%s - signed up", username), Toast.LENGTH_SHORT).show();
+				} else {
+					Toast.makeText(getApplicationContext(), String.format("Signing up failed. Exception: %s", e.getMessage()), Toast.LENGTH_SHORT).show();
+				}
+			}
+		});
 	}
 
 	@Override
 	public void onUserClick(User user) {
-		Toast.makeText(MainActivity.this, String.format("onUserClick(%s | %s) from Activity", user.getName(), user.getSignedInDate()), Toast.LENGTH_SHORT).show();
+		Toast.makeText(MainActivity.this, String.format("onUserClick (%s | %s) from Activity", user.getName(), user.getSignedInDate()), Toast.LENGTH_SHORT).show();
 	}
 }

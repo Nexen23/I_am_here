@@ -13,7 +13,7 @@ public class ParseApplication extends Application {
 		super.onCreate();
 
 		// Enable Local Datastore.
-		Parse.enableLocalDatastore(this);
+		//Parse.enableLocalDatastore(this);
 
 		Parse.initialize(this, "ckJRRjvnaJFT5dMkyCXaCOcDWSEHIhOvpviSLz0T", "F19u2qI3lYOBZo8Rr09gYydrZnQP9Nc0PXOnyYro");
 

@@ -10,6 +10,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.parse.ParseException;
+import com.parse.ParseUser;
+import com.parse.SignUpCallback;
+
 import alex.imhere.R;
 
 public class ImhereFragment extends Fragment {
@@ -48,7 +52,7 @@ public class ImhereFragment extends Fragment {
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onButtonPressed(v);
+				onImherePress(v);
 			}
 		});
 
@@ -60,11 +64,26 @@ public class ImhereFragment extends Fragment {
 		super.onResume();
 	}
 
-	public void onButtonPressed(View v) {
-		//Toast.makeText(getActivity(), "onButtonPressed", Toast.LENGTH_SHORT).show();
+	public void onImherePress(View v) {
 		if (mListener != null) {
-			String username = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-			mListener.onImherePress(username);
+			final String username = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
+
+			ParseUser.getCurrentUser().logOut();
+			ParseUser parseUser = new ParseUser();
+			parseUser.setUsername(username);
+			parseUser.setPassword(username);
+
+			parseUser.signUpInBackground(new SignUpCallback() {
+				@Override
+				public void done(ParseException e) {
+					if (e == null) {
+						Toast.makeText(getActivity(), String.format("%s - signed up", username), Toast.LENGTH_SHORT).show();
+						mListener.onUserLogin(username);
+					} else {
+						Toast.makeText(getActivity(), String.format("Signing up failed. Exception: %s", e.getMessage()), Toast.LENGTH_SHORT).show();
+					}
+				}
+			});
 		}
 	}
 
@@ -86,7 +105,7 @@ public class ImhereFragment extends Fragment {
 	}
 
 	public interface OnFragmentInteractionListener {
-		void onImherePress(final String username);
+		void onUserLogin(final String username);
 	}
 
 }

@@ -1,6 +1,5 @@
 package alex.imhere.activity;
 
-import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -49,22 +48,7 @@ public class MainActivity extends AppCompatActivity
 	}
 
 	@Override
-	public void onImherePress(final String username) {
-		ParseUser.getCurrentUser().logOut();
-		ParseUser parseUser = new ParseUser();
-		parseUser.setUsername(username);
-		parseUser.setPassword(username);
-
-		parseUser.signUpInBackground(new SignUpCallback() {
-			@Override
-			public void done(ParseException e) {
-				if (e == null) {
-					Toast.makeText(getApplicationContext(), String.format("%s - signed up", username), Toast.LENGTH_SHORT).show();
-				} else {
-					Toast.makeText(getApplicationContext(), String.format("Signing up failed. Exception: %s", e.getMessage()), Toast.LENGTH_SHORT).show();
-				}
-			}
-		});
+	public void onUserLogin(final String username) {
 	}
 
 	@Override

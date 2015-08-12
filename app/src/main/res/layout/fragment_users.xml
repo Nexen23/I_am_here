@@ -6,7 +6,7 @@
     <ListView
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:id="@+id/l_users"
+        android:id="@+id/lv_users"
         android:layout_gravity="center_vertical"
         />
 

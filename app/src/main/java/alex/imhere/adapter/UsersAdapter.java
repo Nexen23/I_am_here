@@ -15,11 +15,11 @@ import alex.imhere.R;
 
 import alex.imhere.entity.User;
 
-public class UsersListAdapter extends ArrayAdapter<User> {
+public class UsersAdapter extends ArrayAdapter<User> {
 	private final int resourceId;
 	private Context context;
 
-	public UsersListAdapter(Context context, int item_user, List<User> items) {
+	public UsersAdapter(Context context, int item_user, List<User> items) {
 		super(context, item_user, items);
 
 		this.context = context;

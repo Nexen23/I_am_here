@@ -7,25 +7,25 @@ import android.view.View;
 import android.widget.ListView;
 
 import alex.imhere.R;
-import alex.imhere.activity.provider.MainActivityProvider;
-import alex.imhere.adapter.UsersListAdapter;
+import alex.imhere.activity.dataprovider.MainActivityDP;
+import alex.imhere.adapter.UsersAdapter;
 import alex.imhere.entity.User;
 
-public class UsersListFragment extends ListFragment {
+public class UsersFragment extends ListFragment {
 	private static final String ARG_DUMMY_PARAM = "param";
 	private String dummy_param;
 
 	private OnFragmentInteractionListener mListener;
 
-	public static UsersListFragment newInstance(String param) {
-		UsersListFragment fragment = new UsersListFragment();
+	public static UsersFragment newInstance(String param) {
+		UsersFragment fragment = new UsersFragment();
 		Bundle args = new Bundle();
 		args.putString(ARG_DUMMY_PARAM, param);
 		fragment.setArguments(args);
 		return fragment;
 	}
 
-	public UsersListFragment() {
+	public UsersFragment() {
 		// Required empty public constructor
 	}
 
@@ -38,8 +38,8 @@ public class UsersListFragment extends ListFragment {
 		}
 
 //		setListAdapter(new ArrayAdapter<>(getActivity(),
-//				android.R.layout.simple_list_item_1, android.R.id.text1, MainActivityProvider.ITEMS));
-		setListAdapter(new UsersListAdapter (getActivity(), R.layout.item_user, MainActivityProvider.ITEMS));
+//				android.R.layout.simple_list_item_1, android.R.id.text1, MainActivityDP.ITEMS));
+		setListAdapter(new UsersAdapter(getActivity(), R.layout.item_user, MainActivityDP.ITEMS));
 	}
 
 
@@ -65,7 +65,7 @@ public class UsersListFragment extends ListFragment {
 		super.onListItemClick(l, v, position, id);
 
 		if (null != mListener) {
-			mListener.onUserClick(MainActivityProvider.ITEMS.get(position));
+			mListener.onUserClick(MainActivityDP.ITEMS.get(position));
 		}
 	}
 

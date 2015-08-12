@@ -10,10 +10,10 @@ import android.widget.Toast;
 import alex.imhere.R;
 import alex.imhere.entity.User;
 import alex.imhere.fragment.ImhereFragment;
-import alex.imhere.fragment.UsersListFragment;
+import alex.imhere.fragment.UsersFragment;
 
 public class MainActivity extends AppCompatActivity
-		implements ImhereFragment.OnFragmentInteractionListener, UsersListFragment.OnFragmentInteractionListener{
+		implements ImhereFragment.OnFragmentInteractionListener, UsersFragment.OnFragmentInteractionListener{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {

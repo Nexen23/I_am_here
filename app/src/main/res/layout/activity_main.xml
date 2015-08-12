@@ -17,8 +17,8 @@
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
               android:id="@+id/fragment_users_list"
-              android:name="alex.imhere.fragment.UsersListFragment"
-              tools:layout="@layout/fragment_users_list"
+              android:name="alex.imhere.fragment.UsersFragment"
+              tools:layout="@layout/fragment_users"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:layout_weight="1"/>

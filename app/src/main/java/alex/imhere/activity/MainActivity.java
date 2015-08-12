@@ -7,6 +7,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.parse.ParseObject;
+
 import alex.imhere.R;
 import alex.imhere.entity.User;
 import alex.imhere.fragment.ImhereFragment;

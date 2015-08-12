@@ -6,7 +6,7 @@ import java.util.List;
 
 import alex.imhere.entity.User;
 
-public class MainActivityDP extends BaseDataProvider {
+public class MainActivityDataProvider {
 
 	public static List<User> ITEMS = new ArrayList<>();
 

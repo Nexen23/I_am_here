@@ -8,8 +8,8 @@
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
               xmlns:tools="http://schemas.android.com/tools"
               android:id="@+id/fragment_imhere"
-              android:name="alex.imhere.fragment.ImhereFragment"
-              tools:layout="@layout/fragment_imhere"
+              android:name="alex.imhere.fragment.StatusFragment"
+              tools:layout="@layout/fragment_status"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:layout_weight="1"/>

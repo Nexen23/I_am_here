@@ -1,12 +1,12 @@
-package alex.imhere.activity.dataprovider;
+package alex.imhere.activity.model;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-import alex.imhere.entity.User;
+import alex.imhere.layer.server.User;
 
-public class MainActivityDataProvider {
+public class ImhereModel {
 
 	public static List<User> ITEMS = new ArrayList<>();
 
@@ -15,7 +15,9 @@ public class MainActivityDataProvider {
 		Calendar calendar = Calendar.getInstance();
 		for (int i = 1; i < 16; ++i) {
 			calendar.add(Calendar.SECOND, 3);
-			ITEMS.add(new User(String.format("User %d", i), calendar.getTime()));
+			User user = new User();
+			user.setUdid(String.format("User %d", i));
+			ITEMS.add(user);
 		}
 	}
 }

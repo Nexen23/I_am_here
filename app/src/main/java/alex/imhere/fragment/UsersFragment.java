@@ -7,9 +7,9 @@ import android.view.View;
 import android.widget.ListView;
 
 import alex.imhere.R;
-import alex.imhere.activity.dataprovider.MainActivityDataProvider;
+import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.adapter.UsersAdapter;
-import alex.imhere.entity.User;
+import alex.imhere.layer.server.User;
 
 public class UsersFragment extends ListFragment {
 	private static final String ARG_DUMMY_PARAM = "param";
@@ -39,7 +39,7 @@ public class UsersFragment extends ListFragment {
 
 //		setListAdapter(new ArrayAdapter<>(getActivity(),
 //				android.R.layout.simple_list_item_1, android.R.id.text1, MainActivityDP.ITEMS));
-		setListAdapter(new UsersAdapter(getActivity(), R.layout.item_user, MainActivityDataProvider.ITEMS));
+		setListAdapter(new UsersAdapter(getActivity(), R.layout.item_user, ImhereModel.ITEMS));
 	}
 
 
@@ -65,7 +65,7 @@ public class UsersFragment extends ListFragment {
 		super.onListItemClick(l, v, position, id);
 
 		if (null != mListener) {
-			mListener.onUserClick(MainActivityDataProvider.ITEMS.get(position));
+			mListener.onUserClick(ImhereModel.ITEMS.get(position));
 		}
 	}
 

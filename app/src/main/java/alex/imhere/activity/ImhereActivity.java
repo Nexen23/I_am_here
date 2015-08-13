@@ -4,19 +4,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
-
-import com.parse.ParseException;
-import com.parse.ParseUser;
-import com.parse.SignUpCallback;
 
 import alex.imhere.R;
-import alex.imhere.entity.User;
-import alex.imhere.fragment.ImhereFragment;
+import alex.imhere.layer.server.User;
+import alex.imhere.fragment.StatusFragment;
 import alex.imhere.fragment.UsersFragment;
 
-public class MainActivity extends AppCompatActivity
-		implements ImhereFragment.OnFragmentInteractionListener, UsersFragment.OnFragmentInteractionListener{
+public class ImhereActivity extends AppCompatActivity
+		implements StatusFragment.OnFragmentInteractionListener, UsersFragment.OnFragmentInteractionListener{
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -53,6 +48,6 @@ public class MainActivity extends AppCompatActivity
 
 	@Override
 	public void onUserClick(User user) {
-		Toast.makeText(MainActivity.this, String.format("onUserClick (%s | %s) from Activity", user.getName(), user.getSignedInDate()), Toast.LENGTH_SHORT).show();
+		//Toast.makeText(ImhereActivity.this, String.format("onUserClick (%s | %s) from Activity", user.getUdid(), user.getDieAfterMs()), Toast.LENGTH_SHORT).show();
 	}
 }

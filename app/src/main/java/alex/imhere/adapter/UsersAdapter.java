@@ -1,7 +1,6 @@
 package alex.imhere.adapter;
 
 import android.content.Context;
-import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +12,7 @@ import java.util.List;
 
 import alex.imhere.R;
 
-import alex.imhere.entity.User;
+import alex.imhere.layer.server.User;
 
 public class UsersAdapter extends ArrayAdapter<User> {
 	private final int resourceId;
@@ -47,10 +46,10 @@ public class UsersAdapter extends ArrayAdapter<User> {
 	private void fillViewWithUser(View userView, User user)
 	{
 		TextView tv_name = (TextView) userView.findViewById(R.id.tv_name);
-		tv_name.setText(user.getName());
+		tv_name.setText(user.getUdid());
 
 		TextView tv_singed_in_date = (TextView) userView.findViewById(R.id.tv_singed_in_date);
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss (dd-MM-yyyy)");
-		tv_singed_in_date.setText(sdf.format(user.getSignedInDate()));
+		tv_singed_in_date.setText(sdf.format(user.getDieAfterMs()));
 	}
 }

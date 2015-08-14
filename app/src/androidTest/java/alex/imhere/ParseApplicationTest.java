@@ -20,14 +20,14 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import alex.imhere.layer.server.Server;
+import alex.imhere.layer.server.Session;
 import alex.imhere.layer.server.User;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
 public class ParseApplicationTest extends ApplicationTestCase<ParseApplication> {
-	private Server server;
+	private Session session;
 	private String udid;
 	private Gson gson;
 
@@ -53,7 +53,7 @@ public class ParseApplicationTest extends ApplicationTestCase<ParseApplication> 
 	public void setUp() throws Exception {
 		super.setUp();
 
-		server = new Server();
+		session = new Session();
 		udid = Settings.Secure.getString(this.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 		gson = new GsonBuilder()
 				.registerTypeAdapter(Date.class, ser)
@@ -61,7 +61,7 @@ public class ParseApplicationTest extends ApplicationTestCase<ParseApplication> 
 	}
 
 	public void testLogin() throws Exception {
-		//server.login( udid );
+		//session.login( udid );
 
 		User user = new User();
 		user.setUdid(udid);
@@ -72,7 +72,7 @@ public class ParseApplicationTest extends ApplicationTestCase<ParseApplication> 
 		String result = ParseCloud.callFunction("Login", wrapJsonWithMap(jsonUser));
 
 		user = gson.fromJson( result, User.class );
-		//User user = server.getCurrentUser();
+		//User user = session.getCurrentUser();
 
 		Log.d("TAG", gson.toJson(user));
 	}

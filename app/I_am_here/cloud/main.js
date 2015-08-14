@@ -1,3 +1,5 @@
+/*global Parse:false, $:false, jQuery:false */
+
 // Importas
 var _ = require('underscore'); // jshint ignore:line
 var moment = require('moment'); // jshint ignore:line
@@ -17,7 +19,7 @@ function Log(obj, tag) {
     "use strict";
 
     var loggingString = "Cloud_code: ";
-    if (tag !== null) {
+    if (tag != null) { // jshint ignore:line
         loggingString += "[" + tag + "] ";
     }
     loggingString += obj + "\n";
@@ -70,7 +72,8 @@ function NewSession(udid) {
 function NewParseObject(session) {
     "use strict";
 
-    var obj = Parse.Object.Extend(sessionObjName); // jshint ignore:line
+    var obj = Parse.Object.extend(sessionObjName); // jshint ignore:line
+    Log(obj);
     obj.set({
         udid: session.udid,
         loginedAt: session.loginedAt,
@@ -141,7 +144,7 @@ var API_IsUserOnline = function(request, response) {
 var API_GetUserSession = function(request, response) {
     "use strict";
 
-    var userUdid = request.object.data.udid;
+    var userUdid = request.object.get("data").udid;
     var query = new Parse.Query(sessionObjName); // jshint ignore:line
     var promise = query.first("udid", userUdid);
     promise.then(function(result) {
@@ -154,7 +157,7 @@ var API_GetUserSession = function(request, response) {
 var API_Login = function(request, response) {
     "use strict";
 
-    var userUdid = request.object.udid;
+    var userUdid = request.params.data.udid;
     var session = NewSession(userUdid);
     var parseObject = NewParseObject(session);
 
@@ -174,7 +177,7 @@ var API_Login = function(request, response) {
 var API_Logout = function(request, response) {
     "use strict";
 
-    var userUdid = request.object.udid;
+    var userUdid = request.object.get("udid");
     var query = new Parse.Query(sessionObjName) // jshint ignore:line
         .equalTo("udid", userUdid);
 
@@ -192,7 +195,7 @@ Parse.Cloud.beforeSave(sessionObjName, function(request, response) { // jshint i
 
 
     // TODO: not correct. Need another method. 3 types of sessions exist: NULL | DEAD | ALIVE
-    var userUdid = request.object.udid;
+    var userUdid = request.object.get("udid");
     Parse.Cloud.run("IsUserOnline", {data:{udid:userUdid}}, { // jshint ignore:line
         success: response.success(),
         error: response.error()

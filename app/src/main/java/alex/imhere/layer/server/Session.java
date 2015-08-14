@@ -11,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Server {
+public class Session {
 	static final String
 			API_Login = "Login",
 			API_Logout = "Logout",

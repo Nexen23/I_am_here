@@ -1,69 +1,94 @@
-// Use Parse.Cloud.define to define as many cloud functions as you want.
-// For example:
-/*
-Parse.Cloud.define("hello", function(request, response) {
-	response.success("Hello world!");
-});
-*/
-
 // Importas
-var _ = require('underscore');
-var moment = require('moment');
+var _ = require('underscore'); // jshint ignore:line
+var moment = require('moment'); // jshint ignore:line
 
 // Constants
-var tokenLifetimeSec = 30;
+var sessionObjName = "Session";
+var sessionLifetimeSec = 30;
 
-var tokenName = "token";
-var baseToken = {udid: "", dieAfter: 0, createdAt: moment()};
-
-var eventsChannelName = "events";
+var channelName = "events";
 var publishKey = "pub-c-6271f363-519a-432d-9059-e65a7203ce0e",
     subscribeKey = "sub-c-a3d06db8-410b-11e5-8bf2-0619f8945a4f",
-    httpRequestUrl = 'http://pubsub.pubnub.com/publish/' + publishKey + '/' + subscribeKey + '/0/' + eventsChannelName + '/0/';
+    httpRequestUrl = 'http://pubsub.pubnub.com/publish/' + publishKey + '/' + subscribeKey + '/0/' + channelName + '/0/';
 
 
 // Utils
-function Log(obj, tag)
-{
-	var prefix = "Cloud_code: ";
-	var loggingString = prefix;
-	if (tag != null)
-		loggingString += "[" + tag + "] ";
-	loggingString += obj + "\n";
+function Log(obj, tag) {
+    "use strict";
 
-	console.log(loggingString);
+    var loggingString = "Cloud_code: ";
+    if (tag !== null) {
+        loggingString += "[" + tag + "] ";
+    }
+    loggingString += obj + "\n";
+
+    console.log(loggingString); // jshint ignore:line
 }
 
-
-// Handlers
-var baseHandlers = {
-    success: function() {
-        // Push was successfu
-    },
-    error: function(error) {
-        Log(error.message, "error")
-    }
-};
-
+function GetNow() {
+    "use strict";
+    return moment.utc();
+}
 
 // Supporting
-function UnregisterDeadUsers()
-{
-    var query = new Parse.Query(tokenName);
-    query.lessThanOrEqualTo(deadAtColName, getNow())
+var baseSession = {udid: "", loginedAt: GetNow(), aliveTo: GetNow()};
+
+var errorHandler = function(error) {
+    "use strict";
+    Log(error.message, "error");
+};
+var baseHandler = {
+    success: function(){},
+    error: errorHandler
+};
+
+function DeleteDeadSessions() {
+    "use strict";
+
+    var query = new Parse.Query(sessionObjName); // jshint ignore:line
+    query.lessThanOrEqualTo("aliveTo", GetNow())
         .each(function(obj)
          {
-            obj.destroy();
+             Log(obj, "Deleting dead session");
+             obj.destroy();
          },
-         baseHandlers);
-
-    // TODO
+        baseHandler
+    );
 }
 
-function SendEvent(event)
-{
-    Parse.Cloud.httpRequest({
-        url: httpRequestUrl + event,
+function NewSession(udid) {
+    "use strict";
+
+    var session = _.clone(baseSession);
+    session.udid = udid;
+    session.loginedAt = GetNow();
+    session.aliveTo = GetNow().add({seconds: sessionLifetimeSec});
+
+    return session;
+}
+
+function NewParseObject(session) {
+    "use strict";
+
+    var obj = Parse.Object.Extend(sessionObjName); // jshint ignore:line
+    obj.set({
+        udid: session.udid,
+        loginedAt: session.loginedAt,
+        aliveTo: session.aliveTo
+        },
+        {
+            error: errorHandler
+        }
+    );
+
+    return obj;
+}
+
+function SendEvent(udid) {
+    "use strict";
+
+    Parse.Cloud.httpRequest({ // jshint ignore:line
+        url: httpRequestUrl + JSON.stringify({udid: udid}),
 
         success: function(httpResponse) {
             Log(httpResponse.text);
@@ -75,85 +100,124 @@ function SendEvent(event)
     });
 }
 
+// API functions
+var API_GetNow = function(request, response) {
+    "use strict";
 
-// APIs
-Parse.Cloud.define("GetUsers", function(request, response) {
-	var query = new Parse.Query(tokenName);
+    response.success( GetNow() );
+};
 
-	// TODO
+var API_GetOnlineUsers = function(request, response) {
+    "use strict";
 
-	response.success(query);
-});
+    DeleteDeadSessions();
+    var query = new Parse.Query(sessionObjName); // jshint ignore:line
 
-Parse.Cloud.define("IsUserAlive", function(request, response) {
-	var query = new Parse.Query(tokenName);
+    response.success( query.toJSON() );
+};
 
-	// TODO
+var API_IsUserOnline = function(request, response) {
+    "use strict";
 
-	response.success(query);
-});
+    var userUdid = request.object.data.udid;
+    var query = new Parse.Query(sessionObjName) // jshint ignore:line
+        .equalTo("udid", userUdid)
+        .lessThanOrEqualTo("aliveTo", GetNow());
 
-Parse.Cloud.define("Login", function(request, response) {
-	//var query = new Parse.Query(tokenName);
 
-	var token = _.clone(baseToken);
-	token.createdAt = moment();
-	token.dieAfter = moment().add({seconds:tokenLifetimeSec}) - token.createdAt;
-	token.DATATEST = moment(30000);
-	//token.udid = request.object.get("udid");
+    var userOnline = true;
+    query.count( {
+        success: function(number) {
+            if (number === 0) {
+                userOnline = false;
+            }
+        },
+        error: errorHandler
+    });
 
-	// TODO: SAVE IT TO DB
+    response.success(userOnline);
+};
 
-	response.success( JSON.stringify(token) );
-});
+var API_GetUserSession = function(request, response) {
+    "use strict";
 
-Parse.Cloud.define("Logout", function(request, response) {
-	var query = new Parse.Query(tokenName);
+    var userUdid = request.object.data.udid;
+    var query = new Parse.Query(sessionObjName); // jshint ignore:line
+    var promise = query.first("udid", userUdid);
+    promise.then(function(result) {
+        response.success(result);
+    });
 
-	// TODO: DELETE TOKEN FROM DB
+    response.error();
+};
 
-	response.success(query);
-});
+var API_Login = function(request, response) {
+    "use strict";
+
+    var userUdid = request.object.udid;
+    var session = NewSession(userUdid);
+    var parseObject = NewParseObject(session);
+
+    parseObject.save().then(
+        function(success){},
+        function(error) {
+
+        }
+    );
+    Log(parseObject, "API_Login - parseObject");
+
+    // TODO: make UDID unique (+ can't login if already loginned)
+
+    response.success( JSON.stringify(parseObject) );
+};
+
+var API_Logout = function(request, response) {
+    "use strict";
+
+    var userUdid = request.object.udid;
+    var query = new Parse.Query(sessionObjName) // jshint ignore:line
+        .equalTo("udid", userUdid);
+
+    query.each( function(obj) {
+       obj.destroy();
+    });
+
+    response.success();
+};
 
 
 // Bindings
-/*Parse.Cloud.afterSave(tokenName, function(request) {
-    var token = _.clone(baseToken);
-    var reqToken = request.object;
-    Log(reqToken, "reqToken on afterSave");
+Parse.Cloud.beforeSave(sessionObjName, function(request, response) { // jshint ignore:line
+    "use strict";
 
-    token.udid = reqToken.get("udid");
-    token.deadAt = reqToken.get("deadAt");
 
-	SendEvent(token);
-
-	response.success();
+    // TODO: not correct. Need another method. 3 types of sessions exist: NULL | DEAD | ALIVE
+    var userUdid = request.object.udid;
+    Parse.Cloud.run("IsUserOnline", {data:{udid:userUdid}}, { // jshint ignore:line
+        success: response.success(),
+        error: response.error()
+    });
 });
 
-Parse.Cloud.afterDelete(tokenName, function(request) {
-    var token = _.clone(baseToken);
-    var reqToken = request.object;
-    Log(reqToken, "reqToken on afterDelete");
+Parse.Cloud.afterSave(sessionObjName, function(request) { // jshint ignore:line
+    "use strict";
 
-    token.udid = reqToken.get("udid");
-    token.deadAt = reqToken.get("deadAt");
-    token.dead = true;
+	SendEvent(request.object.get("udid"));
+});
 
-	SendEvent(token);
+Parse.Cloud.afterDelete(sessionObjName, function(request) { // jshint ignore:line
+    "use strict";
 
-	response.success();
-});*/
+    SendEvent(request.object.get("udid"));
+});
 
 
-/*Parse.Cloud.beforeSave(Parse.User, function(request, response) {
-	var lifetimeSeconds = 13;
+// API definitions
+Parse.Cloud.define("GetNow", API_GetNow); // jshint ignore:line
 
-	var deadAt = new Date( getNow() );
-	deadAt.setSeconds(deadAt.getSeconds() + lifetimeSeconds);
+Parse.Cloud.define("IsUserOnline", API_IsUserOnline); // jshint ignore:line
+Parse.Cloud.define("GetOnlineUsers", API_GetOnlineUsers); // jshint ignore:line
+Parse.Cloud.define("GetUserSession", API_GetUserSession); // jshint ignore:line
 
-    var username = request.object.get("username");
-	Log(deadAt, username + " - deletingAt");
-
-	request.object.set(deadAtColName, deadAt);
-	response.success();
-});*/
+Parse.Cloud.define("Login", API_Login); // jshint ignore:line
+Parse.Cloud.define("Logout", API_Logout); // jshint ignore:line

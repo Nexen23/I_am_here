@@ -39,10 +39,6 @@ var errorHandler = function(error) {
     "use strict";
     Log(error.message, "error");
 };
-var baseHandler = {
-    success: function(){},
-    error: errorHandler
-};
 
 function DeleteDeadSessions() {
     "use strict";
@@ -125,7 +121,7 @@ var API_GetOnlineUsers = function(request, response) {
     response.success( query.toJSON() );
 };
 
-var API_IsUserOnline = function(request, response) {
+/*var API_IsUserOnline = function(request, response) {
     "use strict";
 
     var userUdid = request.params.udid;
@@ -145,9 +141,9 @@ var API_IsUserOnline = function(request, response) {
     });
 
     response.success(userOnline);
-};
+};*/
 
-var API_GetUserSession = function(request, response) {
+var API_GetUserAliveTo = function(request, response) {
     "use strict";
 
     var userUdid = request.params.udid;
@@ -181,57 +177,13 @@ var API_Logout = function(request, response) {
 
     var userUdid = request.params.udid;
 
-    var objConstructor = Parse.Object.extend(sessionObjName); // jshint ignore:line
-    var query = new Parse.Query(objConstructor);
-
-    query.equalTo("udid", userUdid);
-    query.find({
-        success: function(results) {
-            Log("Successfully retrieved " + results.length + " scores.");
-            // Do something with the returned Parse.Object values
-            for (var i = 0; i < results.length; i++) {
-                var object = results[i];
-                Log(object.id + ' - ' + object.get('playerName'));
-            }
-        },
-        error: function(error) {
-            Log("Error: " + error.code + " " + error.message);
-        }
-    });
-
-    /*query.each( function(obj) {
-        Log(obj, "Destroy2");
-        obj.destroy();
-    });*/
-
-    /*var query = GetSessionQuery();
-       // .equalTo("udid", userUdid);
-
+    var query = GetSessionQuery()
+        .equalTo("udid", userUdid);
 
     query.each( function(obj) {
-        Log(obj, "Destroy1");
-        obj.destroy();
-    });
-
-    var userOnline = true;
-    query.count( {
-        success: function(number) {
-            Log(number, "Number of users");
-            if (number === 0) {
-                userOnline = false;
-            }
-        },
-        error: errorHandler
-    });
-    Log(userOnline, "UserOnline");
-
-
-    query.each( function(obj) {
-        Log(obj, "Destroy2");
+        Log(obj, "Logout:destroy");
        obj.destroy();
-    });*/
-
-    response.success();
+    }).done( function() {response.success();} );
 };
 
 
@@ -252,9 +204,8 @@ Parse.Cloud.afterDelete(sessionObjName, function(request) { // jshint ignore:lin
 // API definitions
 Parse.Cloud.define("GetNow", API_GetNow); // jshint ignore:line
 
-Parse.Cloud.define("IsUserOnline", API_IsUserOnline); // jshint ignore:line
 Parse.Cloud.define("GetOnlineUsers", API_GetOnlineUsers); // jshint ignore:line
-Parse.Cloud.define("GetUserSession", API_GetUserSession); // jshint ignore:line
+Parse.Cloud.define("GetUserAliveTo", API_GetUserAliveTo); // jshint ignore:line
 
 Parse.Cloud.define("Login", API_Login); // jshint ignore:line
 Parse.Cloud.define("Logout", API_Logout); // jshint ignore:line

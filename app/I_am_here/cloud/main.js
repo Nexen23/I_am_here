@@ -44,14 +44,14 @@ function DeleteDeadSessions() {
     "use strict";
 
     var query = new Parse.Query(sessionObjName); // jshint ignore:line
-    query.lessThanOrEqualTo("aliveTo", GetNow())
+    var promise = query.lessThanOrEqualTo("aliveTo", GetNow())
         .each(function(obj)
          {
              Log(obj, "Deleting dead session");
              obj.destroy();
-         },
-        baseHandler
+         }
     );
+	return promise;
 }
 
 function NewSession(udid) {
@@ -65,14 +65,13 @@ function NewSession(udid) {
     return session;
 }
 
-function GetSessionQuery()
-{
+function GetSessionQuery() {
     "use strict";
     var objConstructor = Parse.Object.extend(sessionObjName); // jshint ignore:line
     return new Parse.Query(objConstructor);
 }
 
-function NewParseObject(session) {
+function NewParseSession(session) {
     "use strict";
 
     var objConstructor = Parse.Object.extend(sessionObjName); // jshint ignore:line
@@ -84,21 +83,17 @@ function NewParseObject(session) {
         aliveTo: session.aliveTo.toDate()
         }
     );
-    Log(obj, "func- NewParseObject");
 
     return obj;
 }
 
-function SendEvent(udid) {
+function SendEvent(session) {
     "use strict";
 
     Parse.Cloud.httpRequest({ // jshint ignore:line
-        url: httpRequestUrl + JSON.stringify({udid: udid}),
+        url: httpRequestUrl + JSON.stringify(session),
 
-        success: function(httpResponse) {
-            //Log(httpResponse.text);
-        },
-
+        success: function(httpResponse) {},
         error: function(httpResponse) {
             Log('Request failed with response code ' + httpResponse.status);
         }
@@ -115,45 +110,13 @@ var API_GetNow = function(request, response) {
 var API_GetOnlineUsers = function(request, response) {
     "use strict";
 
-    DeleteDeadSessions();
-    var query = GetSessionQuery();
+    DeleteDeadSessions().done( function() {
+	    var query = GetSessionQuery();
 
-    response.success( query.toJSON() );
-};
+	    // TODO: implement returning array of sessions
 
-/*var API_IsUserOnline = function(request, response) {
-    "use strict";
-
-    var userUdid = request.params.udid;
-    var query = GetSessionQuery()
-        .equalTo("udid", userUdid)
-        .lessThanOrEqualTo("aliveTo", GetNow());
-
-
-    var userOnline = true;
-    query.count( {
-        success: function(number) {
-            if (number === 0) {
-                userOnline = false;
-            }
-        },
-        error: errorHandler
+	    response.success( query.toJSON() );
     });
-
-    response.success(userOnline);
-};*/
-
-var API_GetUserAliveTo = function(request, response) {
-    "use strict";
-
-    var userUdid = request.params.udid;
-    var query = GetSessionQuery();
-    var promise = query.first("udid", userUdid);
-    promise.then(function(result) {
-        response.success(result);
-    });
-
-    response.error();
 };
 
 var API_Login = function(request, response) {
@@ -161,28 +124,32 @@ var API_Login = function(request, response) {
 
     var userUdid = request.params.udid;
     var session = NewSession(userUdid);
-    var parseObject = NewParseObject(session);
+    var parseObject = NewParseSession(session);
 
-    parseObject.save(null, {
-        success: function(obj){Log(obj); response.success( JSON.stringify(parseObject) );},
-        error: function(error) {errorHandler(error); response.error();}
-    });
-
-    // TODO: make UDID unique (+ can't login if already loginned)
-    // TODO: not correct. Need another method. 3 types of sessions exist: NULL | DEAD | ALIVE
+	Parse.Cloud.run("Logout", {udid: userUdid}).done( function() {
+		parseObject.save(null, {
+			success: function(obj) {
+				Log(obj, "Login:save");
+				response.success( JSON.stringify(parseObject) );
+			},
+			error: function(error) {
+				errorHandler(error);
+				response.error(error);
+			}
+		});
+	});
 };
 
 var API_Logout = function(request, response) {
     "use strict";
 
     var userUdid = request.params.udid;
-
     var query = GetSessionQuery()
         .equalTo("udid", userUdid);
 
     query.each( function(obj) {
         Log(obj, "Logout:destroy");
-       obj.destroy();
+	    obj.destroy();
     }).done( function() {response.success();} );
 };
 
@@ -191,13 +158,13 @@ var API_Logout = function(request, response) {
 Parse.Cloud.afterSave(sessionObjName, function(request) { // jshint ignore:line
     "use strict";
 
-	SendEvent(request.object.get("udid"));
+	SendEvent(request.object);
 });
 
 Parse.Cloud.afterDelete(sessionObjName, function(request) { // jshint ignore:line
     "use strict";
 
-    SendEvent(request.object.get("udid"));
+    SendEvent(request.object);
 });
 
 
@@ -205,7 +172,6 @@ Parse.Cloud.afterDelete(sessionObjName, function(request) { // jshint ignore:lin
 Parse.Cloud.define("GetNow", API_GetNow); // jshint ignore:line
 
 Parse.Cloud.define("GetOnlineUsers", API_GetOnlineUsers); // jshint ignore:line
-Parse.Cloud.define("GetUserAliveTo", API_GetUserAliveTo); // jshint ignore:line
 
 Parse.Cloud.define("Login", API_Login); // jshint ignore:line
 Parse.Cloud.define("Logout", API_Logout); // jshint ignore:line

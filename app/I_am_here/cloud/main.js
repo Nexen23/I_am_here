@@ -112,10 +112,16 @@ var API_GetOnlineUsers = function(request, response) {
 
     DeleteDeadSessions().always( function() {
 	    var query = GetSessionQuery();
-
-	    // TODO: implement returning array of sessions
-
-	    response.success( query.toJSON() );
+	    query.find({
+		    success: function(result)
+		    {
+			    response.success( JSON.stringify(result) );
+		    },
+		    error: function(error)
+		    {
+			    response.success( [] );
+		    }
+	    });
     });
 };
 

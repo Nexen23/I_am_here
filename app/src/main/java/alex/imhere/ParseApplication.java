@@ -18,7 +18,7 @@ public class ParseApplication extends Application {
 		//Parse.enableLocalDatastore(this);
 
 		Parse.initialize(this, "ckJRRjvnaJFT5dMkyCXaCOcDWSEHIhOvpviSLz0T", "F19u2qI3lYOBZo8Rr09gYydrZnQP9Nc0PXOnyYro");
-		ParseInstallation.getCurrentInstallation().saveInBackground();
+		//ParseInstallation.getCurrentInstallation().saveInBackground();
 
 		ParseUser.enableAutomaticUser();
 		ParseACL defaultACL = new ParseACL();

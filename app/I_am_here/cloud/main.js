@@ -47,7 +47,7 @@ function DeleteDeadSessions() {
     var promise = query.lessThanOrEqualTo("aliveTo", GetNow())
         .each(function(obj)
          {
-             Log(obj, "Deleting dead session");
+             Log(obj, "Delete dead session");
              obj.destroy();
          }
     );
@@ -104,13 +104,13 @@ function SendEvent(session) {
 var API_GetNow = function(request, response) {
     "use strict";
 
-    response.success( GetNow() );
+    response.success( GetNow().toDate() );
 };
 
 var API_GetOnlineUsers = function(request, response) {
     "use strict";
 
-    DeleteDeadSessions().done( function() {
+    DeleteDeadSessions().always( function() {
 	    var query = GetSessionQuery();
 
 	    // TODO: implement returning array of sessions
@@ -126,7 +126,7 @@ var API_Login = function(request, response) {
     var session = NewSession(userUdid);
     var parseObject = NewParseSession(session);
 
-	Parse.Cloud.run("Logout", {udid: userUdid}).done( function() {
+	Parse.Cloud.run("Logout", {udid: userUdid}).always( function() {
 		parseObject.save(null, {
 			success: function(obj) {
 				Log(obj, "Login:save");

@@ -49,10 +49,9 @@ public class ParseApplicationTest extends ApplicationTestCase<ParseApplication> 
 	@SuppressWarnings("UnusedAssignment")
 	public void testGetOnlineUsers() throws Exception {
 		Session session = serverAPI.login(udid);
-
 		ArrayList<Session> users = serverAPI.getOnlineUsers();
-		assertEquals("Must be only one user", 1, users.size());
-
 		serverAPI.logout(session);
+
+		assertEquals("Must be only one user", 1, users.size());
 	}
 }

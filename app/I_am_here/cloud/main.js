@@ -44,7 +44,7 @@ function DeleteDeadSessions() {
     "use strict";
 
     var query = new Parse.Query(sessionObjName); // jshint ignore:line
-    var promise = query.lessThanOrEqualTo("aliveTo", GetNow())
+    var promise = query.lessThanOrEqualTo("aliveTo", GetNow().toDate())
         .each(function(obj)
          {
              Log(obj, "Delete dead session");
@@ -68,7 +68,9 @@ function NewSession(udid) {
 function GetSessionQuery() {
     "use strict";
     var objConstructor = Parse.Object.extend(sessionObjName); // jshint ignore:line
-    return new Parse.Query(objConstructor);
+	var query = new Parse.Query(objConstructor);
+    //query.select("udid", "loginedAt", "aliveTo"); //not work for some reason
+	return query;
 }
 
 function NewParseSession(session) {

@@ -6,12 +6,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import alex.imhere.R;
-import alex.imhere.layer.server.User;
+import alex.imhere.layer.server.Session;
 import alex.imhere.fragment.StatusFragment;
 import alex.imhere.fragment.UsersFragment;
 
 public class ImhereActivity extends AppCompatActivity
 		implements StatusFragment.OnFragmentInteractionListener, UsersFragment.OnFragmentInteractionListener{
+
+	protected Session session = new Session();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,10 +46,11 @@ public class ImhereActivity extends AppCompatActivity
 
 	@Override
 	public void onUserLogin(final String username) {
+		session.setUdid(username);
 	}
 
 	@Override
-	public void onUserClick(User user) {
-		//Toast.makeText(ImhereActivity.this, String.format("onUserClick (%s | %s) from Activity", user.getUdid(), user.getDieAfterMs()), Toast.LENGTH_SHORT).show();
+	public void onUserClick(Session session) {
+		//Toast.makeText(ImhereActivity.this, String.format("onUserClick (%s | %s) from Activity", session.getUdid(), session.getDieAfterMs()), Toast.LENGTH_SHORT).show();
 	}
 }

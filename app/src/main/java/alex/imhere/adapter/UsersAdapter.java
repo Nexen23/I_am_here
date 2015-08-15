@@ -12,13 +12,13 @@ import java.util.List;
 
 import alex.imhere.R;
 
-import alex.imhere.layer.server.User;
+import alex.imhere.layer.server.Session;
 
-public class UsersAdapter extends ArrayAdapter<User> {
+public class UsersAdapter extends ArrayAdapter<Session> {
 	private final int resourceId;
 	private Context context;
 
-	public UsersAdapter(Context context, int item_user, List<User> items) {
+	public UsersAdapter(Context context, int item_user, List<Session> items) {
 		super(context, item_user, items);
 
 		this.context = context;
@@ -34,22 +34,22 @@ public class UsersAdapter extends ArrayAdapter<User> {
 			userView = inflater.inflate(resourceId, parent, false);
 		}
 
-		User user = getItem(position);
-		if (user != null)
+		Session session = getItem(position);
+		if (session != null)
 		{
-			fillViewWithUser(userView, user);
+			fillViewWithUser(userView, session);
 		}
 
 		return userView;
 	}
 
-	private void fillViewWithUser(View userView, User user)
+	private void fillViewWithUser(View userView, Session session)
 	{
 		TextView tv_name = (TextView) userView.findViewById(R.id.tv_name);
-		tv_name.setText(user.getUdid());
+		tv_name.setText(session.getUdid());
 
 		TextView tv_singed_in_date = (TextView) userView.findViewById(R.id.tv_singed_in_date);
 		SimpleDateFormat sdf = new SimpleDateFormat("HH:mm:ss (dd-MM-yyyy)");
-		tv_singed_in_date.setText(sdf.format(user.getDieAfterMs()));
+		tv_singed_in_date.setText(sdf.format(session.getAliveTo().toDate()));
 	}
 }

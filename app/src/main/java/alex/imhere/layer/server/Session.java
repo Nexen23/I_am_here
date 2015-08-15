@@ -1,68 +1,51 @@
 package alex.imhere.layer.server;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import com.parse.ParseCloud;
-import com.parse.ParseException;
+import com.google.gson.annotations.SerializedName;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.joda.time.DateTime;
 
 public class Session {
-	static final String
-			API_Login = "Login",
-			API_Logout = "Logout",
-			API_GetUsers = "GetUsers",
-			API_IsUserAlive = "IsUserAlive";
+	@SerializedName("udid")
+	private String udid = "";
+	@SerializedName("loginedAt")
+	private DateTime loginedAt = new DateTime();
+	@SerializedName("aliveTo")
+	private DateTime aliveTo = new DateTime();
 
-	private Gson gson = new Gson();
-
-	private User user = new User();
-
-	public User getCurrentUser() {
-		return user;
+	public Session() {
 	}
 
-	public void login(String udid) throws Exception {
-		user.setUdid(udid);
-
-		try {
-			String jsonUser = gson.toJson(user);
-			Map<String, String> resultWrapped = ParseCloud.callFunction(API_Login, wrapJsonWithMap(jsonUser));
-
-			String resultJson = unwrapJsonWithMap(resultWrapped);
-			user = new User( gson.fromJson(resultJson, User.class) );
-		} catch (ParseException e) {
-			throw (Exception)e;
-		}
+	protected Session(Session session) {
+		this(session.udid, session.loginedAt, session.aliveTo);
 	}
 
-	public void logout() {
-
+	protected Session(String udid, DateTime loginedAt, DateTime aliveTo) {
+		setUdid(udid);
+		setLoginedAt(loginedAt);
+		setAliveTo(aliveTo);
 	}
 
-	public final ArrayList<User> getUsers() {
-		ArrayList<User> ITEMS = new ArrayList<>();
-		Calendar calendar = Calendar.getInstance();
-		for (int i = 1; i < 16; ++i) {
-			calendar.add(Calendar.SECOND, 3);
-			ITEMS.add(new User(String.format("User %d", i), calendar.getTime().getTime()));
-		}
-		return ITEMS;
+	public String getUdid() {
+		return udid;
 	}
 
-	private Map<String, String> wrapJsonWithMap(String json)
-	{
-		Map<String, String> jsonMapWrapper = new HashMap<>();
-		jsonMapWrapper.put("data", json);
-		return jsonMapWrapper;
+	public void setUdid(String udid) {
+		this.udid = udid;
 	}
 
-	private String unwrapJsonWithMap(Map<String, String> jsonMapWrapper)
-	{
-		return (String) jsonMapWrapper.get("data");
+	public DateTime getAliveTo() {
+		return aliveTo;
+	}
+
+	public DateTime getLoginedAt() {
+		return loginedAt;
+	}
+
+	protected void setLoginedAt(DateTime loginedAt) {
+		this.loginedAt = loginedAt;
+	}
+
+	protected void setAliveTo(DateTime aliveTo) {
+		this.aliveTo = aliveTo;
 	}
 }

@@ -9,7 +9,7 @@ import android.widget.ListView;
 import alex.imhere.R;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.adapter.UsersAdapter;
-import alex.imhere.layer.server.User;
+import alex.imhere.layer.server.Session;
 
 public class UsersFragment extends ListFragment {
 	private static final String ARG_DUMMY_PARAM = "param";
@@ -71,7 +71,7 @@ public class UsersFragment extends ListFragment {
 
 
 	public interface OnFragmentInteractionListener {
-		void onUserClick(User user);
+		void onUserClick(Session session);
 	}
 
 }

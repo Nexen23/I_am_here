@@ -10,7 +10,7 @@ import alex.imhere.fragment.view.AbstractView;
 import alex.imhere.layer.server.ServerAPI;
 import alex.imhere.layer.server.Session;
 
-public class ImhereModel implements AbstractModel {
+public class ImhereModel extends AbstractModel {
 	//TODO: exerpt methods to Service! This is too complex for Model in MVC
 	ServerAPI api = new ServerAPI();
 
@@ -44,12 +44,14 @@ public class ImhereModel implements AbstractModel {
 	public Session openNewSession() throws ParseException {
 		//TODO: log exception
 		currentSession = api.login(udid);
+		notifyDataChanged();
 		return currentSession;
 	}
 
 	public void cancelCurrentSession() {
 		if (currentSession != null) {
 			api.logout(currentSession);
+			notifyDataChanged();
 		}
 		currentSession = null;
 	}

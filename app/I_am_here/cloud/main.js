@@ -73,6 +73,26 @@ function GetSessionQuery() {
 	return query;
 }
 
+function IsUserOnline(udid, onUserOnlineHanlder, onUserOfflineHanlder) {
+	"use strict";
+
+	var userAlive = false;
+	var query = GetSessionQuery();
+	query.equalTo("udid", udid).greaterThanOrEqualTo("aliveTo", GetNow().toDate());
+	query.find({
+		success: function(result)
+		{
+			if (result.length == 0) {
+				onUserOfflineHanlder();
+			}
+			else {
+				onUserOnlineHanlder(result);
+			}
+		},
+		error: errorHandler
+	});
+}
+
 function NewParseSession(session) {
     "use strict";
 
@@ -106,24 +126,37 @@ function SendEvent(session) {
 var API_GetNow = function(request, response) {
     "use strict";
 
-    response.success( GetNow().toDate() );
+	var onUserOnline = function(result) {
+		response.success( GetNow().toDate() );
+	};
+
+	var onUserOffline = function() {
+		response.error();
+	};
+
+	IsUserOnline(request.params.udid, onUserOnline, onUserOffline);
 };
 
 var API_GetOnlineUsers = function(request, response) {
     "use strict";
 
+	var onUserOnline = function(result) {
+		var query = GetSessionQuery();
+		query.find({
+			success: function(result)
+			{
+				response.success( JSON.stringify(result) );
+			},
+			error: errorHandler
+		});
+	};
+
+	var onUserOffline = function() {
+		response.error();
+	};
+
     DeleteDeadSessions().always( function() {
-	    var query = GetSessionQuery();
-	    query.find({
-		    success: function(result)
-		    {
-			    response.success( JSON.stringify(result) );
-		    },
-		    error: function(error)
-		    {
-			    response.success( [] );
-		    }
-	    });
+	    IsUserOnline(request.params.udid, onUserOnline, onUserOffline);
     });
 };
 

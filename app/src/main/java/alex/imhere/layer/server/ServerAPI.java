@@ -60,7 +60,7 @@ public class ServerAPI {
 		return session;
 	}
 
-	public void logout(Session session) {
+	public void logout(final Session session) {
 		try {
 			ParseCloud.callFunction(API_Logout, GetRequestFor(session.getUdid()));
 		} catch (ParseException e) {
@@ -68,15 +68,14 @@ public class ServerAPI {
 		}
 	}
 
-	public final ArrayList<Session> getOnlineUsers() throws ParseException {
-		final HashMap<String, Object> emptyParams = new HashMap<String, Object>();
-		String jsonUsers = ParseCloud.callFunction(API_GetOnlineUsers, emptyParams);
+	public final ArrayList<Session> getOnlineUsers(final Session session) throws ParseException {
+		String jsonUsers = ParseCloud.callFunction(API_GetOnlineUsers, GetRequestFor(session.getUdid()));
 		ArrayList<Session> users = gson.fromJson(jsonUsers, new TypeToken<List<Session>>(){}.getType());
 		return users;
 	}
 
-	public DateTime getNow() throws ParseException {
-		String jsonDate = ParseCloud.callFunction(API_GetNow, null);
+	public DateTime getNow(final Session session) throws ParseException {
+		String jsonDate = ParseCloud.callFunction(API_GetNow, GetRequestFor(session.getUdid()));
 		return gson.fromJson(jsonDate, DateTime.class);
 	}
 

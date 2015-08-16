@@ -46,10 +46,9 @@ public class ParseApplicationTest extends ApplicationTestCase<ParseApplication> 
 		udid = Settings.Secure.getString(this.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 	}
 
-	@SuppressWarnings("UnusedAssignment")
 	public void testGetOnlineUsers() throws Exception {
 		Session session = serverAPI.login(udid);
-		ArrayList<Session> users = serverAPI.getOnlineUsers();
+		ArrayList<Session> users = serverAPI.getOnlineUsers(session);
 		serverAPI.logout(session);
 
 		assertEquals("Must be only one user", 1, users.size());

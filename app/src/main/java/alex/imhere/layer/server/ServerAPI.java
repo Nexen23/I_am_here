@@ -1,5 +1,7 @@
 package alex.imhere.layer.server;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonDeserializationContext;
@@ -54,13 +56,13 @@ public class ServerAPI {
 				.registerTypeAdapter(Date.class, deser).create();
 	}
 
-	public Session login(String udid) throws ParseException {
+	public Session login(@NonNull final String udid) throws ParseException {
 		String jsonObject = ParseCloud.callFunction(API_Login, GetRequestFor(udid));
 		Session session = new Session( gson.fromJson(jsonObject, Session.class) );
 		return session;
 	}
 
-	public void logout(final Session session) {
+	public void logout(@NonNull final Session session) {
 		try {
 			ParseCloud.callFunction(API_Logout, GetRequestFor(session.getUdid()));
 		} catch (ParseException e) {
@@ -68,18 +70,18 @@ public class ServerAPI {
 		}
 	}
 
-	public final ArrayList<Session> getOnlineUsers(final Session session) throws ParseException {
+	public final ArrayList<Session> getOnlineUsers(@NonNull final Session session) throws ParseException {
 		String jsonUsers = ParseCloud.callFunction(API_GetOnlineUsers, GetRequestFor(session.getUdid()));
 		ArrayList<Session> users = gson.fromJson(jsonUsers, new TypeToken<List<Session>>(){}.getType());
 		return users;
 	}
 
-	public DateTime getNow(final Session session) throws ParseException {
+	public DateTime getNow(@NonNull final Session session) throws ParseException {
 		String jsonDate = ParseCloud.callFunction(API_GetNow, GetRequestFor(session.getUdid()));
 		return gson.fromJson(jsonDate, DateTime.class);
 	}
 
-	private Map<String, ?> GetRequestFor(String udid)
+	private Map<String, ?> GetRequestFor(@NonNull final String udid)
 	{
 		Map<String, String> result = new HashMap<>();
 		result.put("udid", udid);

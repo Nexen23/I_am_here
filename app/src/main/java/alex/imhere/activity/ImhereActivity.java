@@ -34,7 +34,7 @@ public class ImhereActivity extends AppCompatActivity
 	public void onAttachFragment(Fragment fragment) {
 		super.onAttachFragment(fragment);
 		AbstractView abstractView = (AbstractView) fragment;
-		abstractView.setModel(model);
+		model.addEventListener(abstractView);
 	}
 
 	@Override

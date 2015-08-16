@@ -18,9 +18,8 @@ import alex.imhere.fragment.view.AbstractView;
 import alex.imhere.layer.server.Session;
 
 public class UsersFragment extends ListFragment implements AbstractView {
-	private ImhereModel model;
 	private UsersAdapter usersAdapter = null;
-	private ArrayList<Session> users = new ArrayList<Session>();
+	private ArrayList<Session> users = new ArrayList<>();
 
 	public static UsersFragment newInstance(String param) {
 		UsersFragment fragment = new UsersFragment();
@@ -48,13 +47,10 @@ public class UsersFragment extends ListFragment implements AbstractView {
 		super.onAttach(activity);
 	}
 
-	@Override
-	public void setModel(AbstractModel model) {
-		this.model = (ImhereModel) model;
-	}
 
 	@Override
-	public void onDataUpdate() {
+	public void onDataUpdate(AbstractModel abstractModel) {
+		ImhereModel model = (ImhereModel) abstractModel;
 		try {
 			users = model.getOnlineUsers();
 			usersAdapter.notifyDataSetChanged();

@@ -6,6 +6,8 @@ import android.app.ListFragment;
 import android.view.View;
 import android.widget.ListView;
 
+import java.util.ArrayList;
+
 import alex.imhere.R;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.adapter.UsersAdapter;
@@ -27,7 +29,7 @@ public class UsersFragment extends ListFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		setListAdapter(new UsersAdapter(getActivity(), R.layout.item_user, null));
+		setListAdapter(new UsersAdapter(getActivity(), R.layout.item_user, new ArrayList<Session>()));
 		//setRetainInstance(true);
 	}
 

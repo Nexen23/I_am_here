@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.LogInCallback;
@@ -17,10 +18,14 @@ import com.parse.ParseUser;
 import com.parse.SignUpCallback;
 
 import alex.imhere.R;
+import alex.imhere.activity.model.AbstractModel;
+import alex.imhere.activity.model.ImhereModel;
+import alex.imhere.fragment.view.AbstractView;
 
-public class StatusFragment extends Fragment {
+public class StatusFragment extends Fragment implements AbstractView {
 	private Button button;
 	private OnFragmentInteractionListener mListener;
+	private ImhereModel model;
 
 	public static StatusFragment newInstance(String param) {
 		StatusFragment fragment = new StatusFragment();
@@ -81,6 +86,22 @@ public class StatusFragment extends Fragment {
 	public void onDetach() {
 		super.onDetach();
 		mListener = null;
+	}
+
+	@Override
+	public void setModel(AbstractModel model) {
+		this.model = (ImhereModel) model;
+	}
+
+	@Override
+	public void onDataUpdate() {
+		TextView tv_status = (TextView) getView().findViewById(R.id.tv_status);
+		String status = "Offline";
+		// TODO: hardcoded strings. Move it to res
+		if (model.isCurrentSessionAlive()) {
+			status = "Online";
+		}
+		tv_status.setText(status);
 	}
 
 	public interface OnFragmentInteractionListener {

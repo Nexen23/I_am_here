@@ -1,6 +1,7 @@
 package alex.imhere.activity;
 
 import android.provider.Settings;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -12,6 +13,7 @@ import com.parse.ParseException;
 import alex.imhere.R;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.fragment.StatusFragment;
+import alex.imhere.fragment.view.AbstractView;
 
 public class ImhereActivity extends AppCompatActivity
 		implements StatusFragment.OnFragmentInteractionListener {
@@ -28,6 +30,12 @@ public class ImhereActivity extends AppCompatActivity
 		setContentView(R.layout.activity_main);
 	}
 
+	@Override
+	public void onAttachFragment(Fragment fragment) {
+		super.onAttachFragment(fragment);
+		AbstractView abstractView = (AbstractView) fragment;
+		abstractView.setModel(model);
+	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {

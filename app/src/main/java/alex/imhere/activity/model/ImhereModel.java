@@ -6,10 +6,12 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 
+import alex.imhere.fragment.view.AbstractView;
 import alex.imhere.layer.server.ServerAPI;
 import alex.imhere.layer.server.Session;
 
-public class ImhereModel {
+public class ImhereModel implements AbstractModel {
+	//TODO: exerpt methods to Service! This is too complex for Model in MVC
 	ServerAPI api = new ServerAPI();
 
 	String udid;

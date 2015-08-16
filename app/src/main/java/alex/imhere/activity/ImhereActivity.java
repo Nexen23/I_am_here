@@ -50,15 +50,16 @@ public class ImhereActivity extends AppCompatActivity
 	@Override
 	public void onImhereClick() {
 		if (model.isCurrentSessionAlive()) {
+			model.cancelCurrentSession();
+
+		}
+		else {
 			try {
 				model.openNewSession();
 			} catch (ParseException e) {
 				e.printStackTrace();
 				Toast.makeText(this, "Error logining to server: " + e.getMessage(), Toast.LENGTH_SHORT).show();
 			}
-		}
-		else {
-			model.cancelCurrentSession();
 		}
 	}
 

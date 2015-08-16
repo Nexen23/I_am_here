@@ -46,7 +46,9 @@ public class ImhereModel {
 	}
 
 	public void cancelCurrentSession() {
-		api.logout(currentSession);
+		if (currentSession != null) {
+			api.logout(currentSession);
+		}
 		currentSession = null;
 	}
 }

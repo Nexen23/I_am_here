@@ -1,5 +1,7 @@
 package alex.imhere.activity.model;
 
+import android.support.annotation.NonNull;
+
 import com.parse.ParseException;
 
 import org.joda.time.DateTime;
@@ -20,7 +22,7 @@ public class ImhereModel extends AbstractModel {
 	ArrayList<Session> onlineUsers = new ArrayList<>();
 	DateTime now = new DateTime();
 
-	public ImhereModel(String udid) {
+	public ImhereModel(@NonNull String udid) {
 		this.udid = udid;
 	}
 
@@ -45,14 +47,15 @@ public class ImhereModel extends AbstractModel {
 		//TODO: log exception
 		currentSession = api.login(udid);
 		notifyDataChanged();
+
 		return currentSession;
 	}
 
 	public void cancelCurrentSession() {
 		if (currentSession != null) {
 			api.logout(currentSession);
+			currentSession = null;
 			notifyDataChanged();
 		}
-		currentSession = null;
 	}
 }

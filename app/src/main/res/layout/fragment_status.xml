@@ -7,7 +7,7 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
+        android:text="I am here!"
         android:id="@+id/b_imhere"
         android:layout_gravity="center"
         android:clickable="true"

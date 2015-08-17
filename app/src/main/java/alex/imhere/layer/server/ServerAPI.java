@@ -87,16 +87,4 @@ public class ServerAPI {
 		result.put("udid", udid);
 		return result;
 	}
-
-	/*private Map<String, String> wrapJsonWithMap(String json)
-	{
-		Map<String, String> jsonMapWrapper = new HashMap<>();
-		jsonMapWrapper.put("data", json);
-		return jsonMapWrapper;
-	}
-
-	private String unwrapJsonWithMap(Map<String, String> jsonMapWrapper)
-	{
-		return (String) jsonMapWrapper.get("data");
-	}*/
 }

@@ -36,11 +36,11 @@ public class UsersFragment extends ListFragment implements AbstractView {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
+		users.add(new Session());
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, users);
 		setListAdapter(usersAdapter);
 		//setRetainInstance(true);
 	}
-
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -52,7 +52,8 @@ public class UsersFragment extends ListFragment implements AbstractView {
 	public void onDataUpdate(AbstractModel abstractModel) {
 		ImhereModel model = (ImhereModel) abstractModel;
 		try {
-			users = model.getOnlineUsers();
+			users.clear();
+			users.addAll( model.getOnlineUsers() );
 			usersAdapter.notifyDataSetChanged();
 		} catch (ParseException e) {
 			// TODO: handle exception

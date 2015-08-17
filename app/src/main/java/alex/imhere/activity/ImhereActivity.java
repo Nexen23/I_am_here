@@ -59,7 +59,6 @@ public class ImhereActivity extends AppCompatActivity
 	public void onImhereClick() {
 		if (model.isCurrentSessionAlive()) {
 			model.cancelCurrentSession();
-
 		}
 		else {
 			try {

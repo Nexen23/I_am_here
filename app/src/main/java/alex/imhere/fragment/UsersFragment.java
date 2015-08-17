@@ -3,7 +3,9 @@ package alex.imhere.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.app.ListFragment;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 
 import com.parse.ParseException;
@@ -21,30 +23,28 @@ public class UsersFragment extends ListFragment implements AbstractView {
 	private UsersAdapter usersAdapter = null;
 	private ArrayList<Session> users = new ArrayList<>();
 
-	public static UsersFragment newInstance(String param) {
+	public static UsersFragment newInstance() {
 		UsersFragment fragment = new UsersFragment();
 		Bundle args = new Bundle();
 		fragment.setArguments(args);
 		return fragment;
 	}
 
-	public UsersFragment() {
-		// Required empty public constructor
-	}
+
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+	public void onActivityCreated(Bundle savedInstanceState) {
+		super.onActivityCreated(savedInstanceState);
 
 		users.add(new Session());
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, users);
 		setListAdapter(usersAdapter);
-		//setRetainInstance(true);
 	}
 
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
+	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+		//return super.onCreateView(inflater, container, savedInstanceState);
+		return inflater.inflate(R.layout.fragment_users, container);
 	}
 
 
@@ -59,10 +59,5 @@ public class UsersFragment extends ListFragment implements AbstractView {
 			// TODO: handle exception
 			e.printStackTrace();
 		}
-	}
-
-	@Override
-	public void onDetach() {
-		super.onDetach();
 	}
 }

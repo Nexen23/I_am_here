@@ -15,10 +15,9 @@ import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.fragment.view.AbstractView;
 
 public class StatusFragment extends Fragment implements AbstractView {
-	private Button button;
 	private OnFragmentInteractionListener mListener;
 
-	public static StatusFragment newInstance(String param) {
+	public static StatusFragment newInstance() {
 		StatusFragment fragment = new StatusFragment();
 		Bundle args = new Bundle();
 		fragment.setArguments(args);
@@ -40,7 +39,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 	                         Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_status, container, false);
 
-		button = (Button) view.findViewById(R.id.b_imhere);
+		Button button = (Button) view.findViewById(R.id.b_imhere);
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {

@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="match_parent">
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent"
+			  android:orientation="vertical">
 
-    <ListView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/lv_users"
-        android:layout_gravity="center_vertical"
-        />
+	<TextView android:layout_width="wrap_content"
+			  android:layout_height="wrap_content"
+			  android:text="Online users">
+	</TextView>
+
+	<ListView android:id="@id/android:list"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent">
+	</ListView>
+	<TextView android:id="@id/android:empty"
+			  android:layout_width="match_parent"
+			  android:layout_height="match_parent"
+			  android:gravity="center"
+			  android:text="No users">
+	</TextView>
 
 </LinearLayout>

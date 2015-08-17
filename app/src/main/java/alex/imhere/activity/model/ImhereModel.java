@@ -33,12 +33,17 @@ public class ImhereModel extends AbstractModel {
 
 	public ArrayList<Session> getOnlineUsers() throws ParseException {
 		//TODO: log exception
-		onlineUsers = api.getOnlineUsers(currentSession);
+		if (isCurrentSessionAlive()) {
+			onlineUsers = api.getOnlineUsers(currentSession);
+		} else {
+			onlineUsers.clear();
+		}
 		return onlineUsers;
 	}
 
 	public DateTime getNow() throws ParseException {
 		//TODO: log exception
+		// TODO: 17.08.2015 session can be null
 		now = api.getNow(currentSession);
 		return now;
 	}

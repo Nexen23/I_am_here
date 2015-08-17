@@ -15,7 +15,7 @@ import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.fragment.view.AbstractView;
 
 public class StatusFragment extends Fragment implements AbstractView {
-	private OnFragmentInteractionListener mListener;
+	private FragmentInteractionListener mListener;
 
 	public static StatusFragment newInstance() {
 		StatusFragment fragment = new StatusFragment();
@@ -65,10 +65,10 @@ public class StatusFragment extends Fragment implements AbstractView {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			mListener = (OnFragmentInteractionListener) activity;
+			mListener = (FragmentInteractionListener) activity;
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
-					+ " must implement OnFragmentInteractionListener");
+					+ " must implement FragmentInteractionListener");
 		}
 	}
 
@@ -82,16 +82,17 @@ public class StatusFragment extends Fragment implements AbstractView {
 	public void onDataUpdate(AbstractModel abstractModel) {
 		ImhereModel model = (ImhereModel) abstractModel;
 
-		TextView tv_status = (TextView) getView().findViewById(R.id.tv_status);
+		final TextView tv_status = (TextView) getView().findViewById(R.id.tv_status);
 		String status = "Offline";
 		// TODO: hardcoded strings. Move it to res
 		if (model.isCurrentSessionAlive()) {
 			status = "Online";
 		}
+
 		tv_status.setText(status);
 	}
 
-	public interface OnFragmentInteractionListener {
+	public interface FragmentInteractionListener {
 		void onImhereClick();
 	}
 

@@ -8,9 +8,9 @@ public class Session {
 	@SerializedName("udid")
 	private String udid = "";
 	@SerializedName("loginedAt")
-	private DateTime loginedAt = new DateTime();
+	private DateTime loginedAt = new DateTime(0);
 	@SerializedName("aliveTo")
-	private DateTime aliveTo = new DateTime();
+	private DateTime aliveTo = new DateTime(0);
 
 	public Session() {
 	}

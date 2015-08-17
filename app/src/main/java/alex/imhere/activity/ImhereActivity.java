@@ -16,7 +16,7 @@ import alex.imhere.fragment.StatusFragment;
 import alex.imhere.fragment.view.AbstractView;
 
 public class ImhereActivity extends AppCompatActivity
-		implements StatusFragment.OnFragmentInteractionListener {
+		implements StatusFragment.FragmentInteractionListener {
 
 	ImhereModel model;
 
@@ -34,7 +34,7 @@ public class ImhereActivity extends AppCompatActivity
 	public void onAttachFragment(Fragment fragment) {
 		super.onAttachFragment(fragment);
 		AbstractView abstractView = (AbstractView) fragment;
-		model.addEventListener(abstractView);
+		model.addEventListener(fragment, abstractView);
 	}
 
 	@Override

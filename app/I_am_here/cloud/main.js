@@ -6,7 +6,7 @@ var moment = require('moment'); // jshint ignore:line
 
 // Constants
 var sessionObjName = "IMH_Session";
-var sessionLifetimeSec = 61;
+var sessionLifetimeSec = 31;
 
 var channelName = "events";
 var publishKey = "pub-c-6271f363-519a-432d-9059-e65a7203ce0e",

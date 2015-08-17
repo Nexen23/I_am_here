@@ -11,10 +11,12 @@ import java.util.ArrayList;
 import alex.imhere.fragment.view.AbstractView;
 import alex.imhere.layer.server.ServerAPI;
 import alex.imhere.layer.server.Session;
+import alex.imhere.service.BroadcastChannel;
 
 public class ImhereModel extends AbstractModel {
 	//TODO: exerpt methods to Service! This is too complex for Model in MVC
 	ServerAPI api = new ServerAPI();
+	BroadcastChannel channel;
 
 	String udid;
 	Session currentSession = null;
@@ -24,6 +26,17 @@ public class ImhereModel extends AbstractModel {
 
 	public ImhereModel(@NonNull String udid) {
 		this.udid = udid;
+		channel = new BroadcastChannel(new BroadcastChannel.ChannelEventsListener() {
+			@Override
+			public void onUserOnline(Session session) {
+				notifyDataChanged();
+			}
+
+			@Override
+			public void onUserOffline(Session session) {
+				notifyDataChanged();
+			}
+		});
 	}
 
 	public boolean isCurrentSessionAlive() {
@@ -51,6 +64,8 @@ public class ImhereModel extends AbstractModel {
 	public Session openNewSession() throws ParseException {
 		//TODO: log exception
 		currentSession = api.login(udid);
+		channel.connect();
+
 		notifyDataChanged();
 
 		return currentSession;
@@ -58,8 +73,10 @@ public class ImhereModel extends AbstractModel {
 
 	public void cancelCurrentSession() {
 		if (currentSession != null) {
+			channel.disconnect();
 			api.logout(currentSession);
 			currentSession = null;
+
 			notifyDataChanged();
 		}
 	}

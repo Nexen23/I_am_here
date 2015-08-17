@@ -32,15 +32,14 @@ public class UsersFragment extends ListFragment implements AbstractView {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		users.add(new Session());
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, users);
 		setListAdapter(usersAdapter);
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		return super.onCreateView(inflater, container, savedInstanceState);
-		//return inflater.inflate(R.layout.fragment_users, container);
+		//return super.onCreateView(inflater, container, savedInstanceState);
+		return inflater.inflate(R.layout.fragment_users, container);
 	}
 
 

@@ -2,15 +2,15 @@ package alex.imhere.layer.server;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 
 public class Session {
 	@SerializedName("udid")
 	private String udid = "";
 	@SerializedName("loginedAt")
-	private DateTime loginedAt = new DateTime(0);
+	private LocalDateTime loginedAt = new LocalDateTime(0);
 	@SerializedName("aliveTo")
-	private DateTime aliveTo = new DateTime(0);
+	private LocalDateTime aliveTo = new LocalDateTime(0);
 
 	public Session() {
 	}
@@ -19,7 +19,7 @@ public class Session {
 		this(session.udid, session.loginedAt, session.aliveTo);
 	}
 
-	protected Session(String udid, DateTime loginedAt, DateTime aliveTo) {
+	protected Session(String udid, LocalDateTime loginedAt, LocalDateTime aliveTo) {
 		setUdid(udid);
 		setLoginedAt(loginedAt);
 		setAliveTo(aliveTo);
@@ -33,19 +33,19 @@ public class Session {
 		this.udid = udid;
 	}
 
-	public DateTime getAliveTo() {
+	public LocalDateTime getAliveTo() {
 		return aliveTo;
 	}
 
-	public DateTime getLoginedAt() {
+	public LocalDateTime getLoginedAt() {
 		return loginedAt;
 	}
 
-	protected void setLoginedAt(DateTime loginedAt) {
+	protected void setLoginedAt(LocalDateTime loginedAt) {
 		this.loginedAt = loginedAt;
 	}
 
-	protected void setAliveTo(DateTime aliveTo) {
+	protected void setAliveTo(LocalDateTime aliveTo) {
 		this.aliveTo = aliveTo;
 	}
 }

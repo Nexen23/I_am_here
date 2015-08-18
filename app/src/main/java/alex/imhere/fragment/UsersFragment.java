@@ -6,8 +6,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.parse.ParseException;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,7 +52,7 @@ public class UsersFragment extends ListFragment implements AbstractView {
 		model = (ImhereModel) abstractModel;
 		model.addEventListener(this, this);
 
-		readOnlyUsers = model.getOnlineUsersReadonly();
+		readOnlyUsers = model.getOnlineUsersSet();
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, readOnlyUsers);
 	}
 }

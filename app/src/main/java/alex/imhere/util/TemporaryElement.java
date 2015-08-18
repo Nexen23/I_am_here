@@ -37,6 +37,8 @@ class TemporaryElement<T> implements Comparable {
 	@Override
 	public int compareTo(Object another) {
 		TemporaryElement object = (TemporaryElement) another;
-		return object.deathTime.compareTo(deathTime);
+		int datesComparisionResult = object.deathTime.compareTo(deathTime);
+		int objectsComparisionResult = object.hashCode() - this.hashCode();
+		return (datesComparisionResult != 0) ? datesComparisionResult : objectsComparisionResult;
 	}
 }

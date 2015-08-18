@@ -44,7 +44,7 @@ public class TemporarySet<T> extends Observable {
 		list.clear();
 		sortedElementsSet.clear();
 
-		notifyObservers();
+		notifyCollectionChanged();
 	}
 
 
@@ -64,7 +64,7 @@ public class TemporarySet<T> extends Observable {
 				openNextDeath();
 			}
 
-			notifyObservers();
+			notifyCollectionChanged();
 		}
 
 		return wasAdded;
@@ -86,8 +86,7 @@ public class TemporarySet<T> extends Observable {
 
 			}
 
-			notifyObservers();
-			//notifyObservers(null);
+			notifyCollectionChanged();
 		}
 
 		return wasRemoved;
@@ -106,7 +105,7 @@ public class TemporarySet<T> extends Observable {
 				nowMillis = (new LocalDateTime()).toDateTime().getMillis();
 		long delay = Math.max(0, deathTimeMillis - nowMillis);
 
-		timer.schedule(timerTask, 5000 /*delay*/);
+		timer.schedule(timerTask, delay);
 	}
 
 	private synchronized void cancelNextDeath() {
@@ -122,5 +121,8 @@ public class TemporarySet<T> extends Observable {
 		_remove(nextElementToDie);
 	}
 
-
+	private void notifyCollectionChanged() {
+		setChanged();
+		notifyObservers();
+	}
 }

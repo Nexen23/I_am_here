@@ -20,7 +20,13 @@ public class ImhereModel extends AbstractModel {
 
 	String udid;
 	Session currentSession = null;
-	TemporarySet<Session> onlineUsersReadonly = new TemporarySet<>();
+	TemporarySet<Session> onlineUsersSet = new TemporarySet<>();
+	Observer onlineUsersObserver = new Observer() {
+		@Override
+		public void update(Observable observable, Object data) {
+			notifyDataChanged();
+		}
+	};
 
 	/*LocalDateTime now = new LocalDateTime();*/
 
@@ -30,25 +36,20 @@ public class ImhereModel extends AbstractModel {
 		ChannelService.ChannelEventsListener channelListener = new ChannelService.ChannelEventsListener() {
 			@Override
 			public void onUserOnline(Session session) {
-				if ( onlineUsersReadonly.add(session, session.getAliveTo()) ) {
+				if ( onlineUsersSet.add(session, session.getAliveTo()) ) {
 					notifyDataChanged();
 				}
 			}
 
 			@Override
 			public void onUserOffline(Session session) {
-				if ( onlineUsersReadonly.remove(session) ) {
+				if ( onlineUsersSet.remove(session) ) {
 					notifyDataChanged();
 				}
 			}
 		};
 
-		onlineUsersReadonly.addObserver(new Observer() {
-			@Override
-			public void update(Observable observable, Object data) {
-				notifyDataChanged();
-			}
-		});
+		onlineUsersSet.addObserver(onlineUsersObserver);
 
 		channel = new ChannelService(channelListener);
 	}
@@ -58,8 +59,8 @@ public class ImhereModel extends AbstractModel {
 		return currentSession != null;
 	}
 
-	public final List<Session> getOnlineUsersReadonly() {
-		return onlineUsersReadonly.asReadonlyList();
+	public final List<Session> getOnlineUsersSet() {
+		return onlineUsersSet.asReadonlyList();
 	}
 
 	/*public DateTime getNow() throws ParseException {
@@ -72,7 +73,7 @@ public class ImhereModel extends AbstractModel {
 	public Session openNewSession() throws ParseException {
 		//TODO: log exception
 		currentSession = null;
-		onlineUsersReadonly.clear();
+		onlineUsersSet.clear();
 
 		currentSession = api.login(udid);
 		channel.connect();
@@ -80,7 +81,7 @@ public class ImhereModel extends AbstractModel {
 
 		List<Session> onlineUsers = api.getOnlineUsers(currentSession);
 		for (Session session : onlineUsers) {
-			onlineUsersReadonly.add(session, session.getAliveTo());
+			onlineUsersSet.add(session, session.getAliveTo());
 		}
 
 		notifyDataChanged();
@@ -94,7 +95,7 @@ public class ImhereModel extends AbstractModel {
 			api.logout(currentSession);
 
 			currentSession = null;
-			onlineUsersReadonly.clear();
+			onlineUsersSet.clear();
 
 			notifyDataChanged();
 		}

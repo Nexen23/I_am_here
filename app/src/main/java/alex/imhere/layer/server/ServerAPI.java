@@ -25,6 +25,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import alex.imhere.service.JsonParser;
+
 public class ServerAPI {
 	static final String
 			API_Login = "Login",
@@ -32,33 +34,11 @@ public class ServerAPI {
 			API_GetOnlineUsers = "GetOnlineUsers",
 			API_GetNow = "GetNow";
 
-	private Gson gson = new Gson();
-
-	public ServerAPI() {
-		gson = new Gson();
-
-		JsonSerializer<Date> ser = new JsonSerializer<Date>() {
-			@Override
-			public JsonElement serialize(Date src, Type typeOfSrc, JsonSerializationContext context) {
-				return src == null ? null : new JsonPrimitive(src.getTime());
-			}
-		};
-
-		JsonDeserializer<Date> deser = new JsonDeserializer<Date>() {
-			@Override
-			public Date deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				return json == null ? null : new Date(json.getAsLong());
-			}
-		};
-
-		gson = new GsonBuilder()
-				.registerTypeAdapter(Date.class, ser)
-				.registerTypeAdapter(Date.class, deser).create();
-	}
+	private JsonParser parser = new JsonParser();
 
 	public Session login(@NonNull final String udid) throws ParseException {
 		String jsonObject = ParseCloud.callFunction(API_Login, GetRequestFor(udid));
-		Session session = new Session( gson.fromJson(jsonObject, Session.class) );
+		Session session = parser.fromJson(jsonObject, Session.class);
 		return session;
 	}
 
@@ -72,13 +52,13 @@ public class ServerAPI {
 
 	public final ArrayList<Session> getOnlineUsers(@NonNull final Session session) throws ParseException {
 		String jsonUsers = ParseCloud.callFunction(API_GetOnlineUsers, GetRequestFor(session.getUdid()));
-		ArrayList<Session> users = gson.fromJson(jsonUsers, new TypeToken<List<Session>>(){}.getType());
+		ArrayList<Session> users = parser.fromJson(jsonUsers, new TypeToken<List<Session>>(){}.getType());
 		return users;
 	}
 
 	public DateTime getNow(@NonNull final Session session) throws ParseException {
 		String jsonDate = ParseCloud.callFunction(API_GetNow, GetRequestFor(session.getUdid()));
-		return gson.fromJson(jsonDate, DateTime.class);
+		return parser.fromJson(jsonDate, DateTime.class);
 	}
 
 	private Map<String, ?> GetRequestFor(@NonNull final String udid)

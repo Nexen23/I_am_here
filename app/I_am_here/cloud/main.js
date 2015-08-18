@@ -6,7 +6,7 @@ var moment = require('moment'); // jshint ignore:line
 
 // Constants
 var sessionObjName = "IMH_Session";
-var sessionLifetimeSec = 31;
+var sessionLifetimeSec = 61;
 
 var channelName = "events";
 var publishKey = "pub-c-6271f363-519a-432d-9059-e65a7203ce0e",
@@ -73,7 +73,7 @@ function GetSessionQuery() {
 	return query;
 }
 
-function IsUserOnline(udid, onUserOnlineHanlder, onUserOfflineHanlder) {
+function IsUserOnline(udid, onUserOnlineHanlder, onUserOfflineHanlder, onError) {
 	"use strict";
 
 	var userAlive = false;
@@ -89,7 +89,7 @@ function IsUserOnline(udid, onUserOnlineHanlder, onUserOfflineHanlder) {
 				onUserOnlineHanlder(result);
 			}
 		},
-		error: errorHandler
+		error: onError
 	});
 }
 
@@ -130,11 +130,15 @@ var API_GetNow = function(request, response) {
 		response.success( GetNow().toDate() );
 	};
 
-	var onUserOffline = function() {
-		response.error();
+	var onUserOffline = function(error) {
+		response.error(error);
 	};
 
-	IsUserOnline(request.params.udid, onUserOnline, onUserOffline);
+	var onError = function(error) {
+		response.error(error);
+	};
+
+	IsUserOnline(request.params.udid, onUserOnline, onUserOffline, onError);
 };
 
 var API_GetOnlineUsers = function(request, response) {
@@ -151,12 +155,16 @@ var API_GetOnlineUsers = function(request, response) {
 		});
 	};
 
-	var onUserOffline = function() {
-		response.error();
+	var onUserOffline = function(error) {
+		response.error(error);
+	};
+
+	var onError = function(error) {
+		response.error(error);
 	};
 
     DeleteDeadSessions().always( function() {
-	    IsUserOnline(request.params.udid, onUserOnline, onUserOffline);
+	    IsUserOnline(request.params.udid, onUserOnline, onUserOffline, onError);
     });
 };
 

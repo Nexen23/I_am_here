@@ -15,6 +15,7 @@ import java.util.List;
 import alex.imhere.layer.server.ServerAPI;
 import alex.imhere.layer.server.Session;
 import alex.imhere.service.ChannelService;
+import alex.imhere.util.TemporarySet;
 
 public class ImhereModel extends AbstractModel {
 	//TODO: exerpt methods to Service! This is too complex for Model in MVC

@@ -1,6 +1,6 @@
 package alex.imhere.util;
 
-import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -19,7 +19,7 @@ public class TemporarySet<T> extends Observable {
 	protected TimerTask timerTask = null;
 	protected TemporaryElement<T> nextElementToDie = null;
 
-	public boolean add(T object, DateTime deathTime) {
+	public boolean add(T object, LocalDateTime deathTime) {
 		TemporaryElement<T> element = new TemporaryElement<>(object, deathTime);
 		return _add(element);
 	}
@@ -85,6 +85,12 @@ public class TemporarySet<T> extends Observable {
 				killNextElement();
 			}
 		};
+
+		long deathTimeMillis = nextElementToDie.deathTime.toDateTime().getMillis(),
+				nowMillis = (new LocalDateTime()).toDateTime().getMillis();
+		long delay = Math.max(0, deathTimeMillis - nowMillis);
+
+		timer.schedule(timerTask, delay);
 	}
 
 	private synchronized void cancelNextDeath() {

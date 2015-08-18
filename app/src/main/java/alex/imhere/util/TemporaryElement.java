@@ -3,18 +3,19 @@ package alex.imhere.util;
 import android.support.annotation.NonNull;
 
 import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 
 class TemporaryElement<T> {
 	protected T object = null;
-	protected DateTime deathTime;
+	protected LocalDateTime deathTime;
 
-	public TemporaryElement(@NonNull T object, @NonNull DateTime deathTime) {
+	public TemporaryElement(@NonNull T object, @NonNull LocalDateTime deathTime) {
 		this.deathTime = deathTime;
 		this.object = object;
 	}
 
 	protected TemporaryElement(@NonNull T object) {
-		this(object, new DateTime(0));
+		this(object, new LocalDateTime(0));
 	}
 
 	@Override

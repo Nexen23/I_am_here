@@ -145,7 +145,8 @@ var API_GetOnlineUsers = function(request, response) {
     "use strict";
 
 	var onUserOnline = function(result) {
-		var query = GetSessionQuery();
+		var query = GetSessionQuery()
+		    .addDescending("aliveTo");
 		query.find({
 			success: function(result)
 			{
@@ -213,6 +214,7 @@ Parse.Cloud.afterSave(sessionObjName, function(request) { // jshint ignore:line
 Parse.Cloud.afterDelete(sessionObjName, function(request) { // jshint ignore:line
     "use strict";
 
+    request.object.set("aliveTo", request.object.get("loginedAt"));
     SendEvent(request.object);
 });
 

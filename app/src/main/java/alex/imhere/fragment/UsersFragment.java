@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.parse.ParseException;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import alex.imhere.R;
 import alex.imhere.activity.model.AbstractModel;
@@ -19,7 +20,8 @@ import alex.imhere.layer.server.Session;
 
 public class UsersFragment extends ListFragment implements AbstractView {
 	private UsersAdapter usersAdapter = null;
-	private ArrayList<Session> users = new ArrayList<>();
+	private List<Session> readOnlyUsers = new ArrayList<>();
+	private ImhereModel model = null;
 
 	public static UsersFragment newInstance() {
 		UsersFragment fragment = new UsersFragment();
@@ -32,7 +34,6 @@ public class UsersFragment extends ListFragment implements AbstractView {
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 
-		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, users);
 		setListAdapter(usersAdapter);
 	}
 
@@ -44,15 +45,16 @@ public class UsersFragment extends ListFragment implements AbstractView {
 
 
 	@Override
-	public void onDataUpdate(AbstractModel abstractModel) {
-		ImhereModel model = (ImhereModel) abstractModel;
-		try {
-			users.clear();
-			users.addAll( model.getOnlineUsers() );
-			usersAdapter.notifyDataSetChanged();
-		} catch (ParseException e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
+	public void onDataUpdate() {
+		usersAdapter.notifyDataSetChanged();
+	}
+
+	@Override
+	public void setModel(AbstractModel abstractModel) {
+		model = (ImhereModel) abstractModel;
+		model.addEventListener(this, this);
+
+		readOnlyUsers = model.getOnlineUsersReadonly();
+		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, readOnlyUsers);
 	}
 }

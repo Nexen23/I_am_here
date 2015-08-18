@@ -17,13 +17,12 @@ abstract public class AbstractModel {
 	}
 
 	public void notifyDataChanged() {
-		final AbstractModel data = this;
 		for (int i = 0; i < listeners.size(); i++) {
 			final AbstractView view = listeners.get(i);
 			listenersFragments.get(i).getActivity().runOnUiThread(new Runnable() {
 				@Override
 				public void run() {
-					view.onDataUpdate(data);
+					view.onDataUpdate();
 				}
 			});
 		}

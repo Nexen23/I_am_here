@@ -10,14 +10,15 @@ import com.pubnub.api.PubnubException;
 
 import alex.imhere.layer.server.Session;
 
-public class BroadcastChannel {
+public class ChannelService {
+	// TODO: 18.08.2015 split it to MainService and Service for ServerAPI only (also no hardcoded strings!)
 	final static String CHANNEL_NAME = "events";
 
 	private Pubnub pubnub = new Pubnub("", "sub-c-a3d06db8-410b-11e5-8bf2-0619f8945a4f");
 	private ChannelEventsListener eventsListener;
-	private Gson gson = new Gson();
+	private JsonParser jsonParser = new JsonParser();
 
-	public BroadcastChannel(ChannelEventsListener eventsListener) {
+	public ChannelService(ChannelEventsListener eventsListener) {
 		this.eventsListener = eventsListener;
 	}
 
@@ -50,8 +51,18 @@ public class BroadcastChannel {
 							Log.d("TAG", "SUBSCRIBE : " + channel + " : "
 									+ message.getClass() + " : " + message.toString() + " [" + timetoken + "]");
 
+							Session session = jsonParser.fromJson(message.toString(), Session.class);
+							int timeComparizion = session.getLoginedAt().compareTo(session.getAliveTo());
+							boolean sessionIsDead = false;
+							if (timeComparizion >= 0) {
+								sessionIsDead = true;
+							}
 
-							eventsListener.onUserOnline(gson.fromJson(message.toString(), Session.class) );
+							if (sessionIsDead) {
+								eventsListener.onUserOffline(session);
+							} else {
+								eventsListener.onUserOnline(session);
+							}
 						}
 
 						@Override

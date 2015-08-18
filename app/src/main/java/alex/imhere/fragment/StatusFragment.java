@@ -16,6 +16,7 @@ import alex.imhere.fragment.view.AbstractView;
 
 public class StatusFragment extends Fragment implements AbstractView {
 	private FragmentInteractionListener mListener;
+	private ImhereModel model;
 
 	public static StatusFragment newInstance() {
 		StatusFragment fragment = new StatusFragment();
@@ -79,9 +80,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 	}
 
 	@Override
-	public void onDataUpdate(AbstractModel abstractModel) {
-		ImhereModel model = (ImhereModel) abstractModel;
-
+	public void onDataUpdate() {
 		final TextView tv_status = (TextView) getView().findViewById(R.id.tv_status);
 		String status = "Offline";
 		// TODO: hardcoded strings. Move it to res
@@ -90,6 +89,12 @@ public class StatusFragment extends Fragment implements AbstractView {
 		}
 
 		tv_status.setText(status);
+	}
+
+	@Override
+	public void setModel(AbstractModel abstractModel) {
+		model = (ImhereModel) abstractModel;
+		model.addEventListener(this, this);
 	}
 
 	public interface FragmentInteractionListener {

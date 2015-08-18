@@ -15,6 +15,7 @@ public class Session {
 	public Session() {
 	}
 
+	//region Protected
 	protected Session(Session session) {
 		this(session.udid, session.loginedAt, session.aliveTo);
 	}
@@ -25,6 +26,16 @@ public class Session {
 		setAliveTo(aliveTo);
 	}
 
+	protected void setLoginedAt(LocalDateTime loginedAt) {
+		this.loginedAt = loginedAt;
+	}
+
+	protected void setAliveTo(LocalDateTime aliveTo) {
+		this.aliveTo = aliveTo;
+	}
+	//endregion
+
+	//region Public
 	public String getUdid() {
 		return udid;
 	}
@@ -40,12 +51,23 @@ public class Session {
 	public LocalDateTime getLoginedAt() {
 		return loginedAt;
 	}
+	//endregion
 
-	protected void setLoginedAt(LocalDateTime loginedAt) {
-		this.loginedAt = loginedAt;
+	//region Override
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Session session = (Session) o;
+
+		return getUdid().equals(session.getUdid());
+
 	}
 
-	protected void setAliveTo(LocalDateTime aliveTo) {
-		this.aliveTo = aliveTo;
+	@Override
+	public int hashCode() {
+		return getUdid().hashCode();
 	}
+	//endregion
 }

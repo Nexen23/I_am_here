@@ -3,16 +3,18 @@ package alex.imhere.util;
 import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
 import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.TreeSet;
 
 public class TemporarySet<T> extends Observable {
 	// TODO: 18.08.2015 make sure it's thread-safe implementation
-	protected SortedSet<TemporaryElement<T>> sortedElementsSet;
+	protected SortedSet<TemporaryElement<T>> sortedElementsSet = new TreeSet<>();
 	protected List<T> list = new ArrayList<>();
 
 	protected final Timer timer = new Timer();
@@ -29,9 +31,22 @@ public class TemporarySet<T> extends Observable {
 		return _remove(element);
 	}
 
+	public void clear() {
+		_clear();
+	}
+
 	public final List<T> asReadonlyList() {
 		return Collections.unmodifiableList(list);
 	}
+
+	private synchronized void _clear() {
+		cancelNextDeath();
+		list.clear();
+		sortedElementsSet.clear();
+
+		notifyObservers();
+	}
+
 
 	private synchronized boolean _add(TemporaryElement<T> isertingElement) {
 		// TODO: 18.08.2015 implement unique add to List
@@ -72,6 +87,7 @@ public class TemporarySet<T> extends Observable {
 			}
 
 			notifyObservers();
+			//notifyObservers(null);
 		}
 
 		return wasRemoved;
@@ -90,11 +106,13 @@ public class TemporarySet<T> extends Observable {
 				nowMillis = (new LocalDateTime()).toDateTime().getMillis();
 		long delay = Math.max(0, deathTimeMillis - nowMillis);
 
-		timer.schedule(timerTask, delay);
+		timer.schedule(timerTask, 5000 /*delay*/);
 	}
 
 	private synchronized void cancelNextDeath() {
-		timerTask.cancel();
+		if (timerTask != null) {
+			timerTask.cancel();
+		}
 		timer.purge();
 		nextElementToDie = null;
 		timerTask = null;
@@ -103,4 +121,6 @@ public class TemporarySet<T> extends Observable {
 	private synchronized void killNextElement() {
 		_remove(nextElementToDie);
 	}
+
+
 }

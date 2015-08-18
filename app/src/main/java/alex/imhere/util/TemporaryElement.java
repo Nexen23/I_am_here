@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 
-class TemporaryElement<T> {
+class TemporaryElement<T> implements Comparable {
 	protected T object = null;
 	protected LocalDateTime deathTime;
 
@@ -32,5 +32,11 @@ class TemporaryElement<T> {
 	@Override
 	public int hashCode() {
 		return object.hashCode();
+	}
+
+	@Override
+	public int compareTo(Object another) {
+		TemporaryElement object = (TemporaryElement) another;
+		return object.deathTime.compareTo(deathTime);
 	}
 }

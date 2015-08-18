@@ -4,13 +4,9 @@ import android.support.annotation.NonNull;
 
 import com.parse.ParseException;
 
-import org.joda.time.DateTime;
-
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Observable;
+import java.util.Observer;
 
 import alex.imhere.layer.server.ServerAPI;
 import alex.imhere.layer.server.Session;
@@ -24,33 +20,37 @@ public class ImhereModel extends AbstractModel {
 
 	String udid;
 	Session currentSession = null;
-	List<Session> onlineUsers = new ArrayList<>();
+	TemporarySet<Session> onlineUsersReadonly = new TemporarySet<>();
 
 	/*LocalDateTime now = new LocalDateTime();*/
 
 	public ImhereModel(@NonNull String udid) {
 		this.udid = udid;
-		channel = new ChannelService(new ChannelService.ChannelEventsListener() {
+
+		ChannelService.ChannelEventsListener channelListener = new ChannelService.ChannelEventsListener() {
 			@Override
 			public void onUserOnline(Session session) {
-				int sessionIndex = onlineUsers.lastIndexOf(session);
-				if (sessionIndex != -1) {
-					onlineUsers.remove(sessionIndex);
+				if ( onlineUsersReadonly.add(session, session.getAliveTo()) ) {
+					notifyDataChanged();
 				}
-
-				onlineUsers.add(0, session);
-
-				notifyDataChanged();
 			}
 
 			@Override
 			public void onUserOffline(Session session) {
-				boolean userWasRemoved = onlineUsers.remove(session);
-				if (userWasRemoved) {
+				if ( onlineUsersReadonly.remove(session) ) {
 					notifyDataChanged();
 				}
 			}
+		};
+
+		onlineUsersReadonly.addObserver(new Observer() {
+			@Override
+			public void update(Observable observable, Object data) {
+				notifyDataChanged();
+			}
 		});
+
+		channel = new ChannelService(channelListener);
 	}
 
 	public boolean isCurrentSessionAlive() {
@@ -59,7 +59,7 @@ public class ImhereModel extends AbstractModel {
 	}
 
 	public final List<Session> getOnlineUsersReadonly() {
-		return Collections.unmodifiableList(onlineUsers);
+		return onlineUsersReadonly.asReadonlyList();
 	}
 
 	/*public DateTime getNow() throws ParseException {
@@ -72,12 +72,16 @@ public class ImhereModel extends AbstractModel {
 	public Session openNewSession() throws ParseException {
 		//TODO: log exception
 		currentSession = null;
-		onlineUsers.clear();
+		onlineUsersReadonly.clear();
 
 		currentSession = api.login(udid);
-		// TODO: 18.08.2015 log exception
-		onlineUsers.addAll( api.getOnlineUsers(currentSession) );
 		channel.connect();
+		// TODO: 18.08.2015 log exception
+
+		List<Session> onlineUsers = api.getOnlineUsers(currentSession);
+		for (Session session : onlineUsers) {
+			onlineUsersReadonly.add(session, session.getAliveTo());
+		}
 
 		notifyDataChanged();
 
@@ -90,7 +94,7 @@ public class ImhereModel extends AbstractModel {
 			api.logout(currentSession);
 
 			currentSession = null;
-			onlineUsers.clear();
+			onlineUsersReadonly.clear();
 
 			notifyDataChanged();
 		}

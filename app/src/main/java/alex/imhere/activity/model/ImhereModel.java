@@ -43,14 +43,14 @@ public class ImhereModel extends AbstractModel {
 		ChannelService.ChannelEventsListener channelListener = new ChannelService.ChannelEventsListener() {
 			@Override
 			public void onUserOnline(Session session) {
-				if (isCurrentSessionAlive() && onlineUsersSet.add(session, session.getAliveTo())) {
+				if ( isCurrentSessionAlive() && onlineUsersSet.add(session, session.getAliveTo()) ) {
 					notifyDataChanged();
 				}
 			}
 
 			@Override
 			public void onUserOffline(Session session) {
-				if (isCurrentSessionAlive() && onlineUsersSet.remove(session)) {
+				if ( isCurrentSessionAlive() && onlineUsersSet.remove(session) ) {
 					notifyDataChanged();
 				}
 			}

@@ -1,8 +1,12 @@
 package alex.imhere.layer.server;
 
+import android.support.annotation.NonNull;
+
 import com.google.gson.annotations.SerializedName;
 
+import org.joda.time.Duration;
 import org.joda.time.LocalDateTime;
+import org.joda.time.Period;
 
 public class Session {
 	@SerializedName("udid")
@@ -50,6 +54,12 @@ public class Session {
 
 	public LocalDateTime getLoginedAt() {
 		return loginedAt;
+	}
+
+	@NonNull
+	public Duration getLifetime() {
+		Duration duration = new Duration(new LocalDateTime().toDateTime(), aliveTo.toDateTime());
+		return (duration.getMillis() < 0) ? new Duration(0) : duration;
 	}
 	//endregion
 

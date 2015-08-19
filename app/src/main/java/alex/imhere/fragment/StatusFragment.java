@@ -1,10 +1,10 @@
 package alex.imhere.fragment;
 
 import android.app.Activity;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.os.AsyncTaskCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,12 +15,21 @@ import alex.imhere.R;
 import alex.imhere.activity.model.AbstractModel;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.fragment.view.AbstractView;
+import alex.imhere.fragment.view.UiRunnable;
+import alex.imhere.fragment.view.UpdatingViewTimer;
+import alex.imhere.service.TimeFormatter;
 
 public class StatusFragment extends Fragment implements AbstractView {
 	private FragmentInteractionListener mListener;
 	private ImhereModel model;
+	private TimeFormatter timeFormatter = new TimeFormatter();
 
+	private TextView tvStatus;
+	private TextView tvTimer;
 	private Button imhererButton;
+
+	private Handler uiHandler;
+	private UpdatingViewTimer updatingViewTimer;
 
 	public static StatusFragment newInstance() {
 		StatusFragment fragment = new StatusFragment();
@@ -38,14 +47,34 @@ public class StatusFragment extends Fragment implements AbstractView {
 	                         Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_status, container, false);
 
+		uiHandler = new Handler();
+		updatingViewTimer = new UpdatingViewTimer(uiHandler, this);
+		updatingViewTimer.start();
 
+		tvStatus = (TextView) view.findViewById(R.id.tv_status);
+		tvTimer = (TextView) view.findViewById(R.id.tv_timer);
 		imhererButton = (Button) view.findViewById(R.id.b_imhere);
+
 		imhererButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (mListener != null) {
-					v.setEnabled(false);
-					mListener.onImhereClick();
+
+					UiRunnable onPreExecute = new UiRunnable(uiHandler, new Runnable() {
+						@Override
+						public void run() {
+							imhererButton.setEnabled(false);
+						}
+					});
+					UiRunnable onPostExecute = new UiRunnable(uiHandler, new Runnable() {
+						@Override
+						public void run() {
+							imhererButton.setEnabled(true);
+						}
+					});
+
+					onPreExecute.run();
+					mListener.onImhereClick(onPostExecute);
 				}
 			}
 		});
@@ -72,21 +101,17 @@ public class StatusFragment extends Fragment implements AbstractView {
 
 	@Override
 	public void onDataUpdate() {
-		imhererButton.setEnabled(true);
-
-		final TextView tv_status = (TextView) getView().findViewById(R.id.tv_status);
-		final TextView tv_timer = (TextView) getView().findViewById(R.id.tv_timer);
-
 		String status = "Offline";
-		tv_timer.setVisibility(View.INVISIBLE);
+		int timerVisibility = View.INVISIBLE;
 
-		// TODO: hardcoded strings. Move it to res
 		if (model.isCurrentSessionAlive()) {
 			status = "Online";
-			tv_timer.setVisibility(View.VISIBLE);
+			timerVisibility = View.VISIBLE;
+			tvTimer.setText( timeFormatter.durationToMSString(model.getCurrentSessionLifetime()) );
 		}
 
-		tv_status.setText(status);
+		tvStatus.setText(status);
+		tvTimer.setVisibility(timerVisibility);
 	}
 
 	@Override
@@ -96,7 +121,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 	}
 
 	public interface FragmentInteractionListener {
-		void onImhereClick();
+		void onImhereClick(@Nullable final UiRunnable onPostExecute);
 	}
 
 }

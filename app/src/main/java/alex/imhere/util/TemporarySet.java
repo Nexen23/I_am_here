@@ -1,6 +1,8 @@
 package alex.imhere.util;
 
+import org.joda.time.Duration;
 import org.joda.time.LocalDateTime;
+import org.joda.time.Period;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -101,9 +103,11 @@ public class TemporarySet<T> extends Observable {
 			}
 		};
 
-		long deathTimeMillis = nextElementToDie.deathTime./*minusSeconds(1).*/toDateTime().getMillis(),
-				nowMillis = (new LocalDateTime()).toDateTime().getMillis();
-		long delay = Math.max(0, deathTimeMillis - nowMillis);
+
+		LocalDateTime now = new LocalDateTime();
+		Duration duration = new Duration(now.toDateTime(), nextElementToDie.deathTime.toDateTime());
+		long lifetimeMillis = duration.getMillis();
+		long delay = Math.max(0, lifetimeMillis);
 
 		timer.schedule(timerTask, delay);
 	}

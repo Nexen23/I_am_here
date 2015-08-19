@@ -4,6 +4,9 @@ import android.support.annotation.NonNull;
 
 import com.parse.ParseException;
 
+import org.joda.time.Duration;
+import org.joda.time.Period;
+
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
@@ -55,8 +58,11 @@ public class ImhereModel extends AbstractModel {
 	}
 
 	public boolean isCurrentSessionAlive() {
-		// TODO: do tests about aliveTo field
-		return currentSession != null;
+		return currentSession != null && currentSession.getLifetime().getMillis() != 0;
+	}
+
+	public Duration getCurrentSessionLifetime() {
+		return currentSession.getLifetime();
 	}
 
 	public final List<Session> getOnlineUsersSet() {

@@ -7,19 +7,14 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import org.joda.time.Duration;
-import org.joda.time.Interval;
-import org.joda.time.LocalDateTime;
 import org.joda.time.Period;
-import org.joda.time.format.PeriodFormatter;
-import org.joda.time.format.PeriodFormatterBuilder;
 
-import java.text.SimpleDateFormat;
 import java.util.List;
 
 import alex.imhere.R;
 
 import alex.imhere.layer.server.Session;
+import alex.imhere.service.TimeFormatter;
 
 public class UsersAdapter extends ArrayAdapter<Session> {
 	private final int resourceId;
@@ -57,33 +52,7 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 
 		TextView tv_singed_in_date = (TextView) userView.findViewById(R.id.tv_singed_in_date);
 
-		/*long deathTimeMillis = session.getAliveTo().toDateTime().getMillis(),
-				nowMillis = (new LocalDateTime()).toDateTime().getMillis();
-		long delay = Math.max(0, deathTimeMillis - nowMillis);
-
-		Duration duration = new Duration(delay);*/
-
-		LocalDateTime ldt = new LocalDateTime();
-		Duration duration = new Duration(ldt.toDateTime(), session.getAliveTo().toDateTime());
-
-		Period period = duration.toPeriod();
-		PeriodFormatter minutesAndSeconds = new PeriodFormatterBuilder()
-				.printZeroAlways()
-				.appendMinutes()
-				.appendSeparator(":")
-				.appendSeconds()
-				.toFormatter();
-		/*PeriodFormatter formatter = new PeriodFormatterBuilder()
-				.appendDays()
-				.appendSuffix("d")
-				.appendHours()
-				.appendSuffix("h")
-				.appendMinutes()
-				.appendSuffix("m")
-				.appendSeconds()
-				.appendSuffix("s")
-				.toFormatter();*/
-		String result = minutesAndSeconds.print(period);
+		String result = new TimeFormatter().durationToMSString( session.getLifetime() );
 
 		tv_singed_in_date.setText( result );
 	}

@@ -2,6 +2,7 @@ package alex.imhere.activity;
 
 import android.content.Context;
 import android.provider.Settings;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,13 +12,14 @@ import android.widget.Toast;
 
 import com.parse.ParseException;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import org.joda.time.LocalDateTime;
+import org.joda.time.Period;
 
 import alex.imhere.R;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.fragment.StatusFragment;
 import alex.imhere.fragment.view.AbstractView;
+import alex.imhere.fragment.view.UiRunnable;
 
 public class ImhereActivity extends AppCompatActivity
 		implements StatusFragment.FragmentInteractionListener {
@@ -60,12 +62,15 @@ public class ImhereActivity extends AppCompatActivity
 	}
 
 	@Override
-	public void onImhereClick() {
+	public void onImhereClick(@Nullable final UiRunnable onPostExecute) {
 		if (model.isCurrentSessionAlive()) {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
 					model.cancelCurrentSession();
+					if (onPostExecute != null) {
+						onPostExecute.run();
+					}
 				}
 			}).start();
 		}
@@ -76,6 +81,9 @@ public class ImhereActivity extends AppCompatActivity
 				public void run() {
 					try {
 						model.openNewSession();
+						if (onPostExecute != null) {
+							onPostExecute.run();
+						}
 					} catch (ParseException e) {
 						e.printStackTrace();
 						String toaskString = "Error logining to server: " + e.getMessage();

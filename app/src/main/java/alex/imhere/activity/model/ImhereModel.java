@@ -5,11 +5,12 @@ import android.support.annotation.NonNull;
 import com.parse.ParseException;
 
 import org.joda.time.Duration;
-import org.joda.time.Period;
 
 import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import alex.imhere.layer.server.ServerAPI;
 import alex.imhere.layer.server.Session;
@@ -18,18 +19,21 @@ import alex.imhere.util.TemporarySet;
 
 public class ImhereModel extends AbstractModel {
 	//TODO: exerpt methods to Service! This is too complex for Model in MVC
-	ServerAPI api = new ServerAPI();
-	ChannelService channel;
+	private ServerAPI api = new ServerAPI();
+	private ChannelService channel;
 
-	String udid;
-	Session currentSession = null;
-	TemporarySet<Session> onlineUsersSet = new TemporarySet<>();
-	Observer onlineUsersObserver = new Observer() {
+	private String udid;
+	private Session currentSession = null;
+	private TemporarySet<Session> onlineUsersSet = new TemporarySet<>();
+	private Observer onlineUsersObserver = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
 			notifyDataChanged();
 		}
 	};
+
+	private Timer timer = new Timer();
+	private TimerTask timerTask;
 
 	/*LocalDateTime now = new LocalDateTime();*/
 
@@ -39,14 +43,14 @@ public class ImhereModel extends AbstractModel {
 		ChannelService.ChannelEventsListener channelListener = new ChannelService.ChannelEventsListener() {
 			@Override
 			public void onUserOnline(Session session) {
-				if ( onlineUsersSet.add(session, session.getAliveTo()) ) {
+				if ( isCurrentSessionAlive() && onlineUsersSet.add(session, session.getAliveTo()) ) {
 					notifyDataChanged();
 				}
 			}
 
 			@Override
 			public void onUserOffline(Session session) {
-				if ( onlineUsersSet.remove(session) ) {
+				if ( isCurrentSessionAlive() && onlineUsersSet.remove(session) ) {
 					notifyDataChanged();
 				}
 			}
@@ -82,6 +86,14 @@ public class ImhereModel extends AbstractModel {
 		channel.connect();
 		// TODO: 18.08.2015 log exception
 
+		timerTask = new TimerTask() {
+			@Override
+			public void run() {
+				cancelCurrentSession();
+			}
+		};
+		timer.schedule(timerTask, currentSession.getAliveTo().toDate());
+
 		List<Session> onlineUsers = api.getOnlineUsers(currentSession);
 		for (Session session : onlineUsers) {
 			onlineUsersSet.add(session, session.getAliveTo());
@@ -96,6 +108,10 @@ public class ImhereModel extends AbstractModel {
 		if (currentSession != null) {
 			channel.disconnect();
 			api.logout(currentSession);
+
+			timerTask.cancel();
+			timer.purge();
+			timerTask = null;
 
 			currentSession = null;
 			onlineUsersSet.clear();

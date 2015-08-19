@@ -9,7 +9,7 @@ public class UpdatingViewTimer {
 	private AbstractView view;
 	private Handler uiHandler;
 
-	private final long updatingPeriodMs = 1000;
+	private final long updatingPeriodMs = 500;
 	private final Timer timer = new Timer();
 	private final TimerTask updateTask = new TimerTask() {
 		@Override
@@ -29,7 +29,7 @@ public class UpdatingViewTimer {
 	}
 
 	public synchronized void start() {
-		timer.schedule(updateTask, 0, updatingPeriodMs);
+		timer.scheduleAtFixedRate(updateTask, 0, updatingPeriodMs);
 	}
 
 	public synchronized void stop() {

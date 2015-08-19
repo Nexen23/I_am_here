@@ -1,6 +1,7 @@
 package alex.imhere.fragment;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -21,6 +22,16 @@ public class UsersFragment extends ListFragment implements AbstractView {
 	private List<Session> readOnlyUsers = new ArrayList<>();
 	private ImhereModel model = null;
 
+	private Handler uiHandler;
+	private final long REFRESH_PERIOD_MS = 777;
+	private final Runnable refreshOnlineUsers = new Runnable() {
+		@Override
+		public void run() {
+			usersAdapter.notifyDataSetChanged();
+			uiHandler.postDelayed(this, REFRESH_PERIOD_MS);
+		}
+	};
+
 	public static UsersFragment newInstance() {
 		UsersFragment fragment = new UsersFragment();
 		Bundle args = new Bundle();
@@ -33,6 +44,9 @@ public class UsersFragment extends ListFragment implements AbstractView {
 		super.onActivityCreated(savedInstanceState);
 
 		setListAdapter(usersAdapter);
+
+		uiHandler = new Handler();
+		uiHandler.post(refreshOnlineUsers);
 	}
 
 	@Override

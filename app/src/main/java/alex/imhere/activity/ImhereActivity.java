@@ -1,19 +1,16 @@
 package alex.imhere.activity;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.parse.ParseException;
-
-import org.joda.time.LocalDateTime;
-import org.joda.time.Period;
 
 import alex.imhere.R;
 import alex.imhere.activity.model.ImhereModel;
@@ -73,8 +70,7 @@ public class ImhereActivity extends AppCompatActivity
 					}
 				}
 			}).start();
-		}
-		else {
+		} else {
 			final Context context = this;
 			new Thread(new Runnable() {
 				@Override

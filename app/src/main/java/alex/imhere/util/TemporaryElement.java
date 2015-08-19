@@ -2,7 +2,6 @@ package alex.imhere.util;
 
 import android.support.annotation.NonNull;
 
-import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 
 class TemporaryElement<T> implements Comparable {
@@ -36,9 +35,11 @@ class TemporaryElement<T> implements Comparable {
 
 	@Override
 	public int compareTo(Object another) {
-		TemporaryElement object = (TemporaryElement) another;
-		int datesComparisionResult = object.deathTime.compareTo(deathTime);
-		int objectsComparisionResult = object.hashCode() - this.hashCode();
+		TemporaryElement a = this,
+				b = (TemporaryElement) another;
+
+		int datesComparisionResult = a.deathTime.compareTo(b.deathTime);
+		int objectsComparisionResult = a.hashCode() - b.hashCode();
 		return (datesComparisionResult != 0) ? datesComparisionResult : objectsComparisionResult;
 	}
 }

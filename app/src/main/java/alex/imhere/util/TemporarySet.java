@@ -2,10 +2,8 @@ package alex.imhere.util;
 
 import org.joda.time.Duration;
 import org.joda.time.LocalDateTime;
-import org.joda.time.Period;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Observable;
@@ -81,11 +79,7 @@ public class TemporarySet<T> extends Observable {
 
 			if (nextElementToDie.equals(deletingElement)) {
 				cancelNextDeath();
-
-				if (sortedElementsSet.size() != 0) {
-					_add( sortedElementsSet.first() );
-				}
-
+				openNextDeath();
 			}
 
 			notifyCollectionChanged();
@@ -95,21 +89,23 @@ public class TemporarySet<T> extends Observable {
 	}
 
 	private synchronized void openNextDeath() {
-		nextElementToDie = sortedElementsSet.first();
-		timerTask = new TimerTask() {
-			@Override
-			public void run() {
-				killNextElement();
-			}
-		};
+		if (sortedElementsSet.size() != 0) {
+			nextElementToDie = sortedElementsSet.first();
+			timerTask = new TimerTask() {
+				@Override
+				public void run() {
+					_remove(nextElementToDie);
+				}
+			};
 
 
-		LocalDateTime now = new LocalDateTime();
-		Duration duration = new Duration(now.toDateTime(), nextElementToDie.deathTime.toDateTime());
-		long lifetimeMillis = duration.getMillis();
-		long delay = Math.max(0, lifetimeMillis);
+			LocalDateTime now = new LocalDateTime();
+			Duration duration = new Duration(now.toDateTime(), nextElementToDie.deathTime.toDateTime());
+			long lifetimeMillis = duration.getMillis();
+			long delay = Math.max(0, lifetimeMillis);
 
-		timer.schedule(timerTask, delay);
+			timer.schedule(timerTask, delay);
+		}
 	}
 
 	private synchronized void cancelNextDeath() {
@@ -119,10 +115,6 @@ public class TemporarySet<T> extends Observable {
 		timer.purge();
 		nextElementToDie = null;
 		timerTask = null;
-	}
-
-	private synchronized void killNextElement() {
-		_remove(nextElementToDie);
 	}
 
 	private void notifyCollectionChanged() {

@@ -31,15 +31,15 @@ public class StatusFragment extends Fragment implements AbstractView {
 	private Handler uiHandler;
 	private UpdatingViewTimer updatingViewTimer;
 
+	public StatusFragment() {
+		// Required empty public constructor
+	}
+
 	public static StatusFragment newInstance() {
 		StatusFragment fragment = new StatusFragment();
 		Bundle args = new Bundle();
 		fragment.setArguments(args);
 		return fragment;
-	}
-
-	public StatusFragment() {
-		// Required empty public constructor
 	}
 
 	@Override
@@ -107,7 +107,8 @@ public class StatusFragment extends Fragment implements AbstractView {
 		if (model.isCurrentSessionAlive()) {
 			status = "Online";
 			timerVisibility = View.VISIBLE;
-			tvTimer.setText( timeFormatter.durationToMSString(model.getCurrentSessionLifetime()) );
+			String durationMsString = timeFormatter.durationToMSString(model.getCurrentSessionLifetime());
+			tvTimer.setText(durationMsString);
 		}
 
 		tvStatus.setText(status);

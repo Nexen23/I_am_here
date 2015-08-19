@@ -101,7 +101,7 @@ public class TemporarySet<T> extends Observable {
 			}
 		};
 
-		long deathTimeMillis = nextElementToDie.deathTime.toDateTime().getMillis(),
+		long deathTimeMillis = nextElementToDie.deathTime./*minusSeconds(1).*/toDateTime().getMillis(),
 				nowMillis = (new LocalDateTime()).toDateTime().getMillis();
 		long delay = Math.max(0, deathTimeMillis - nowMillis);
 

@@ -72,9 +72,6 @@ public class ImhereModel extends AbstractModel {
 
 	public Session openNewSession() throws ParseException {
 		//TODO: log exception
-		currentSession = null;
-		onlineUsersSet.clear();
-
 		currentSession = api.login(udid);
 		channel.connect();
 		// TODO: 18.08.2015 log exception

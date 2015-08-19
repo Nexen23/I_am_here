@@ -1,8 +1,10 @@
 package alex.imhere.fragment;
 
 import android.app.Activity;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.os.AsyncTaskCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,8 @@ public class StatusFragment extends Fragment implements AbstractView {
 	private FragmentInteractionListener mListener;
 	private ImhereModel model;
 
+	private Button imhererButton;
+
 	public static StatusFragment newInstance() {
 		StatusFragment fragment = new StatusFragment();
 		Bundle args = new Bundle();
@@ -30,36 +34,23 @@ public class StatusFragment extends Fragment implements AbstractView {
 	}
 
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		//setRetainInstance(true);
-	}
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_status, container, false);
 
-		Button button = (Button) view.findViewById(R.id.b_imhere);
-		button.setOnClickListener(new View.OnClickListener() {
+
+		imhererButton = (Button) view.findViewById(R.id.b_imhere);
+		imhererButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				onImherePress(v);
+				if (mListener != null) {
+					v.setEnabled(false);
+					mListener.onImhereClick();
+				}
 			}
 		});
 
 		return view;
-	}
-
-	@Override
-	public void onResume() {
-		super.onResume();
-	}
-
-	public void onImherePress(View v) {
-		if (mListener != null) {
-			mListener.onImhereClick();
-		}
 	}
 
 	@Override
@@ -81,11 +72,18 @@ public class StatusFragment extends Fragment implements AbstractView {
 
 	@Override
 	public void onDataUpdate() {
+		imhererButton.setEnabled(true);
+
 		final TextView tv_status = (TextView) getView().findViewById(R.id.tv_status);
+		final TextView tv_timer = (TextView) getView().findViewById(R.id.tv_timer);
+
 		String status = "Offline";
+		tv_timer.setVisibility(View.INVISIBLE);
+
 		// TODO: hardcoded strings. Move it to res
 		if (model.isCurrentSessionAlive()) {
 			status = "Online";
+			tv_timer.setVisibility(View.VISIBLE);
 		}
 
 		tv_status.setText(status);

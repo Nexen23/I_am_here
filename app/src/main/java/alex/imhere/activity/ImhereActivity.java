@@ -1,5 +1,6 @@
 package alex.imhere.activity;
 
+import android.content.Context;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +10,9 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.parse.ParseException;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import alex.imhere.R;
 import alex.imhere.activity.model.ImhereModel;
@@ -58,15 +62,27 @@ public class ImhereActivity extends AppCompatActivity
 	@Override
 	public void onImhereClick() {
 		if (model.isCurrentSessionAlive()) {
-			model.cancelCurrentSession();
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					model.cancelCurrentSession();
+				}
+			}).start();
 		}
 		else {
-			try {
-				model.openNewSession();
-			} catch (ParseException e) {
-				e.printStackTrace();
-				Toast.makeText(this, "Error logining to server: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-			}
+			final Context context = this;
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						model.openNewSession();
+					} catch (ParseException e) {
+						e.printStackTrace();
+						String toaskString = "Error logining to server: " + e.getMessage();
+						Toast.makeText(context, toaskString, Toast.LENGTH_SHORT).show();
+					}
+				}
+			}).start();
 		}
 	}
 

@@ -62,11 +62,11 @@ public class ImhereModel extends AbstractModel {
 	}
 
 	public boolean isCurrentSessionAlive() {
-		return currentSession != null && currentSession.getLifetime().getMillis() != 0;
+		return currentSession != null && currentSession.getRestLifetime().getMillis() != 0;
 	}
 
 	public Duration getCurrentSessionLifetime() {
-		return currentSession.getLifetime();
+		return currentSession.getRestLifetime();
 	}
 
 	public final List<Session> getOnlineUsersSet() {

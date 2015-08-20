@@ -6,7 +6,6 @@ import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.Duration;
 import org.joda.time.LocalDateTime;
-import org.joda.time.Period;
 
 public class Session {
 	@SerializedName("udid")
@@ -57,8 +56,14 @@ public class Session {
 	}
 
 	@NonNull
-	public Duration getLifetime() {
+	public Duration getRestLifetime() {
 		Duration duration = new Duration(new LocalDateTime().toDateTime(), aliveTo.toDateTime());
+		return (duration.getMillis() < 0) ? new Duration(0) : duration;
+	}
+
+	@NonNull
+	public Duration getFullLifetime() {
+		Duration duration = new Duration(loginedAt.toDateTime(), aliveTo.toDateTime());
 		return (duration.getMillis() < 0) ? new Duration(0) : duration;
 	}
 	//endregion

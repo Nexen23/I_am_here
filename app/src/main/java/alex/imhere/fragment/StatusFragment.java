@@ -127,7 +127,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 	@Override
 	public void setModel(AbstractModel abstractModel) {
 		model = (ImhereModel) abstractModel;
-		model.addEventListener(this, this);
+		model.addEventListener(this);
 	}
 
 	private void updateStatus(boolean statusChanged, boolean currentSessionIsAlive) {

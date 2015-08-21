@@ -2,9 +2,12 @@ package alex.imhere.activity;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -28,9 +31,10 @@ public class ImhereActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 
 		final String udid = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-		model = new ImhereModel(udid);
+		model = new ImhereModel(new Handler(), udid);
 
 		setContentView(R.layout.activity_main);
+		showUsersFragment(false);
 	}
 
 	@Override
@@ -58,6 +62,20 @@ public class ImhereActivity extends AppCompatActivity
 		return super.onOptionsItemSelected(item);
 	}
 
+	public void showUsersFragment(boolean doShow) {
+		FragmentManager fragmentManager = getSupportFragmentManager();
+		Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_users);
+
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		transaction.setCustomAnimations(R.anim.push_up_in, R.anim.push_up_out);
+		if (doShow) {
+			transaction.show(fragment);
+		} else {
+			transaction.hide(fragment);
+		}
+		transaction.commit();
+	}
+
 	@Override
 	public void onImhereClick(@Nullable final UiRunnable onPostExecute) {
 		if (model.isCurrentSessionAlive()) {
@@ -68,6 +86,8 @@ public class ImhereActivity extends AppCompatActivity
 					if (onPostExecute != null) {
 						onPostExecute.run();
 					}
+
+					showUsersFragment(false);
 				}
 			}).start();
 		} else {
@@ -80,6 +100,16 @@ public class ImhereActivity extends AppCompatActivity
 						if (onPostExecute != null) {
 							onPostExecute.run();
 						}
+
+
+						Runnable usersFragmentAnimation = new Runnable() {
+							@Override
+							public void run() {
+								showUsersFragment(true);
+							}
+						};
+						model.getUiHandler().post(usersFragmentAnimation);
+
 					} catch (ParseException e) {
 						e.printStackTrace();
 						String toaskString = "Error logining to server: " + e.getMessage();
@@ -89,5 +119,4 @@ public class ImhereActivity extends AppCompatActivity
 			}).start();
 		}
 	}
-
 }

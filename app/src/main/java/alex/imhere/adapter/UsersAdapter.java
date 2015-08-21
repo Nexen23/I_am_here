@@ -69,15 +69,16 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 
 				/*ColorDrawable[] color = {
 						new ColorDrawable(startingColor),
-						new ColorDrawable(Color.RED)};
+						new ColorDrawable(Color.RED)}; //only 2 allowed
 				TransitionDrawable trans = new TransitionDrawable(color);
 				userView.setBackground(trans);
 				trans.startTransition((int) session.getRestLifetime().getMillis());*/
 
-				/*ObjectAnimator dyingColorAnimation = ObjectAnimator.ofInt(userView, "backgroundColor", startingColor, Color.RED);
+				/*ObjectAnimator dyingColorAnimation = ObjectAnimator.ofInt(userView, "backgroundColor", Color.GREEN, Color.YELLOW, Color.RED);
 				dyingColorAnimation.setDuration(restLifetimeMs);
 				dyingColorAnimation.setEvaluator(new ArgbEvaluator());
-				dyingColorAnimation.start();*/
+				dyingColorAnimation.setInterpolator(new LinearInterpolator());
+				dyingColorAnimation.start(); // how to use startingColor??*/
 			}
 		}
 

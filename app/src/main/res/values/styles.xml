@@ -10,7 +10,7 @@
         <item name="android:textSize">28sp</item>
         <item name="android:gravity">center</item>
 
-        <item name="android:background">@drawable/button_imhere</item>
+        <item name="android:background">@drawable/button_imhere_off</item>
 
         <item name="android:shadowColor">#A8A8A8</item>
         <item name="android:shadowDx">0</item>

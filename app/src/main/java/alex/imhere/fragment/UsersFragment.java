@@ -25,6 +25,7 @@ public class UsersFragment extends ListFragment implements AbstractView {
 
 	private Handler uiHandler;
 	private UpdatingViewTimer updatingViewTimer;
+	private boolean currentSessionWasAlive = false;
 
 	public static UsersFragment newInstance() {
 		UsersFragment fragment = new UsersFragment();
@@ -52,13 +53,18 @@ public class UsersFragment extends ListFragment implements AbstractView {
 
 	@Override
 	public void onDataUpdate() {
+		boolean currentSessionIsAlive = model.isCurrentSessionAlive(),
+				statusChanged = currentSessionIsAlive != currentSessionWasAlive;
+
 		usersAdapter.notifyDataSetChanged();
+
+		currentSessionWasAlive = currentSessionIsAlive;
 	}
 
 	@Override
 	public void setModel(AbstractModel abstractModel) {
 		model = (ImhereModel) abstractModel;
-		model.addEventListener(this, this);
+		model.addEventListener(this);
 
 		readOnlyUsers = model.getOnlineUsersSet();
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, readOnlyUsers);

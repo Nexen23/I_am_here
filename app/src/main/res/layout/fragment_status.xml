@@ -20,6 +20,7 @@
     <TextSwitcher
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Status"
         android:id="@+id/ts_status"
         android:layout_alignParentTop="true"

@@ -1,5 +1,6 @@
 package alex.imhere.activity.model;
 
+import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.parse.ParseException;
@@ -37,7 +38,8 @@ public class ImhereModel extends AbstractModel {
 
 	/*LocalDateTime now = new LocalDateTime();*/
 
-	public ImhereModel(@NonNull String udid) {
+	public ImhereModel(@NonNull Handler uiHandler, @NonNull String udid) {
+		super(uiHandler);
 		this.udid = udid;
 
 		ChannelService.ChannelEventsListener channelListener = new ChannelService.ChannelEventsListener() {

@@ -1,13 +1,12 @@
 package alex.imhere.activity;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -63,10 +62,11 @@ public class ImhereActivity extends AppCompatActivity
 	}
 
 	public void showUsersFragment(final boolean doShow) {
+		final Activity activity = this;
 		model.getUiHandler().post(new Runnable() {
 			@Override
 			public void run() {
-				FragmentManager fragmentManager = getSupportFragmentManager();
+				/*FragmentManager fragmentManager = getSupportFragmentManager();
 				Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_users);
 
 				FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -76,7 +76,25 @@ public class ImhereActivity extends AppCompatActivity
 				} else {
 					transaction.hide(fragment);
 				}
-				transaction.commit();
+				transaction.commit();*/
+
+				/*final FrameLayout usersView = (FrameLayout) activity.findViewById(R.id.fl_fragment_users);
+				final RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) usersView.getLayoutParams();
+				ValueAnimator animator = ValueAnimator.ofInt(-130, 0); //params.rightMargin
+				if (doShow == false) {
+					animator = ValueAnimator.ofInt(0, -130);
+				}
+				animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+					@Override
+					public void onAnimationUpdate(ValueAnimator valueAnimator)
+					{
+						params.rightMargin = (Integer) valueAnimator.getAnimatedValue();
+						//params.setMarginEnd((Integer) valueAnimator.getAnimatedValue());
+						usersView.requestLayout();
+					}
+				});
+				animator.setDuration(500);
+				animator.start();*/
 			}
 		});
 	}

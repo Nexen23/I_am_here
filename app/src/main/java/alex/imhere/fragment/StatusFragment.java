@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -23,6 +25,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 	private FragmentInteractionListener mListener;
 	private ImhereModel model;
 	private TimeFormatter timeFormatter = new TimeFormatter();
+	private boolean currentSessionWasAlive = false;
 
 	private TextView tvStatus;
 	private TextView tvTimer;
@@ -101,24 +104,47 @@ public class StatusFragment extends Fragment implements AbstractView {
 
 	@Override
 	public void onDataUpdate() {
-		String status = "Offline";
-		int timerVisibility = View.INVISIBLE;
-
-		if (model.isCurrentSessionAlive()) {
-			status = "Online";
-			timerVisibility = View.VISIBLE;
-			String durationMsString = timeFormatter.durationToMSString(model.getCurrentSessionLifetime());
-			tvTimer.setText(durationMsString);
-		}
-
-		tvStatus.setText(status);
-		tvTimer.setVisibility(timerVisibility);
+		boolean currentSessionIsAlive = model.isCurrentSessionAlive();
+		updateStatus(currentSessionIsAlive);
+		updateTimer(currentSessionIsAlive);
+		currentSessionWasAlive = currentSessionIsAlive;
 	}
 
 	@Override
 	public void setModel(AbstractModel abstractModel) {
 		model = (ImhereModel) abstractModel;
 		model.addEventListener(this, this);
+	}
+
+	private void updateStatus(boolean currentSessionIsAlive) {
+		String status = "Offline";
+		if (currentSessionIsAlive) {
+			status = "Online";
+		}
+
+		tvStatus.setText(status);
+	}
+
+	private void updateTimer(boolean currentSessionIsAlive) {
+		int timerVisibility = View.INVISIBLE;
+
+		if (currentSessionIsAlive) {
+			timerVisibility = View.VISIBLE;
+			String durationMsString = timeFormatter.durationToMSString(model.getCurrentSessionLifetime());
+			tvTimer.setText(durationMsString);
+		}
+
+		if (currentSessionWasAlive != currentSessionIsAlive) {
+			int animationType = R.anim.fade_in;
+			if (currentSessionIsAlive != true) {
+				animationType = R.anim.fade_out;
+			}
+			Animation timerAnimation = AnimationUtils.loadAnimation(getActivity(), animationType);
+
+			tvTimer.startAnimation(timerAnimation);
+		}
+
+		tvTimer.setVisibility(timerVisibility);
 	}
 
 	public interface FragmentInteractionListener {

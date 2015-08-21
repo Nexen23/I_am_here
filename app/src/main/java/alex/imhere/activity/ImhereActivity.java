@@ -83,7 +83,7 @@ public class ImhereActivity extends AppCompatActivity
 						usersView.requestLayout();
 					}
 				});
-				animator.setDuration(300);
+				animator.setDuration( getResources().getInteger(R.integer.duration_users_fragment_sliding) );
 				animator.start();
 			}
 		});

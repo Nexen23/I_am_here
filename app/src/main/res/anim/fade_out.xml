@@ -4,5 +4,5 @@
 	<alpha
 		android:fromAlpha="1.0"
 		android:toAlpha="0.1"
-		android:duration="300" />
+		android:duration="@integer/duration_base" />
 </set>

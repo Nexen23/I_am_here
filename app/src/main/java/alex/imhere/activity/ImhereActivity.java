@@ -1,5 +1,6 @@
 package alex.imhere.activity;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
@@ -10,6 +11,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.parse.ParseException;
@@ -33,7 +36,6 @@ public class ImhereActivity extends AppCompatActivity
 		model = new ImhereModel(new Handler(), udid);
 
 		setContentView(R.layout.activity_main);
-		showUsersFragment(false);
 	}
 
 	@Override
@@ -66,35 +68,23 @@ public class ImhereActivity extends AppCompatActivity
 		model.getUiHandler().post(new Runnable() {
 			@Override
 			public void run() {
-				/*FragmentManager fragmentManager = getSupportFragmentManager();
-				Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_users);
-
-				FragmentTransaction transaction = fragmentManager.beginTransaction();
-				transaction.setCustomAnimations(R.anim.push_up_in, R.anim.push_up_out);
-				if (doShow) {
-					transaction.show(fragment);
-				} else {
-					transaction.hide(fragment);
-				}
-				transaction.commit();*/
-
-				/*final FrameLayout usersView = (FrameLayout) activity.findViewById(R.id.fl_fragment_users);
-				final RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) usersView.getLayoutParams();
-				ValueAnimator animator = ValueAnimator.ofInt(-130, 0); //params.rightMargin
+				final FrameLayout usersView = (FrameLayout) activity.findViewById(R.id.fl_fragment_users);
+				final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) usersView.getLayoutParams();
+				final int marginInPx = (int) getResources().getDimension(R.dimen.fragment_users_margin);
+				ValueAnimator animator = ValueAnimator.ofInt(marginInPx, 0);
 				if (doShow == false) {
-					animator = ValueAnimator.ofInt(0, -130);
+					animator = ValueAnimator.ofInt(0, marginInPx);
 				}
 				animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 					@Override
 					public void onAnimationUpdate(ValueAnimator valueAnimator)
 					{
 						params.rightMargin = (Integer) valueAnimator.getAnimatedValue();
-						//params.setMarginEnd((Integer) valueAnimator.getAnimatedValue());
 						usersView.requestLayout();
 					}
 				});
-				animator.setDuration(500);
-				animator.start();*/
+				animator.setDuration(300);
+				animator.start();
 			}
 		});
 	}
@@ -116,7 +106,14 @@ public class ImhereActivity extends AppCompatActivity
 				@Override
 				public void run() {
 					try {
-						model.openNewSession();
+						Runnable onSessionClosed = new Runnable() {
+							@Override
+							public void run() {
+								showUsersFragment(false);
+							}
+						};
+
+						model.openNewSession(onSessionClosed);
 						onPostExecute.run();
 						showUsersFragment(true);
 					} catch (ParseException e) {

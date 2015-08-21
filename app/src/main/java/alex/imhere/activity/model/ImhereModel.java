@@ -82,7 +82,7 @@ public class ImhereModel extends AbstractModel {
 		return now;
 	}*/
 
-	public Session openNewSession() throws ParseException {
+	public Session openNewSession(final Runnable onSessionClosed) throws ParseException {
 		//TODO: log exception
 		currentSession = api.login(udid);
 		channel.connect();
@@ -92,6 +92,7 @@ public class ImhereModel extends AbstractModel {
 			@Override
 			public void run() {
 				cancelCurrentSession();
+				onSessionClosed.run();
 			}
 		};
 		timer.schedule(timerTask, currentSession.getAliveTo().toDate());

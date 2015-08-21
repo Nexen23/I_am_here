@@ -50,6 +50,11 @@ public class UsersFragment extends ListFragment implements AbstractView {
 		return inflater.inflate(R.layout.fragment_users, container);
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		onDataUpdate();
+	}
 
 	@Override
 	public void onDataUpdate() {

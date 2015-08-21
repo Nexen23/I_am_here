@@ -5,15 +5,17 @@
              tools:context=".ImhereFragment">
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
         android:text="I am here!"
         android:id="@+id/b_imhere"
         android:layout_gravity="center"
         android:clickable="true"
         android:layout_marginLeft="247dp"
+        style="@style/button_imhere"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"
+        android:textColor="@color/button_imhere_selector"/>
 
     <TextView
         android:layout_width="wrap_content"

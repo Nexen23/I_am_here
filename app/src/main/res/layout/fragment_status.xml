@@ -11,11 +11,10 @@
         android:id="@+id/b_imhere"
         android:layout_gravity="center"
         android:clickable="true"
-        android:layout_marginLeft="247dp"
         style="@style/button_imhere"
+        android:textColor="@color/button_imhere_selector"
         android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:textColor="@color/button_imhere_selector"/>
+        android:layout_centerHorizontal="true"/>
 
     <TextSwitcher
         android:layout_width="wrap_content"

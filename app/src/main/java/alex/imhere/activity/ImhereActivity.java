@@ -4,7 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -62,31 +62,33 @@ public class ImhereActivity extends AppCompatActivity
 		return super.onOptionsItemSelected(item);
 	}
 
-	public void showUsersFragment(boolean doShow) {
-		FragmentManager fragmentManager = getSupportFragmentManager();
-		Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_users);
+	public void showUsersFragment(final boolean doShow) {
+		model.getUiHandler().post(new Runnable() {
+			@Override
+			public void run() {
+				FragmentManager fragmentManager = getSupportFragmentManager();
+				Fragment fragment = fragmentManager.findFragmentById(R.id.fragment_users);
 
-		FragmentTransaction transaction = fragmentManager.beginTransaction();
-		transaction.setCustomAnimations(R.anim.push_up_in, R.anim.push_up_out);
-		if (doShow) {
-			transaction.show(fragment);
-		} else {
-			transaction.hide(fragment);
-		}
-		transaction.commit();
+				FragmentTransaction transaction = fragmentManager.beginTransaction();
+				transaction.setCustomAnimations(R.anim.push_up_in, R.anim.push_up_out);
+				if (doShow) {
+					transaction.show(fragment);
+				} else {
+					transaction.hide(fragment);
+				}
+				transaction.commit();
+			}
+		});
 	}
 
 	@Override
-	public void onImhereClick(@Nullable final UiRunnable onPostExecute) {
+	public void onImhereClick(@NonNull final UiRunnable onPostExecute) {
 		if (model.isCurrentSessionAlive()) {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
 					model.cancelCurrentSession();
-					if (onPostExecute != null) {
-						onPostExecute.run();
-					}
-
+					onPostExecute.run();
 					showUsersFragment(false);
 				}
 			}).start();
@@ -97,19 +99,8 @@ public class ImhereActivity extends AppCompatActivity
 				public void run() {
 					try {
 						model.openNewSession();
-						if (onPostExecute != null) {
-							onPostExecute.run();
-						}
-
-
-						Runnable usersFragmentAnimation = new Runnable() {
-							@Override
-							public void run() {
-								showUsersFragment(true);
-							}
-						};
-						model.getUiHandler().post(usersFragmentAnimation);
-
+						onPostExecute.run();
+						showUsersFragment(true);
 					} catch (ParseException e) {
 						e.printStackTrace();
 						String toaskString = "Error logining to server: " + e.getMessage();

@@ -3,7 +3,7 @@ package alex.imhere.fragment;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.Nullable;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -159,7 +159,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 	}
 
 	public interface FragmentInteractionListener {
-		void onImhereClick(@Nullable final UiRunnable onPostExecute);
+		void onImhereClick(final @NonNull UiRunnable onPostExecute);
 	}
 
 }

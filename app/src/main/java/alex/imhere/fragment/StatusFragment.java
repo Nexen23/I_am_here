@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
+import android.widget.TextSwitcher;
 import android.widget.TextView;
 
 import alex.imhere.R;
@@ -27,7 +28,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 	private TimeFormatter timeFormatter = new TimeFormatter();
 	private boolean currentSessionWasAlive = false;
 
-	private TextView tvStatus;
+	private TextSwitcher tsStatus;
 	private TextView tvTimer;
 	private Button imhererButton;
 
@@ -54,7 +55,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 		updatingViewTimer = new UpdatingViewTimer(uiHandler, this);
 		updatingViewTimer.start();
 
-		tvStatus = (TextView) view.findViewById(R.id.tv_status);
+		tsStatus = (TextSwitcher) view.findViewById(R.id.ts_status);
 		tvTimer = (TextView) view.findViewById(R.id.tv_timer);
 		imhererButton = (Button) view.findViewById(R.id.b_imhere);
 
@@ -82,6 +83,18 @@ public class StatusFragment extends Fragment implements AbstractView {
 			}
 		});
 
+
+		tsStatus.setAnimateFirstView(false);
+
+		TextView tvSessionDead = (TextView) inflater.inflate(R.layout.textview_status, null);
+		tvSessionDead.setText("Offline");
+		tsStatus.addView(tvSessionDead);
+		tsStatus.showNext();
+
+		TextView tvSessionAlive = (TextView) inflater.inflate(R.layout.textview_status, null);
+		tvSessionAlive.setText("Online");
+		tsStatus.addView(tvSessionAlive);
+
 		return view;
 	}
 
@@ -104,9 +117,10 @@ public class StatusFragment extends Fragment implements AbstractView {
 
 	@Override
 	public void onDataUpdate() {
-		boolean currentSessionIsAlive = model.isCurrentSessionAlive();
-		updateStatus(currentSessionIsAlive);
-		updateTimer(currentSessionIsAlive);
+		boolean currentSessionIsAlive = model.isCurrentSessionAlive(),
+				statusChanged = currentSessionIsAlive != currentSessionWasAlive;
+		updateStatus(statusChanged, currentSessionIsAlive);
+		updateTimer(statusChanged, currentSessionIsAlive);
 		currentSessionWasAlive = currentSessionIsAlive;
 	}
 
@@ -116,16 +130,13 @@ public class StatusFragment extends Fragment implements AbstractView {
 		model.addEventListener(this, this);
 	}
 
-	private void updateStatus(boolean currentSessionIsAlive) {
-		String status = "Offline";
-		if (currentSessionIsAlive) {
-			status = "Online";
+	private void updateStatus(boolean statusChanged, boolean currentSessionIsAlive) {
+		if (statusChanged) {
+			tsStatus.showNext();
 		}
-
-		tvStatus.setText(status);
 	}
 
-	private void updateTimer(boolean currentSessionIsAlive) {
+	private void updateTimer(boolean statusChanged, boolean currentSessionIsAlive) {
 		int timerVisibility = View.INVISIBLE;
 
 		if (currentSessionIsAlive) {

@@ -17,15 +17,16 @@
         android:layout_centerHorizontal="true"
         android:textColor="@color/button_imhere_selector"/>
 
-    <TextView
+    <TextSwitcher
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Status"
-        android:id="@+id/tv_status"
+        android:id="@+id/ts_status"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"/>
+        android:layout_marginTop="30dp"
+        android:inAnimation="@anim/push_up_in"
+        android:outAnimation="@anim/push_up_out" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -33,6 +34,6 @@
         android:textAppearance="?android:attr/textAppearanceMedium"
         android:text="Timer"
         android:id="@+id/tv_timer"
-        android:layout_below="@+id/tv_status"
+        android:layout_below="@+id/ts_status"
         android:layout_centerHorizontal="true"/>
 </RelativeLayout>

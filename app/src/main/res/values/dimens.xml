@@ -3,11 +3,15 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="fragment_users_width">130dp</dimen>
-    <dimen name="fragment_users_margin">-130dp</dimen>
 
-    <dimen name="default_padding">5dp</dimen>
 
-    <dimen name="button_imhere_size_default">150dp</dimen>
-    <dimen name="button_imhere_size_pressed">140dp</dimen>
+
+    <dimen name="fragment_users_width">160dp</dimen>
+    <dimen name="fragment_users_margin">-160dp</dimen>
+
+    <dimen name="padding_default">3dp</dimen>
+    <!--<dimen name="divider_item_user">2dp</dimen>-->
+
+    <dimen name="button_imhere_size_default">130dp</dimen>
+    <dimen name="button_imhere_size_pressed">120dp</dimen>
 </resources>

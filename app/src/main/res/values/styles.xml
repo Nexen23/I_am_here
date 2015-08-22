@@ -6,14 +6,15 @@
     </style>
 
     <style name="button_imhere">
-        <item name="android:textSize">28sp</item>
+        <item name="android:textSize">26sp</item>
+        <!--<item name="android:textStyle">bold</item>-->
         <item name="android:gravity">center</item>
 
         <item name="android:layout_width">@dimen/button_imhere_size_default</item>
         <item name="android:layout_height">@dimen/button_imhere_size_default</item>
 
         <item name="android:textColor">@color/button_imhere_selector</item>
-        <item name="android:background">@drawable/button_imhere_off</item>
+        <item name="android:background">@drawable/button_imhere_on</item>
     </style>
 
 </resources>

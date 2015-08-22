@@ -5,10 +5,6 @@
 	<solid
 		android:color="#A92222"/>
 
-	<size
-		android:width="@dimen/button_imhere_size_pressed"
-		android:height="@dimen/button_imhere_size_pressed" />
-
 	<stroke
 		android:width="3dp"
 		android:color="#000000"/>

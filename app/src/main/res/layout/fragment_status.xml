@@ -11,12 +11,12 @@
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"/>
 
-    <Button
+    <!--<Button
         android:text="I&apos;m TESTING!"
         android:id="@+id/b_test"
         style="@style/button_imhere"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"/>
+        android:layout_centerHorizontal="true"/>-->
 
     <TextSwitcher
         android:layout_width="wrap_content"

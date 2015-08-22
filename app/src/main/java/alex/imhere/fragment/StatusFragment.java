@@ -21,21 +21,28 @@ import alex.imhere.fragment.view.AbstractView;
 import alex.imhere.fragment.view.UiRunnable;
 import alex.imhere.fragment.view.UpdatingViewTimer;
 import alex.imhere.service.TimeFormatter;
+import butterknife.Bind;
+import butterknife.ButterKnife;
 import hugo.weaving.DebugLog;
+
+/*import com.github.stephanenicolas.loglifecycle.LogLifeCycle;
+
+@LogLifeCycle*/
 
 @DebugLog
 public class StatusFragment extends Fragment implements AbstractView {
-	private FragmentInteractionListener mListener;
-	private ImhereModel model;
-	private TimeFormatter timeFormatter = new TimeFormatter();
-	private boolean currentSessionWasAlive = false;
+	FragmentInteractionListener mListener;
+	ImhereModel model;
+	boolean currentSessionWasAlive = false;
 
-	private TextSwitcher tsStatus;
-	private TextView tvTimer;
-	private Button imhererButton;
+	TimeFormatter timeFormatter = new TimeFormatter();
 
-	private Handler uiHandler;
-	private UpdatingViewTimer updatingViewTimer;
+	@Bind(R.id.ts_status) TextSwitcher tsStatus;
+	@Bind(R.id.tv_timer) TextView tvTimer;
+	@Bind(R.id.b_imhere) Button imhererButton;
+
+	Handler uiHandler;
+	UpdatingViewTimer updatingViewTimer;
 
 	public StatusFragment() {
 		// Required empty public constructor
@@ -52,14 +59,11 @@ public class StatusFragment extends Fragment implements AbstractView {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_status, container, false);
+		ButterKnife.bind(this, view);
 
 		uiHandler = new Handler();
 		updatingViewTimer = new UpdatingViewTimer(uiHandler, this);
 		updatingViewTimer.start();
-
-		tsStatus = (TextSwitcher) view.findViewById(R.id.ts_status);
-		tvTimer = (TextView) view.findViewById(R.id.tv_timer);
-		imhererButton = (Button) view.findViewById(R.id.b_imhere);
 
 		tsStatus.setAnimateFirstView(false);
 		TextView tvSessionDead = (TextView) inflater.inflate(R.layout.textview_status, null);
@@ -132,8 +136,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 		model.addEventListener(this);
 	}
 
-	@DebugLog
-	private void updateStatus(boolean statusChanged, boolean currentSessionIsAlive) {
+	void updateStatus(boolean statusChanged, boolean currentSessionIsAlive) {
 		if (statusChanged) {
 			if (currentSessionIsAlive) {
 				tsStatus.setText("Online");
@@ -143,8 +146,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 		}
 	}
 
-	@DebugLog
-	private void updateTimer(boolean statusChanged, boolean currentSessionIsAlive) {
+	void updateTimer(boolean statusChanged, boolean currentSessionIsAlive) {
 		int timerVisibility = View.INVISIBLE;
 
 		if (currentSessionIsAlive) {

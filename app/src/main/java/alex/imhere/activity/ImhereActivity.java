@@ -23,6 +23,7 @@ import alex.imhere.fragment.StatusFragment;
 import alex.imhere.fragment.view.AbstractView;
 import alex.imhere.fragment.view.UiRunnable;
 
+
 public class ImhereActivity extends AppCompatActivity
 		implements StatusFragment.FragmentInteractionListener {
 

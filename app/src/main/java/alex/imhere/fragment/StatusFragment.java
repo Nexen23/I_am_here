@@ -21,7 +21,9 @@ import alex.imhere.fragment.view.AbstractView;
 import alex.imhere.fragment.view.UiRunnable;
 import alex.imhere.fragment.view.UpdatingViewTimer;
 import alex.imhere.service.TimeFormatter;
+import hugo.weaving.DebugLog;
 
+@DebugLog
 public class StatusFragment extends Fragment implements AbstractView {
 	private FragmentInteractionListener mListener;
 	private ImhereModel model;
@@ -130,6 +132,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 		model.addEventListener(this);
 	}
 
+	@DebugLog
 	private void updateStatus(boolean statusChanged, boolean currentSessionIsAlive) {
 		if (statusChanged) {
 			if (currentSessionIsAlive) {
@@ -140,6 +143,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 		}
 	}
 
+	@DebugLog
 	private void updateTimer(boolean statusChanged, boolean currentSessionIsAlive) {
 		int timerVisibility = View.INVISIBLE;
 

@@ -6,7 +6,9 @@ import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.Duration;
 import org.joda.time.LocalDateTime;
+import org.parceler.Parcel;
 
+@Parcel
 public class Session {
 	@SerializedName("udid")
 	private String udid = "";

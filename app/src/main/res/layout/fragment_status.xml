@@ -5,15 +5,17 @@
              tools:context=".ImhereFragment">
 
     <Button
-        android:layout_width="150dp"
-        android:layout_height="150dp"
         android:text="I&apos;m here!"
         android:id="@+id/b_imhere"
-        android:layout_gravity="center"
-        android:clickable="true"
         style="@style/button_imhere"
-        android:textColor="@color/button_imhere_selector"
         android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:text="I&apos;m TESTING!"
+        android:id="@+id/b_test"
+        style="@style/button_imhere"
+        android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>
 
     <TextSwitcher
@@ -26,7 +28,8 @@
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:inAnimation="@anim/push_up_in"
-        android:outAnimation="@anim/push_up_out" />
+        android:outAnimation="@anim/push_up_out">
+    </TextSwitcher>
 
     <TextView
         android:layout_width="wrap_content"
@@ -36,4 +39,5 @@
         android:id="@+id/tv_timer"
         android:layout_below="@+id/ts_status"
         android:layout_centerHorizontal="true"/>
+
 </RelativeLayout>

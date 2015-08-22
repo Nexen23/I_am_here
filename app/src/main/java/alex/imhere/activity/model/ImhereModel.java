@@ -89,6 +89,11 @@ public class ImhereModel extends AbstractModel {
 		channel.connect();
 		// TODO: 18.08.2015 log exception
 
+		List<Session> onlineUsers = api.getOnlineUsers(currentSession);
+		for (Session session : onlineUsers) {
+			onlineUsersSet.add(session, session.getAliveTo());
+		}
+
 		timerTask = new TimerTask() {
 			@Override
 			public void run() {
@@ -97,11 +102,6 @@ public class ImhereModel extends AbstractModel {
 			}
 		};
 		timer.schedule(timerTask, currentSession.getAliveTo().toDate());
-
-		List<Session> onlineUsers = api.getOnlineUsers(currentSession);
-		for (Session session : onlineUsers) {
-			onlineUsersSet.add(session, session.getAliveTo());
-		}
 
 		notifyDataChanged();
 

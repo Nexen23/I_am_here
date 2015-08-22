@@ -4,4 +4,5 @@
 		  android:layout_height="match_parent"
 		  android:textAppearance="?android:attr/textAppearanceLarge"
 
-	/>
+		  android:gravity="center"
+		  android:id="@+id/l_tv_status"/>

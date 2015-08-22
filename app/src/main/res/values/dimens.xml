@@ -7,4 +7,7 @@
     <dimen name="fragment_users_margin">-130dp</dimen>
 
     <dimen name="default_padding">5dp</dimen>
+
+    <dimen name="button_imhere_size_default">150dp</dimen>
+    <dimen name="button_imhere_size_pressed">140dp</dimen>
 </resources>

@@ -2,15 +2,12 @@
 <shape xmlns:android="http://schemas.android.com/apk/res/android"
 	   android:shape="oval">
 
-	<!--<corners
-		android:radius="100dp"/>-->
-
 	<solid
 		android:color="#C94242"/>
 
-	<!--<size
-		android:width="150dp"
-		android:height="150dp"/>-->
+	<size
+		android:width="@dimen/button_imhere_size_default"
+		android:height="@dimen/button_imhere_size_default"/>
 
 	<stroke
 		android:width="3dp"

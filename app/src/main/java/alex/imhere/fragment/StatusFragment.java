@@ -59,6 +59,16 @@ public class StatusFragment extends Fragment implements AbstractView {
 		tvTimer = (TextView) view.findViewById(R.id.tv_timer);
 		imhererButton = (Button) view.findViewById(R.id.b_imhere);
 
+		tsStatus.setAnimateFirstView(false);
+		TextView tvSessionDead = (TextView) inflater.inflate(R.layout.textview_status, null);
+		tvSessionDead.setText("Offline");
+		tsStatus.addView(tvSessionDead);
+		tsStatus.showNext();
+
+		TextView tvSessionAlive = (TextView) inflater.inflate(R.layout.textview_status, null);
+		tvSessionAlive.setText("Online");
+		tsStatus.addView(tvSessionAlive);
+
 		imhererButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -68,12 +78,14 @@ public class StatusFragment extends Fragment implements AbstractView {
 						@Override
 						public void run() {
 							imhererButton.setEnabled(false);
+							tsStatus.setText("   Connecting...");
 						}
 					});
 					UiRunnable onPostExecute = new UiRunnable(uiHandler, new Runnable() {
 						@Override
 						public void run() {
 							imhererButton.setEnabled(true);
+							//imhererButton.animate().setDuration(700).rotationX(180f).start();
 						}
 					});
 
@@ -82,18 +94,6 @@ public class StatusFragment extends Fragment implements AbstractView {
 				}
 			}
 		});
-
-
-		tsStatus.setAnimateFirstView(false);
-
-		TextView tvSessionDead = (TextView) inflater.inflate(R.layout.textview_status, null);
-		tvSessionDead.setText("Offline");
-		tsStatus.addView(tvSessionDead);
-		tsStatus.showNext();
-
-		TextView tvSessionAlive = (TextView) inflater.inflate(R.layout.textview_status, null);
-		tvSessionAlive.setText("Online");
-		tsStatus.addView(tvSessionAlive);
 
 		return view;
 	}
@@ -132,7 +132,11 @@ public class StatusFragment extends Fragment implements AbstractView {
 
 	private void updateStatus(boolean statusChanged, boolean currentSessionIsAlive) {
 		if (statusChanged) {
-			tsStatus.showNext();
+			if (currentSessionIsAlive) {
+				tsStatus.setText("Online");
+			} else {
+				tsStatus.setText("Offline");
+			}
 		}
 	}
 

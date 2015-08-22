@@ -29,7 +29,7 @@
         android:layout_height="match_parent"
         android:id="@+id/fl_fragment_users"
         android:layout_alignWithParentIfMissing="false"
-        android:clickable="true"
+        android:clickable="false"
         android:padding="@dimen/default_padding"
         android:layout_alignParentTop="true"
         android:layout_alignParentStart="false"

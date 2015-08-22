@@ -3,14 +3,14 @@
 	   android:shape="oval">
 
 	<solid
-		android:color="#BDBDBD"/>
+		android:color="#A8A8A8"/>
 
 	<size
 		android:width="@dimen/button_imhere_size_default"
 		android:height="@dimen/button_imhere_size_default" />
 
 	<stroke
-		android:width="2dp"
-		android:color="#232323"/>
+		android:width="3dp"
+		android:color="#333333"/>
 
 </shape>

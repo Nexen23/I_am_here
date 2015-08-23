@@ -1,12 +1,17 @@
 package alex.imhere.adapter;
 
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.LinearInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -19,14 +24,21 @@ import alex.imhere.service.TimeFormatter;
 public class UsersAdapter extends ArrayAdapter<Session> {
 	private final int resourceId;
 	private Context context;
+	/*@BindColor(R.color.user_born) */int userBornColor;
+	/*@BindColor(R.color.user_alive) */int userAliveColor;
+	/*@BindColor(R.color.user_dead) */int userDeadColor;
 
-	public UsersAdapter(Context context, int item_user, List<Session> items) {
-		super(context, item_user, items);
+	public UsersAdapter(Activity activity, int item_user, List<Session> items) {
+		super(activity, item_user, items);
 
-		this.context = context;
+		this.context = activity;
 		this.resourceId = item_user;
-	}
 
+		/*ButterKnife.bind(activity);*/
+		userBornColor = activity.getResources().getColor(R.color.user_born);
+		userAliveColor = activity.getResources().getColor(R.color.user_alive);
+		userDeadColor = activity.getResources().getColor(R.color.user_dead);
+	}
 
 
 	@Override
@@ -74,11 +86,17 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 				userView.setBackground(trans);
 				trans.startTransition((int) session.getRestLifetime().getMillis());*/
 
-				/*ObjectAnimator dyingColorAnimation = ObjectAnimator.ofInt(userView, "backgroundColor", Color.GREEN, Color.YELLOW, Color.RED);
+
+				Drawable background = userView.getBackground();
+				int[] colors = {userBornColor, userAliveColor, userDeadColor};
+				/*GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
+				gradientDrawable.setColors();*/
+
+				ObjectAnimator dyingColorAnimation = ObjectAnimator.ofInt(userView, "backgroundColor", userBornColor, userAliveColor, userDeadColor);
 				dyingColorAnimation.setDuration(restLifetimeMs);
 				dyingColorAnimation.setEvaluator(new ArgbEvaluator());
 				dyingColorAnimation.setInterpolator(new LinearInterpolator());
-				dyingColorAnimation.start(); // how to use startingColor??*/
+				dyingColorAnimation.start(); // how to use startingColor??
 			}
 		}
 

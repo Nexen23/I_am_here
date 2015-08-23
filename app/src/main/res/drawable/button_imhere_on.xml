@@ -9,13 +9,6 @@
 		android:state_enabled="false"
 		android:drawable="@drawable/button_imhere_on_disabled" />
 
-	<!--<item
-		android:state_focused="true"
-		android:drawable="@drawable/button_imhere_on_pressed" />
-	<item
-		android:state_hovered="true"
-		android:drawable="@drawable/button_imhere_on_pressed" />-->
-
 	<item
 		android:drawable="@drawable/button_imhere_on_default" />
 

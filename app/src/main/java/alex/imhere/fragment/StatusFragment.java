@@ -1,6 +1,7 @@
 package alex.imhere.fragment;
 
 import android.app.Activity;
+import android.graphics.drawable.TransitionDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -131,6 +132,9 @@ public class StatusFragment extends Fragment implements AbstractView {
 				statusChanged = currentSessionIsAlive != currentSessionWasAlive;
 		updateStatus(statusChanged, currentSessionIsAlive);
 		updateTimer(statusChanged, currentSessionIsAlive);
+		if (statusChanged) {
+			updateButton(currentSessionIsAlive);
+		}
 		currentSessionWasAlive = currentSessionIsAlive;
 	}
 
@@ -170,6 +174,17 @@ public class StatusFragment extends Fragment implements AbstractView {
 		}
 
 		tvTimer.setVisibility(timerVisibility);
+	}
+
+	void updateButton(boolean currentSessionIsAlive) {
+		TransitionDrawable drawable = (TransitionDrawable) imhereButton.getBackground();
+		if (currentSessionIsAlive) {
+			imhereButton.setText("I\'m out!");
+			drawable.startTransition(0);
+		} else {
+			imhereButton.setText("I\'m here!");
+			drawable.reverseTransition(0);
+		}
 	}
 
 	public interface FragmentInteractionListener {

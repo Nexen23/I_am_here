@@ -11,11 +11,11 @@ import org.parceler.Parcel;
 @Parcel
 public class Session {
 	@SerializedName("udid")
-	private String udid = "";
+	String udid = "";
 	@SerializedName("loginedAt")
-	private LocalDateTime loginedAt = new LocalDateTime(0);
+	LocalDateTime loginedAt = new LocalDateTime(0);
 	@SerializedName("aliveTo")
-	private LocalDateTime aliveTo = new LocalDateTime(0);
+	LocalDateTime aliveTo = new LocalDateTime(0);
 
 	public Session() {
 	}

@@ -14,7 +14,7 @@
         <item name="android:layout_height">@dimen/button_imhere_size_default</item>
 
         <item name="android:textColor">@color/button_imhere_selector</item>
-        <item name="android:background">@drawable/button_imhere_on</item>
+        <item name="android:background">@drawable/button_imhere</item>
     </style>
 
 </resources>

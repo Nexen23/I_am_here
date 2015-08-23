@@ -14,6 +14,8 @@ import android.widget.Button;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 
+import com.skyfishjy.library.RippleBackground;
+
 import alex.imhere.R;
 import alex.imhere.activity.model.AbstractModel;
 import alex.imhere.activity.model.ImhereModel;
@@ -39,7 +41,8 @@ public class StatusFragment extends Fragment implements AbstractView {
 
 	@Bind(R.id.ts_status) TextSwitcher tsStatus;
 	@Bind(R.id.tv_timer) TextView tvTimer;
-	@Bind(R.id.b_imhere) Button imhererButton;
+	@Bind(R.id.b_imhere) Button imhereButton;
+	@Bind(R.id.e_b_imhere) RippleBackground imhereButtonClickEffect;
 
 	Handler uiHandler;
 	UpdatingViewTimer updatingViewTimer;
@@ -75,7 +78,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 		tvSessionAlive.setText("Online");
 		tsStatus.addView(tvSessionAlive);
 
-		imhererButton.setOnClickListener(new View.OnClickListener() {
+		imhereButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				if (mListener != null) {
@@ -83,15 +86,16 @@ public class StatusFragment extends Fragment implements AbstractView {
 					UiRunnable onPreExecute = new UiRunnable(uiHandler, new Runnable() {
 						@Override
 						public void run() {
-							imhererButton.setEnabled(false);
+							imhereButtonClickEffect.startRippleAnimation();
+							imhereButton.setEnabled(false);
 							tsStatus.setText("   Connecting...");
 						}
 					});
 					UiRunnable onPostExecute = new UiRunnable(uiHandler, new Runnable() {
 						@Override
 						public void run() {
-							imhererButton.setEnabled(true);
-							//imhererButton.animate().setDuration(700).rotationX(180f).start();
+							imhereButton.setEnabled(true);
+							imhereButtonClickEffect.stopRippleAnimation();
 						}
 					});
 

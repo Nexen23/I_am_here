@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<array name="user_states">
+		<item>@color/user_born</item>
+		<item>@color/user_alive</item>
+		<item>@color/user_dead</item>
+	</array>
+</resources>

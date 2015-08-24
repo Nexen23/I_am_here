@@ -3,6 +3,7 @@ package alex.imhere.fragment.view;
 import android.animation.TimeAnimator;
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
@@ -19,6 +20,9 @@ import alex.imhere.R;
 import alex.imhere.util.ArrayUtils;
 
 public class UserView extends View {
+	static public final int LIFETIME_DEAFULT = 2300;
+	static public final int[] COLORS_DEFAULT = {Color.WHITE, Color.BLACK};
+
 	private Paint borderPaint, fillPaint;
 
 	private int colors[] = {};
@@ -26,8 +30,7 @@ public class UserView extends View {
 	private float padding;
 
 	private TimeAnimator gradientAnimation = new TimeAnimator();
-	private boolean gradientAnimationRunning = false;
-	private long lifetime = 2300, updateTickMs = 25;
+	private long lifetime = LIFETIME_DEAFULT, updateTickMs = 25;
 	private long accumulatorMs = 0;
 	private float gradientOffset = 0f;
 
@@ -39,21 +42,50 @@ public class UserView extends View {
 
 	public UserView(Context context, AttributeSet attrs) {
 		super(context, attrs);
+
+		parseAttrs(attrs, 0);
 		onInitialize();
 	}
 
 	public UserView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
+
+		parseAttrs(attrs, defStyleAttr);
 		onInitialize();
 	}
 
+	public void parseAttrs(AttributeSet attrs, int defStyleAttr) {
+		// TODO: 24.08.2015 what is defStyleAttr?
+		TypedArray attributes = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.UserView, defStyleAttr, 0);
+		try
+		{
+			setLifetime( attributes.getInt(R.styleable.UserView_lifetime, LIFETIME_DEAFULT) );
+			int statesColorsResourceId = attributes.getResourceId(R.styleable.UserView_states_colors, 0);
+			TypedArray colorsResources = getResources().obtainTypedArray(statesColorsResourceId);
+			int[] colorsInts = new int[colorsResources.length()];
+			for (int i = 0; i < colorsResources.length(); ++i) {
+				colorsInts[i] = colorsResources.getColor(i, Color.BLACK);
+			}
+			setGradientStatesColors(colorsInts);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+			setLifetime(LIFETIME_DEAFULT);
+			setGradientStatesColors(COLORS_DEFAULT.clone());
+		}
+		finally
+		{
+			attributes.recycle();
+		}
+	}
+
 	private void onInitialize() {
-		int userBornColor = getContext().getResources().getColor(R.color.user_born);
+		/*int userBornColor = getContext().getResources().getColor(R.color.user_born);
 		int userAliveColor = getContext().getResources().getColor(R.color.user_alive);
 		int userDeadColor = getContext().getResources().getColor(R.color.user_dead);
-		int[] colors = new int[]{userBornColor, userAliveColor, userDeadColor};
-		setGradientStatesColors(colors);
-		setLifetime(lifetime);
+		int[] colors = new int[]{userBornColor, userAliveColor, userDeadColor};*/
+		//setGradientStatesColors(colors);
+		//setLifetime(lifetime);
 
 		borderPaint = new Paint();
 		borderPaint.setColor(Color.BLACK);
@@ -61,7 +93,7 @@ public class UserView extends View {
 		borderPaint.setStyle(Paint.Style.STROKE);
 
 		fillPaint = new Paint();
-		fillPaint.setColor(userBornColor);
+		fillPaint.setColor(colors[0]);
 		fillPaint.setStyle(Paint.Style.FILL);
 
 		Resources r = getResources();
@@ -133,15 +165,13 @@ public class UserView extends View {
 		width = getWidth();
 		height = getHeight();
 
-		stopGradientAnimation();
-
 		LinearGradient gradient = new LinearGradient(
 				0, height / 2, width * colors.length - 1, height / 2,
 				colors, null, Shader.TileMode.REPEAT);
 		fillPaint.setShader(gradient);
-		if (isGradientAnimationRunning()) {
+		//if (isGradientAnimationRunning()) {
 			startGradientAnimation();
-		}
+		//}
 	}
 
 	@Override

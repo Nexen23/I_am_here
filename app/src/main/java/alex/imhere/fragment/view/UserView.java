@@ -1,58 +1,58 @@
 package alex.imhere.fragment.view;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
-import android.animation.ValueAnimator;
+import android.animation.TimeAnimator;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 
+import java.util.ArrayList;
+
 import alex.imhere.R;
+import alex.imhere.util.ArrayUtils;
 
 public class UserView extends View {
 	private Paint borderPaint, fillPaint;
-	private LinearGradient gradient;
 
-	private long lifetime = 2000;
-
-	int userBornColor;
-	int userAliveColor;
-	int userDeadColor;
-	private int height, width;
-	private float circlePx;
+	private int colors[] = {};
+	private int height = 0, width = 0;
 	private float padding;
 
-	int colors[];
+	private TimeAnimator gradientAnimation = new TimeAnimator();
+	private long lifetime = 2300, updateTickMs = 25;
+	private long accumulatorMs = 0;
+	private float gradientOffset = 0f;
 
-	public UserView(Context context/*, long lifetime*/) {
+	public UserView(Context context) {
 		super(context);
-		initialize(lifetime);
-		// TODO: 24.08.2015 pass colors as args for View in XML
+		onInitialize();
+		// TODO: 24.08.2015 pass statesColors as args for View in XML
 	}
 
 	public UserView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		initialize(lifetime);
+		onInitialize();
 	}
 
 	public UserView(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
-		initialize(lifetime);
+		onInitialize();
 	}
 
-	private void initialize(long lifetime) {
-		this.lifetime = lifetime;
-		userBornColor = getContext().getResources().getColor(R.color.user_born);
-		userAliveColor = getContext().getResources().getColor(R.color.user_alive);
-		userDeadColor = getContext().getResources().getColor(R.color.user_dead);
-		colors = new int[]{userBornColor, userAliveColor, userAliveColor, userDeadColor};
+	private void onInitialize() {
+		int userBornColor = getContext().getResources().getColor(R.color.user_born);
+		int userAliveColor = getContext().getResources().getColor(R.color.user_alive);
+		int userDeadColor = getContext().getResources().getColor(R.color.user_dead);
+		int[] colors = new int[]{userBornColor, userAliveColor, userDeadColor};
+		setGradientStatesColors(colors);
+		setLifetime(lifetime);
 
 		borderPaint = new Paint();
 		borderPaint.setColor(Color.BLACK);
@@ -64,50 +64,96 @@ public class UserView extends View {
 		fillPaint.setStyle(Paint.Style.FILL);
 
 		Resources r = getResources();
-		circlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, r.getDisplayMetrics());
 		padding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, r.getDisplayMetrics());
 
-
-
-		ArgbEvaluator evaluator = new ArgbEvaluator();
-		ObjectAnimator animator = ObjectAnimator.ofObject(this, "color", evaluator, userBornColor, userAliveColor, userAliveColor, userDeadColor);
-		animator.setDuration(lifetime).setRepeatCount(ValueAnimator.INFINITE);
-		animator.start();
 	}
 
-	public void setColor(int color) {
-		//fillPaint.setColor(color);
-		if (gradient != null) {
-			colors[0] = color;
+	public void setGradientStatesColors(int[] statesColors) {
+		ArrayList<Integer> colors = new ArrayList<>();
+		for (int i = 0; i < statesColors.length; i++) {
+			colors.add(statesColors[i]);
+			colors.add(statesColors[i]); // purposly
 		}
-		invalidate();
+
+		this.colors = ArrayUtils.ToInts(colors);
+	}
+
+	public void setLifetime(long lifetime) {
+		this.lifetime = lifetime;
+	}
+
+	public void startGradientAnimation() {
+		final float gradientOffsetCoef = (float) (updateTickMs) / lifetime;
+		final int colorsCount = this.colors.length - 1;
+		gradientAnimation.setTimeListener(new TimeAnimator.TimeListener() {
+			@Override
+			public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
+				//totalTime = totalTime % lifetime; // TODO: 24.08.2015 delete this after debugging
+				if (totalTime > lifetime) {
+					animation.cancel();
+					animation.end();
+				} else {
+					accumulatorMs += deltaTime;
+
+					final long gradientWidth = width * colorsCount;
+
+					final long gradientOffsetsCount = accumulatorMs / updateTickMs;
+					gradientOffset += (gradientOffsetsCount * gradientWidth) * gradientOffsetCoef;
+					accumulatorMs %= updateTickMs;
+
+					boolean gradientOffsetChanged = (gradientOffsetsCount > 0) ? true : false;
+					if (gradientOffsetChanged) {
+						invalidate();
+					}
+				}
+			}
+		});
+
+		gradientAnimation.start();
+	}
+
+	public void stopGradientAnimation() {
+		gradientAnimation.cancel();
+		gradientAnimation.end();
+		accumulatorMs = 0;
+		gradientOffset = 0;
 	}
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
+
+		width = getWidth();
+		height = getHeight();
+
+		stopGradientAnimation();
+
+		LinearGradient gradient = new LinearGradient(
+				0, height / 2, width * colors.length - 1, height / 2,
+				colors, null, Shader.TileMode.REPEAT);
+		fillPaint.setShader(gradient);
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
 
-		width = getWidth();
-		height = getHeight();
+		if (gradientAnimation.isStarted() == false) {
+			startGradientAnimation();
+		}
 
-		//if (gradient == null) {
-			gradient = new LinearGradient(
-					0, height / 2, width - 1, height / 2,
-					colors, null, Shader.TileMode.REPEAT);
-			fillPaint.setShader(gradient);
-		//}
+		RectF rect = new RectF();
+		rect.left = padding + gradientOffset;
+		rect.right = width - 1 - padding + gradientOffset;
 
-		//canvas.drawBitmap(bitmap, 0, 0, borderPaint);
-		//float r = Math.min(Math.min(circlePx, height / 2 - 3), width / 2 - 3);
-		//canvas.drawCircle(width / 2 - 3, height / 2 - 3, r, fillPaint);
+		rect.top = padding;
+		rect.bottom = height - 1 - padding;
 
-		canvas.drawRect(padding, padding, width - 1 - padding, height - 1 - padding, fillPaint);
+		canvas.save();
+		canvas.translate(-gradientOffset, 0);
+		canvas.drawRect(rect, fillPaint);
 
+		canvas.restore();
 		canvas.drawRect(0, 0, width - 1, height - 1, borderPaint);
 	}
 }

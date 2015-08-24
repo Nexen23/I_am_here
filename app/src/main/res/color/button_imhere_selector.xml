@@ -8,5 +8,5 @@
 		android:state_enabled="true"
 		android:color="@android:color/white" />-->
 	<item
-		android:color="@android:color/white" />
+		android:color="#FFFFFF" />
 </selector>

@@ -1,17 +1,11 @@
 package alex.imhere.adapter;
 
-import android.animation.ArgbEvaluator;
-import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.Animation;
-import android.view.animation.LinearInterpolator;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
@@ -46,7 +40,7 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 		View userView = convertView;
 		Session session = getItem(position);
 
-		String sessionLoggingString = "null";
+		/*String sessionLoggingString = "null";
 		String userViewLoggingString = "null";
 		String animationLoggingString = "null";
 
@@ -65,12 +59,14 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 
 		String loggingString = String.format("[UsersAdapter] [%d - %s] {userView == %s} {animation == %s}",
 				position, sessionLoggingString, userViewLoggingString, animationLoggingString);
-		Log.d("TAG", loggingString);
+		Log.d("TAG", loggingString);*/
 
 		if (userView == null)
 		{
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			userView = inflater.inflate(resourceId, parent, false);
+
+			//userView = new UserView(context, session.getRestLifetime().getMillis()); // TODO: 24.08.2015 no comparision with null
 
 			if (session != null) {
 				Long restLifetimeMs = session.getRestLifetime().getMillis();
@@ -87,21 +83,52 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 				trans.startTransition((int) session.getRestLifetime().getMillis());*/
 
 
-				Drawable background = userView.getBackground();
-				int[] colors = {userBornColor, userAliveColor, userDeadColor};
-				/*GradientDrawable gradientDrawable = new GradientDrawable(GradientDrawable.Orientation.LEFT_RIGHT, colors);
-				gradientDrawable.setColors();*/
+				/*final GradientDrawable background = (GradientDrawable) userView.getBackground();
+				//background.mutate();
 
-				ObjectAnimator dyingColorAnimation = ObjectAnimator.ofInt(userView, "backgroundColor", userBornColor, userAliveColor, userDeadColor);
+				final int[] colors = new int[]{userBornColor, userAliveColor, userAliveColor, userDeadColor};
+				background.setGradientType(GradientDrawable.LINEAR_GRADIENT);
+				background.setColors(colors);
+				//colors[0] = userDeadColor; colors[1] = userDeadColor; colors[2] = userDeadColor;
+				TimeAnimator timeAnimator = new TimeAnimator();
+				final long duration = restLifetimeMs;
+				final View finalUserView = userView;
+				final int[] x = {0};
+				timeAnimator.setTimeListener(new TimeAnimator.TimeListener() {
+					@Override
+					public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
+						if (totalTime > duration) {
+							animation.cancel();
+						}
+
+						if (totalTime / 250 > x[0]) {
+							x[0] = x[0] + 1;
+
+							float coef = (float) (totalTime) / duration;
+							//colors[0] = (int) (coef * 0xFF0000) + 0xFF000000;
+							//Log.d("TAG", String.format("%f[coef] - %d[colors[0]] :: %d[pointer]", coef, colors[0], colors.hashCode()));
+							colors[0] = colors[0] + 10000;
+							colors[1] = colors[1] + 20000;
+							colors[2] = colors[2] + 70000;
+							colors[3] = colors[3] + 150000;
+							//background.invalidateSelf();
+							//finalUserView.postInvalidate();
+							finalUserView.setBackground(background);
+						}
+					}
+				});
+				timeAnimator.start();*/
+				//ObjectAnimator dyingColorAnimation = ObjectAnimator.ofInt(userView, "backgroundColor", userBornColor, userAliveColor, userDeadColor);
+
+				/*ObjectAnimator dyingColorAnimation = ObjectAnimator.ofInt(userView, "backgroundColor", userBornColor, userAliveColor, userDeadColor);
 				dyingColorAnimation.setDuration(restLifetimeMs);
 				dyingColorAnimation.setEvaluator(new ArgbEvaluator());
 				dyingColorAnimation.setInterpolator(new LinearInterpolator());
-				dyingColorAnimation.start(); // how to use startingColor??
+				dyingColorAnimation.start(); // how to use startingColor??*/
 			}
 		}
 
-		if (session != null)
-		{
+		if (session != null) {
 			fillView(userView, session);
 		}
 

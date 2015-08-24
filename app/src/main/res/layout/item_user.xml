@@ -6,31 +6,32 @@
                 android:gravity="center"
                 android:textAlignment="center"
               android:weightSum="1"
-              android:background="@drawable/item_user_bg"
               android:padding="@dimen/padding_default">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="------UDID------"
-        android:id="@+id/tv_name"
-        android:layout_centerVertical="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:textColor="@android:color/white"
-        android:textAlignment="center"/>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:textAppearance="?android:attr/textAppearanceSmall"
-        android:text="lifetime"
-        android:id="@+id/tv_singed_in_date"
-        android:layout_above="@+id/tv_name"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:textColor="@android:color/white"
-        android:textAlignment="center"
-        />
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="------UDID------"
+            android:id="@+id/tv_name"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@android:color/white"
+            android:textAlignment="center"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:text="lifetime"
+            android:id="@+id/tv_singed_in_date"
+            android:layout_above="@+id/tv_name"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:textColor="@android:color/white"
+            android:textAlignment="center"
+            />
+
 </LinearLayout>

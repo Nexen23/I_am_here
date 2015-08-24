@@ -31,39 +31,13 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"/>-->
 
-    <alex.imhere.fragment.view.UserView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_width="75dp"
-        android:layout_height="55dp"
-        android:layout_alignParentBottom="true"/>
-    <alex.imhere.fragment.view.UserView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_marginLeft="80dp"
-        android:layout_width="75dp"
-        android:layout_height="55dp"
-        android:layout_alignParentBottom="true"
-        app:lifetime="1000"
-        app:states_colors="@array/user_states" />
-    <alex.imhere.fragment.view.UserView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_marginLeft="160dp"
-        android:layout_width="75dp"
-        android:layout_height="55dp"
-        android:layout_alignParentBottom="true"
-        app:lifetime="2000"
-        app:states_colors="@array/user_states" />
-    <alex.imhere.fragment.view.UserView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_marginLeft="240dp"
-        android:layout_width="75dp"
-        android:layout_height="55dp"
-        android:layout_alignParentBottom="true"
-        app:lifetime="3000"
-        app:states_colors="@array/user_states" />
+	<include
+		android:id="@+id/b_test_GRADIENT"
+		android:layout_marginLeft="0dp"
+		android:layout_width="180dp"
+		android:layout_height="95dp"
+		android:layout_alignParentBottom="true"
+		layout="@layout/item_user"/>
 
     <TextSwitcher
         android:layout_width="wrap_content"

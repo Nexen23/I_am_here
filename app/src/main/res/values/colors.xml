@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<color name="user_born">#00BB00</color>
+	<color name="user_alive">#888800</color>
+	<color name="user_dead">#BB0000</color>
+</resources>

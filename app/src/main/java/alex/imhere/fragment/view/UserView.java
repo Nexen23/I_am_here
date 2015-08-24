@@ -5,10 +5,11 @@ import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
@@ -17,7 +18,7 @@ import alex.imhere.R;
 
 public class UserView extends View {
 	private Paint borderPaint, fillPaint;
-	private Bitmap bitmap;
+	private LinearGradient gradient;
 
 	private long lifetime = 2000;
 
@@ -27,6 +28,8 @@ public class UserView extends View {
 	private int height, width;
 	private float circlePx;
 	private float padding;
+
+	int colors[];
 
 	public UserView(Context context/*, long lifetime*/) {
 		super(context);
@@ -49,6 +52,7 @@ public class UserView extends View {
 		userBornColor = getContext().getResources().getColor(R.color.user_born);
 		userAliveColor = getContext().getResources().getColor(R.color.user_alive);
 		userDeadColor = getContext().getResources().getColor(R.color.user_dead);
+		colors = new int[]{userBornColor, userAliveColor, userAliveColor, userDeadColor};
 
 		borderPaint = new Paint();
 		borderPaint.setColor(Color.BLACK);
@@ -63,6 +67,8 @@ public class UserView extends View {
 		circlePx = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 32, r.getDisplayMetrics());
 		padding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, r.getDisplayMetrics());
 
+
+
 		ArgbEvaluator evaluator = new ArgbEvaluator();
 		ObjectAnimator animator = ObjectAnimator.ofObject(this, "color", evaluator, userBornColor, userAliveColor, userAliveColor, userDeadColor);
 		animator.setDuration(lifetime).setRepeatCount(ValueAnimator.INFINITE);
@@ -70,15 +76,16 @@ public class UserView extends View {
 	}
 
 	public void setColor(int color) {
-		fillPaint.setColor(color);
+		//fillPaint.setColor(color);
+		if (gradient != null) {
+			colors[0] = color;
+		}
 		invalidate();
 	}
 
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-
-		//bitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
 	}
 
 	@Override
@@ -87,6 +94,13 @@ public class UserView extends View {
 
 		width = getWidth();
 		height = getHeight();
+
+		//if (gradient == null) {
+			gradient = new LinearGradient(
+					0, height / 2, width - 1, height / 2,
+					colors, null, Shader.TileMode.REPEAT);
+			fillPaint.setShader(gradient);
+		//}
 
 		//canvas.drawBitmap(bitmap, 0, 0, borderPaint);
 		//float r = Math.min(Math.min(circlePx, height / 2 - 3), width / 2 - 3);

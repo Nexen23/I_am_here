@@ -26,6 +26,7 @@ public class UserView extends View {
 	private float padding;
 
 	private TimeAnimator gradientAnimation = new TimeAnimator();
+	private boolean gradientAnimationRunning = false;
 	private long lifetime = 2300, updateTickMs = 25;
 	private long accumulatorMs = 0;
 	private float gradientOffset = 0f;
@@ -83,19 +84,22 @@ public class UserView extends View {
 	}
 
 	public void startGradientAnimation() {
+		stopGradientAnimation();
+
 		final float gradientOffsetCoef = (float) (updateTickMs) / lifetime;
 		final int colorsCount = this.colors.length - 1;
 		gradientAnimation.setTimeListener(new TimeAnimator.TimeListener() {
 			@Override
 			public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
 				//totalTime = totalTime % lifetime; // TODO: 24.08.2015 delete this after debugging
+
+				final long gradientWidth = width * colorsCount;
 				if (totalTime > lifetime) {
 					animation.cancel();
-					animation.end();
+					gradientOffset = gradientWidth;
+					invalidate();
 				} else {
 					accumulatorMs += deltaTime;
-
-					final long gradientWidth = width * colorsCount;
 
 					final long gradientOffsetsCount = accumulatorMs / updateTickMs;
 					gradientOffset += (gradientOffsetsCount * gradientWidth) * gradientOffsetCoef;
@@ -114,9 +118,12 @@ public class UserView extends View {
 
 	public void stopGradientAnimation() {
 		gradientAnimation.cancel();
-		gradientAnimation.end();
 		accumulatorMs = 0;
 		gradientOffset = 0;
+	}
+
+	public boolean isGradientAnimationRunning() {
+		return gradientAnimation.isRunning();
 	}
 
 	@Override
@@ -132,15 +139,14 @@ public class UserView extends View {
 				0, height / 2, width * colors.length - 1, height / 2,
 				colors, null, Shader.TileMode.REPEAT);
 		fillPaint.setShader(gradient);
+		if (isGradientAnimationRunning()) {
+			startGradientAnimation();
+		}
 	}
 
 	@Override
 	protected void onDraw(Canvas canvas) {
 		super.onDraw(canvas);
-
-		if (gradientAnimation.isStarted() == false) {
-			startGradientAnimation();
-		}
 
 		RectF rect = new RectF();
 		rect.left = padding + gradientOffset;

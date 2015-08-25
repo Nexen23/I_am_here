@@ -5,6 +5,8 @@ import android.os.Handler;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import alex.imhere.activity.model.AbstractModel;
+
 public class UpdatingViewTimer {
 	private AbstractView view;
 	private Handler uiHandler;
@@ -17,7 +19,7 @@ public class UpdatingViewTimer {
 			uiHandler.post( new Runnable() {
 				@Override
 				public void run() {
-					view.onDataUpdate();
+					view.onDataUpdate(AbstractModel.UNIVERSAL_NOTIFICATION, null);
 				}
 			});
 		}

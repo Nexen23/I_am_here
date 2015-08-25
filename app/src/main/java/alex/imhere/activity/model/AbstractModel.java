@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import alex.imhere.fragment.view.AbstractView;
 
 abstract public class AbstractModel {
+	static public final int UNIVERSAL_NOTIFICATION = 0;
+	static protected final int LAST_NOTIFICATION_FLAG = 0;
+	// TODO: 25.08.2015 refactor Observer/Observable
 	private Handler uiHandler;
 	ArrayList<AbstractView> listeners = new ArrayList<>();
 
@@ -19,13 +22,17 @@ abstract public class AbstractModel {
 		listeners.add(view);
 	}
 
-	public void notifyDataChanged() {
+	public void notifyDataChanged(int notification) {
+		notifyDataChanged(notification, null);
+	}
+
+	public void notifyDataChanged(final int notification, final Object data) {
 		for (int i = 0; i < listeners.size(); i++) {
 			final AbstractView view = listeners.get(i);
 			uiHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					view.onDataUpdate();
+					view.onDataUpdate(notification, data);
 				}
 			});
 		}

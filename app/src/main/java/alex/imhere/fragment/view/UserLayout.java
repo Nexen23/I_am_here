@@ -132,7 +132,7 @@ public class UserLayout extends FrameLayout {
 		canvas.drawPath(shapeBorderPath, borderPaint);
 
 		// drawing border of real Layout for child Views
-		canvas.drawRect(sidesGap, 0f, (width - 1) - sidesGap, height - 1, borderPaint);
+		//canvas.drawRect(sidesGap, 0f, (width - 1) - sidesGap, height - 1, borderPaint);
 
 		super.onDraw(canvas);
 	}

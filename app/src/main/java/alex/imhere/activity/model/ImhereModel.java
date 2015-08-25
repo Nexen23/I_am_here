@@ -16,9 +16,17 @@ import java.util.TimerTask;
 import alex.imhere.layer.server.ServerAPI;
 import alex.imhere.layer.server.Session;
 import alex.imhere.service.ChannelService;
+import alex.imhere.util.ListObservable;
 import alex.imhere.util.TemporarySet;
 
 public class ImhereModel extends AbstractModel {
+	// TODO: 25.08.2015 make smart flags without chances of collision
+	static public final int ADD_USER_NOTIFICATION = 1 + LAST_NOTIFICATION_FLAG;
+	static public final int REMOVE_USER_NOTIFICATION = 2 + LAST_NOTIFICATION_FLAG;
+	static public final int CLEAR_USER_NOTIFICATION = 3 + LAST_NOTIFICATION_FLAG;
+	static public final int LOGIN_NOTIFICATION = 4 + LAST_NOTIFICATION_FLAG;
+	//static protected final int LAST_NOTIFICATION_FLAG = 5;
+
 	//TODO: exerpt methods to Service! This is too complex for Model in MVC
 	private ServerAPI api = new ServerAPI();
 	private ChannelService channel;
@@ -29,7 +37,23 @@ public class ImhereModel extends AbstractModel {
 	private Observer onlineUsersObserver = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
-			notifyDataChanged();
+			try {
+				ListObservable.NotificationData notificationData = (ListObservable.NotificationData) data;
+
+				if (notificationData.notification == ListObservable.Notification.ADD) {
+					notifyDataChanged(ADD_USER_NOTIFICATION, notificationData.data);
+				}
+				if (notificationData.notification == ListObservable.Notification.REMOVE) {
+					notifyDataChanged(REMOVE_USER_NOTIFICATION, notificationData.data);
+				}
+				if (notificationData.notification == ListObservable.Notification.CLEAR) {
+					notifyDataChanged(UNIVERSAL_NOTIFICATION, null);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+				// TODO: 25.08.2015 log
+				throw e;
+			}
 		}
 	};
 
@@ -46,14 +70,14 @@ public class ImhereModel extends AbstractModel {
 			@Override
 			public void onUserOnline(Session session) {
 				if ( isCurrentSessionAlive() && onlineUsersSet.add(session, session.getAliveTo()) ) {
-					notifyDataChanged();
+					//notifyDataChanged(ADD_USER_NOTIFICATION, session);
 				}
 			}
 
 			@Override
 			public void onUserOffline(Session session) {
 				if ( isCurrentSessionAlive() && onlineUsersSet.remove(session) ) {
-					notifyDataChanged();
+					//notifyDataChanged(REMOVE_USER_NOTIFICATION, session);
 				}
 			}
 		};
@@ -104,7 +128,7 @@ public class ImhereModel extends AbstractModel {
 		timer.schedule(timerTask, currentSession.getAliveTo().toDate());
 
 		this.currentSession = currentSession;
-		notifyDataChanged();
+		notifyDataChanged(LOGIN_NOTIFICATION);
 
 		return currentSession;
 	}
@@ -121,7 +145,7 @@ public class ImhereModel extends AbstractModel {
 			currentSession = null;
 			//onlineUsersSet.clear();
 
-			notifyDataChanged();
+			notifyDataChanged(CLEAR_USER_NOTIFICATION);
 		}
 	}
 }

@@ -127,7 +127,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 	}
 
 	@Override
-	public void onDataUpdate() {
+	public void onDataUpdate(final int notification, final Object data) {
 		boolean currentSessionIsAlive = model.isCurrentSessionAlive(),
 				statusChanged = currentSessionIsAlive != currentSessionWasAlive;
 		updateStatus(statusChanged, currentSessionIsAlive);

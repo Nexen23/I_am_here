@@ -18,22 +18,34 @@ import alex.imhere.service.TimeFormatter;
 public class UsersAdapter extends ArrayAdapter<Session> {
 	private final int resourceId;
 	private Context context;
-	/*@BindColor(R.color.user_born) */int userBornColor;
-	/*@BindColor(R.color.user_alive) */int userAliveColor;
-	/*@BindColor(R.color.user_dead) */int userDeadColor;
+	List<Session> items;
 
 	public UsersAdapter(Activity activity, int item_user, List<Session> items) {
 		super(activity, item_user, items);
+		this.items = items;
 
 		this.context = activity;
 		this.resourceId = item_user;
-
-		/*ButterKnife.bind(activity);*/
-		userBornColor = activity.getResources().getColor(R.color.user_born);
-		userAliveColor = activity.getResources().getColor(R.color.user_alive);
-		userDeadColor = activity.getResources().getColor(R.color.user_dead);
 	}
 
+	@Override
+	public void add(Session insertingSession) {
+		if (getCount() == 0) {
+			super.add(insertingSession);
+		} else {
+			boolean notInserted = true;
+			for( int i = 0; i < getCount() && notInserted; i++ ) {
+				Session session = getItem(i);
+				if (session.getRestLifetime().getMillis() >= insertingSession.getRestLifetime().getMillis()) {
+					insert(insertingSession, i);
+					notInserted = false;
+				}
+			}
+			if (notInserted) {
+				super.add(insertingSession);
+			}
+		}
+	}
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {

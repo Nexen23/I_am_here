@@ -6,13 +6,12 @@ import org.joda.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Observable;
 import java.util.SortedSet;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
-public class TemporarySet<T> extends Observable {
+public class TemporarySet<T> extends ListObservable {
 	// TODO: 18.08.2015 make sure it's thread-safe implementation
 	protected SortedSet<TemporaryElement<T>> sortedElementsSet = new TreeSet<>();
 	protected List<T> list = new ArrayList<>();
@@ -44,7 +43,7 @@ public class TemporarySet<T> extends Observable {
 		list.clear();
 		sortedElementsSet.clear();
 
-		notifyCollectionChanged();
+		notifyCollectionChanged(Notification.CLEAR, null);
 	}
 
 
@@ -64,7 +63,7 @@ public class TemporarySet<T> extends Observable {
 				openNextDeath();
 			}
 
-			notifyCollectionChanged();
+			notifyCollectionChanged(Notification.ADD, isertingElement.object);
 		}
 
 		return wasAdded;
@@ -82,7 +81,7 @@ public class TemporarySet<T> extends Observable {
 				openNextDeath();
 			}
 
-			notifyCollectionChanged();
+			notifyCollectionChanged(Notification.REMOVE, deletingElement.object);
 		}
 
 		return wasRemoved;
@@ -115,10 +114,5 @@ public class TemporarySet<T> extends Observable {
 		timer.purge();
 		nextElementToDie = null;
 		timerTask = null;
-	}
-
-	private void notifyCollectionChanged() {
-		setChanged();
-		notifyObservers();
 	}
 }

@@ -42,25 +42,46 @@ public class UsersFragment extends ListFragment implements AbstractView {
 	}
 
 	@Override
+	public void onResume() {
+		super.onResume();
+		onDataUpdate(AbstractModel.UNIVERSAL_NOTIFICATION, null);
+	}
+
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		uiHandler = new Handler();
+		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, new ArrayList<Session>());
+
 		updatingViewTimer = new UpdatingViewTimer(uiHandler, this);
 		updatingViewTimer.start();
 
 		return inflater.inflate(R.layout.fragment_users, container);
 	}
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		onDataUpdate();
-	}
 
 	@Override
-	public void onDataUpdate() {
+	public void onDataUpdate(final int notification, final Object data) {
 		boolean currentSessionIsAlive = model.isCurrentSessionAlive(),
 				statusChanged = currentSessionIsAlive != currentSessionWasAlive;
 
+		Session session = (Session) data;
+		switch (notification) {
+			case ImhereModel.ADD_USER_NOTIFICATION :
+				usersAdapter.add(session);
+				break;
+
+			case ImhereModel.REMOVE_USER_NOTIFICATION :
+				usersAdapter.remove(session);
+				break;
+
+			case ImhereModel.CLEAR_USER_NOTIFICATION :
+				usersAdapter.clear();
+				break;
+
+			/*default :
+				usersAdapter.notifyDataSetChanged();
+				break;*/
+		}
 		usersAdapter.notifyDataSetChanged();
 
 		currentSessionWasAlive = currentSessionIsAlive;
@@ -71,7 +92,6 @@ public class UsersFragment extends ListFragment implements AbstractView {
 		model = (ImhereModel) abstractModel;
 		model.addEventListener(this);
 
-		readOnlyUsers = model.getOnlineUsersSet();
-		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, readOnlyUsers);
+		//readOnlyUsers = model.getOnlineUsersSet();
 	}
 }

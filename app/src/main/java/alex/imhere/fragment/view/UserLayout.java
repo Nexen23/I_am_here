@@ -2,7 +2,6 @@ package alex.imhere.fragment.view;
 
 import android.animation.TimeAnimator;
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -11,7 +10,6 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Shader;
 import android.util.AttributeSet;
-import android.util.TypedValue;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
@@ -22,6 +20,7 @@ import alex.imhere.util.ArrayUtils;
 public class UserLayout extends FrameLayout {
 	static public final int LIFETIME_DEAFULT = 2300;
 	static public final int[] COLORS_DEFAULT = {Color.WHITE, Color.BLACK};
+	static public final float SIDES_GAP_DEFAULT = 0f;
 
 	private Paint borderPaint, fillPaint;
 
@@ -55,6 +54,8 @@ public class UserLayout extends FrameLayout {
 		try
 		{
 			setLifetime( attributes.getInt(R.styleable.UserLayout_lifetime, LIFETIME_DEAFULT) );
+			setSidesGap( attributes.getDimension(R.styleable.UserLayout_sides_gap, SIDES_GAP_DEFAULT) );
+
 			int statesColorsResourceId = attributes.getResourceId(R.styleable.UserLayout_states_colors, 0);
 			TypedArray colorsResources = getResources().obtainTypedArray(statesColorsResourceId);
 			int[] colorsInts = new int[colorsResources.length()];
@@ -67,10 +68,14 @@ public class UserLayout extends FrameLayout {
 			e.printStackTrace();
 			setLifetime(LIFETIME_DEAFULT);
 			setGradientStatesColors(COLORS_DEFAULT.clone());
+			setSidesGap(SIDES_GAP_DEFAULT);
 		}
 		finally
 		{
 			attributes.recycle();
+
+			int sidesGapCeiled = (int) Math.ceil(sidesGap);
+			setPadding(sidesGapCeiled, 0, sidesGapCeiled, 0);
 		}
 	}
 
@@ -88,9 +93,8 @@ public class UserLayout extends FrameLayout {
 		fillPaint.setStyle(Paint.Style.FILL);
 		fillPaint.setAntiAlias(true);
 
-		Resources r = getResources();
-		sidesGap = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, r.getDisplayMetrics());
-
+		/*Resources r = getResources();
+		sidesGap = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, r.getDisplayMetrics());*/
 	}
 
 	public void setGradientStatesColors(int[] statesColors) {
@@ -105,6 +109,10 @@ public class UserLayout extends FrameLayout {
 
 	public void setLifetime(long lifetime) {
 		this.lifetime = lifetime;
+	}
+
+	public void setSidesGap(float sidesGap) {
+		this.sidesGap = sidesGap;
 	}
 
 	public void startGradientAnimation() {
@@ -179,6 +187,9 @@ public class UserLayout extends FrameLayout {
 		canvas.restore();
 
 		canvas.drawPath(shapeBorderPath, borderPaint);
+
+		// drawing border of real Layout for child Views
+		canvas.drawRect(sidesGap, 0f, (width - 1) - sidesGap, height - 1, borderPaint);
 
 		super.onDraw(canvas);
 	}

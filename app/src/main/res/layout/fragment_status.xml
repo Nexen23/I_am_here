@@ -34,8 +34,8 @@
 	<include
 		android:id="@+id/b_test_GRADIENT"
 		android:layout_marginLeft="0dp"
-		android:layout_width="180dp"
-		android:layout_height="95dp"
+		android:layout_width="110dp"
+		android:layout_height="wrap_content"
 		android:layout_alignParentBottom="true"
 		layout="@layout/item_user"/>
 

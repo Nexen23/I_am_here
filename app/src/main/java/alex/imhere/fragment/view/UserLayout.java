@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.AttributeSet;
@@ -27,18 +28,12 @@ public class UserLayout extends FrameLayout {
 
 	private int colors[] = {};
 	private int height = 0, width = 0;
-	private float padding;
 
 	private TimeAnimator gradientAnimation = new TimeAnimator();
 	private long lifetime = LIFETIME_DEAFULT, updateTickMs = 25;
 	private long accumulatorMs = 0;
 	private float gradientOffset = 0f;
-
-	public UserLayout(Context context) {
-		super(context);
-		onInitialize();
-		// TODO: 24.08.2015 pass statesColors as args for View in XML
-	}
+	private float sidesGap;
 
 	public UserLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -80,26 +75,21 @@ public class UserLayout extends FrameLayout {
 	}
 
 	private void onInitialize() {
-		/*int userBornColor = getContext().getResources().getColor(R.color.user_born);
-		int userAliveColor = getContext().getResources().getColor(R.color.user_alive);
-		int userDeadColor = getContext().getResources().getColor(R.color.user_dead);
-		int[] colors = new int[]{userBornColor, userAliveColor, userDeadColor};*/
-		//setGradientStatesColors(colors);
-		//setLifetime(lifetime);
-
 		setWillNotDraw(false);
 
 		borderPaint = new Paint();
 		borderPaint.setColor(Color.BLACK);
-		borderPaint.setStrokeWidth(1);
+		borderPaint.setStrokeWidth(2);
 		borderPaint.setStyle(Paint.Style.STROKE);
+		borderPaint.setAntiAlias(true);
 
 		fillPaint = new Paint();
 		fillPaint.setColor(colors[0]);
 		fillPaint.setStyle(Paint.Style.FILL);
+		fillPaint.setAntiAlias(true);
 
 		Resources r = getResources();
-		padding = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 3, r.getDisplayMetrics());
+		sidesGap = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, r.getDisplayMetrics());
 
 	}
 
@@ -179,19 +169,37 @@ public class UserLayout extends FrameLayout {
 	@Override
 	protected void onDraw(Canvas canvas) {
 		RectF rect = new RectF();
-		rect.left = padding + gradientOffset;
-		rect.right = width - 1 - padding + gradientOffset;
+		rect.left = gradientOffset;
+		rect.right = width - 1 + gradientOffset;
 
-		rect.top = padding;
-		rect.bottom = height - 1 - padding;
+		rect.top = 0;
+		rect.bottom = height - 1;
 
 		canvas.save();
 		canvas.translate(-gradientOffset, 0);
-		canvas.drawRect(rect, fillPaint);
+		//canvas.drawRect(rect, fillPaint);
+
+		Path parallelogrammPath = getParallelogrammPath(width, height, sidesGap, gradientOffset);
+		canvas.drawPath(parallelogrammPath, fillPaint);
 
 		canvas.restore();
-		canvas.drawRect(1, 1, width - 2, height - 2, borderPaint);
+		//canvas.drawRect(1, 1, width - 2, height - 2, borderPaint);
+		Path parallelogrammPathBorder = getParallelogrammPath(width, height, sidesGap, 0f);
+		canvas.drawPath(parallelogrammPathBorder, borderPaint);
 
 		super.onDraw(canvas);
+	}
+
+	private Path getParallelogrammPath(float fullWidth, float fullHeight, float sidesGap, float leftOffset) {
+		// TODO: 25.08.2015 delete leftOffset arg. Path has method `offset`
+		Path path = new Path();
+
+		path.moveTo(leftOffset, fullHeight - 1);
+		path.lineTo(leftOffset + sidesGap, 0f);
+		path.lineTo(leftOffset + (fullWidth - 1), 0f);
+		path.lineTo(leftOffset + (fullWidth - 1) - sidesGap, fullHeight - 1);
+		path.lineTo(leftOffset, fullHeight - 1);
+
+		return path;
 	}
 }

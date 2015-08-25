@@ -9,7 +9,6 @@ import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Path;
-import android.graphics.RectF;
 import android.graphics.Shader;
 import android.util.AttributeSet;
 import android.util.TypedValue;
@@ -34,6 +33,7 @@ public class UserLayout extends FrameLayout {
 	private long accumulatorMs = 0;
 	private float gradientOffset = 0f;
 	private float sidesGap;
+	private Path shapePath, shapeBorderPath, tempPath = new Path();
 
 	public UserLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -161,6 +161,10 @@ public class UserLayout extends FrameLayout {
 				0, height / 2, width * colors.length - 1, height / 2,
 				colors, null, Shader.TileMode.REPEAT);
 		fillPaint.setShader(gradient);
+
+		shapePath = getParallelogrammPath(width, height, sidesGap);
+		shapeBorderPath = getParallelogrammPath(width, height, sidesGap);
+
 		//if (isGradientAnimationRunning()) {
 			startGradientAnimation();
 		//}
@@ -168,37 +172,31 @@ public class UserLayout extends FrameLayout {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		RectF rect = new RectF();
-		rect.left = gradientOffset;
-		rect.right = width - 1 + gradientOffset;
-
-		rect.top = 0;
-		rect.bottom = height - 1;
-
 		canvas.save();
 		canvas.translate(-gradientOffset, 0);
-		//canvas.drawRect(rect, fillPaint);
-
-		Path parallelogrammPath = getParallelogrammPath(width, height, sidesGap, gradientOffset);
-		canvas.drawPath(parallelogrammPath, fillPaint);
-
+		shapePath.offset(gradientOffset, 0f, tempPath);
+		canvas.drawPath(tempPath, fillPaint);
 		canvas.restore();
-		//canvas.drawRect(1, 1, width - 2, height - 2, borderPaint);
-		Path parallelogrammPathBorder = getParallelogrammPath(width, height, sidesGap, 0f);
-		canvas.drawPath(parallelogrammPathBorder, borderPaint);
+
+		canvas.drawPath(shapeBorderPath, borderPaint);
 
 		super.onDraw(canvas);
 	}
 
-	private Path getParallelogrammPath(float fullWidth, float fullHeight, float sidesGap, float leftOffset) {
-		// TODO: 25.08.2015 delete leftOffset arg. Path has method `offset`
+	private Path getParallelogrammPath(float width, float height, float sidesGap) {
 		Path path = new Path();
 
-		path.moveTo(leftOffset, fullHeight - 1);
-		path.lineTo(leftOffset + sidesGap, 0f);
-		path.lineTo(leftOffset + (fullWidth - 1), 0f);
-		path.lineTo(leftOffset + (fullWidth - 1) - sidesGap, fullHeight - 1);
-		path.lineTo(leftOffset, fullHeight - 1);
+		float[] pLeftBottom = {0f, height - 1},
+				pLeftTop = {sidesGap, 0f},
+				pRightTop = {(width - 1), 0f},
+				pRightBottom = {(width - 1) - sidesGap, height - 1};
+
+		path.moveTo(pLeftBottom[0], pLeftBottom[1]);
+
+		path.lineTo(pLeftTop[0], pLeftTop[1]);
+		path.lineTo(pRightTop[0], pRightTop[1]);
+		path.lineTo(pRightBottom[0], pRightBottom[1]);
+		path.lineTo(pLeftBottom[0], pLeftBottom[1]);
 
 		return path;
 	}

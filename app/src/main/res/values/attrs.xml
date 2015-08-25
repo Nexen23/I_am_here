@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 	<declare-styleable name="UserLayout">
-		<attr name="sides_gap" format="dimension" />
+		<attr name="sides_gaps" format="dimension" />
 		<attr name="states_colors" format="reference" />
 		<attr name="lifetime" format="integer" />
+		<attr name="start_animation_on_creation" format="boolean" />
 	</declare-styleable>
 </resources>

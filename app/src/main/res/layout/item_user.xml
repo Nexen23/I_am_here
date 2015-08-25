@@ -8,7 +8,7 @@
     android:layout_alignParentBottom="true"
     app:lifetime="3000"
     app:states_colors="@array/user_states"
-    app:sides_gap="15dp">
+    app:sides_gaps="15dp">
 
     <LinearLayout
         android:layout_width="fill_parent"

@@ -21,18 +21,20 @@ public class UserLayout extends FrameLayout {
 	static public final int LIFETIME_DEAFULT = 2300;
 	static public final int[] COLORS_DEFAULT = {Color.WHITE, Color.BLACK};
 	static public final float SIDES_GAP_DEFAULT = 0f;
+	static public final boolean START_ANIMATION_ON_CREATION_DEFAULT = false;
 
 	private Paint borderPaint, fillPaint;
 
 	private int colors[] = {};
 	private int height = 0, width = 0;
 
+	private boolean startAnimationOnCreation;
 	private TimeAnimator gradientAnimation = new TimeAnimator();
-	private long lifetime = LIFETIME_DEAFULT, updateTickMs = 25;
+	private long lifetime = LIFETIME_DEAFULT, updateTickMs = 25, timeElapsed = 0;
 	private long accumulatorMs = 0;
 	private float gradientOffset = 0f;
 	private float sidesGap;
-	private Path shapePath, shapeBorderPath, tempPath = new Path();
+	private Path shapePath, shapeBorderPath, tempPath = new Path();;
 
 	public UserLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -54,7 +56,8 @@ public class UserLayout extends FrameLayout {
 		try
 		{
 			setLifetime( attributes.getInt(R.styleable.UserLayout_lifetime, LIFETIME_DEAFULT) );
-			setSidesGap( attributes.getDimension(R.styleable.UserLayout_sides_gap, SIDES_GAP_DEFAULT) );
+			setSidesGap( attributes.getDimension(R.styleable.UserLayout_sides_gaps, SIDES_GAP_DEFAULT));
+			setStartAnimationOnCreation( attributes.getBoolean(R.styleable.UserLayout_start_animation_on_creation, START_ANIMATION_ON_CREATION_DEFAULT) );
 
 			int statesColorsResourceId = attributes.getResourceId(R.styleable.UserLayout_states_colors, 0);
 			TypedArray colorsResources = getResources().obtainTypedArray(statesColorsResourceId);
@@ -63,12 +66,12 @@ public class UserLayout extends FrameLayout {
 				colorsInts[i] = colorsResources.getColor(i, Color.BLACK);
 			}
 			setGradientStatesColors(colorsInts);
-		}
-		catch (Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 			setLifetime(LIFETIME_DEAFULT);
 			setGradientStatesColors(COLORS_DEFAULT.clone());
 			setSidesGap(SIDES_GAP_DEFAULT);
+			setStartAnimationOnCreation(START_ANIMATION_ON_CREATION_DEFAULT);
 		}
 		finally
 		{
@@ -97,67 +100,6 @@ public class UserLayout extends FrameLayout {
 		sidesGap = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 20, r.getDisplayMetrics());*/
 	}
 
-	public void setGradientStatesColors(int[] statesColors) {
-		ArrayList<Integer> colors = new ArrayList<>();
-		for (int i = 0; i < statesColors.length; i++) {
-			colors.add(statesColors[i]);
-			colors.add(statesColors[i]); // purposly
-		}
-
-		this.colors = ArrayUtils.ToInts(colors);
-	}
-
-	public void setLifetime(long lifetime) {
-		this.lifetime = lifetime;
-	}
-
-	public void setSidesGap(float sidesGap) {
-		this.sidesGap = sidesGap;
-	}
-
-	public void startGradientAnimation() {
-		stopGradientAnimation();
-
-		final float gradientOffsetCoef = (float) (updateTickMs) / lifetime;
-		final int colorsCount = this.colors.length - 1;
-		gradientAnimation.setTimeListener(new TimeAnimator.TimeListener() {
-			@Override
-			public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
-				//totalTime = totalTime % lifetime; // TODO: 24.08.2015 delete this after debugging
-
-				final long gradientWidth = width * colorsCount;
-				if (totalTime > lifetime) {
-					animation.cancel();
-					gradientOffset = gradientWidth;
-					invalidate();
-				} else {
-					accumulatorMs += deltaTime;
-
-					final long gradientOffsetsCount = accumulatorMs / updateTickMs;
-					gradientOffset += (gradientOffsetsCount * gradientWidth) * gradientOffsetCoef;
-					accumulatorMs %= updateTickMs;
-
-					boolean gradientOffsetChanged = (gradientOffsetsCount > 0) ? true : false;
-					if (gradientOffsetChanged) {
-						invalidate();
-					}
-				}
-			}
-		});
-
-		gradientAnimation.start();
-	}
-
-	public void stopGradientAnimation() {
-		gradientAnimation.cancel();
-		accumulatorMs = 0;
-		gradientOffset = 0;
-	}
-
-	public boolean isGradientAnimationRunning() {
-		return gradientAnimation.isRunning();
-	}
-
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
@@ -173,9 +115,10 @@ public class UserLayout extends FrameLayout {
 		shapePath = getParallelogrammPath(width, height, sidesGap);
 		shapeBorderPath = getParallelogrammPath(width, height, sidesGap);
 
-		//if (isGradientAnimationRunning()) {
+		resolveTimeElapsed();
+		if (startAnimationOnCreation) {
 			startGradientAnimation();
-		//}
+		}
 	}
 
 	@Override
@@ -210,5 +153,88 @@ public class UserLayout extends FrameLayout {
 		path.lineTo(pLeftBottom[0], pLeftBottom[1]);
 
 		return path;
+	}
+
+	public void setStartAnimationOnCreation(boolean startAnimationOnCreation) {
+		this.startAnimationOnCreation = startAnimationOnCreation;
+	}
+
+	public void setGradientStatesColors(int[] statesColors) {
+		ArrayList<Integer> colors = new ArrayList<>();
+		for (int i = 0; i < statesColors.length; i++) {
+			colors.add(statesColors[i]);
+			colors.add(statesColors[i]); // purposly: for states
+		}
+
+		this.colors = ArrayUtils.ToInts(colors);
+	}
+
+	public void setLifetime(long lifetime) {
+		setLifetime(lifetime, 0);
+	}
+
+	public void setLifetime(long lifetime, long timeElapsed) {
+		this.lifetime = lifetime;
+		this.timeElapsed = timeElapsed;
+		resolveTimeElapsed();
+	}
+
+	public void setSidesGap(float sidesGap) {
+		this.sidesGap = sidesGap;
+	}
+
+	public void startGradientAnimation() {
+		stopGradientAnimation();
+		resolveTimeElapsed();
+
+		final float gradientOffsetCoef = (float) (updateTickMs) / lifetime;
+		final int colorsCount = this.colors.length - 1;
+		gradientAnimation.setTimeListener(new TimeAnimator.TimeListener() {
+			@Override
+			public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
+				//totalTime = totalTime % lifetime; // TODO: 24.08.2015 delete this after debugging
+
+				final long gradientWidth = width * colorsCount;
+				if (totalTime > (lifetime - timeElapsed)) {
+					animation.cancel();
+					gradientOffset = gradientWidth;
+					invalidate();
+				} else {
+					accumulatorMs += deltaTime;
+
+					final long gradientOffsetsCount = accumulatorMs / updateTickMs;
+					gradientOffset += (gradientOffsetsCount * gradientWidth) * gradientOffsetCoef;
+					accumulatorMs %= updateTickMs;
+
+					boolean gradientOffsetChanged = (gradientOffsetsCount > 0) ? true : false;
+					if (gradientOffsetChanged) {
+						invalidate();
+					}
+				}
+			}
+		});
+
+		gradientAnimation.start();
+	}
+
+	public void stopGradientAnimation() {
+		gradientAnimation.cancel();
+		accumulatorMs = 0;
+		gradientOffset = 0;
+	}
+
+	public boolean isGradientAnimationRunning() {
+		return gradientAnimation.isRunning();
+	}
+
+	public void clearTimeElapsed() {
+		timeElapsed = 0;
+	}
+
+	public void resolveTimeElapsed() {
+		final float gradientOffsetCoef = (float) (timeElapsed) / lifetime;
+		final int colorsCount = this.colors.length - 1;
+		final long gradientWidth = width * colorsCount;
+		gradientOffset = gradientWidth * gradientOffsetCoef;
 	}
 }

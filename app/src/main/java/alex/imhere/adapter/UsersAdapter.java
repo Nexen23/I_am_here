@@ -2,7 +2,6 @@ package alex.imhere.adapter;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import alex.imhere.R;
+import alex.imhere.fragment.view.UserLayout;
 import alex.imhere.layer.server.Session;
 import alex.imhere.service.TimeFormatter;
 
@@ -37,7 +37,7 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		View userView = convertView;
+		UserLayout userView = (UserLayout) convertView;
 		Session session = getItem(position);
 
 		/*String sessionLoggingString = "null";
@@ -64,67 +64,16 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 		if (userView == null)
 		{
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			userView = inflater.inflate(resourceId, parent, false);
+			userView = (UserLayout) inflater.inflate(resourceId, parent, false);
 
-			//userView = new UserView(context, session.getRestLifetime().getMillis()); // TODO: 24.08.2015 no comparision with null
 
 			if (session != null) {
 				Long restLifetimeMs = session.getRestLifetime().getMillis();
 				Long fullLifetimeMs = session.getFullLifetime().getMillis();
-				float lifetimeCoef = restLifetimeMs.floatValue() / fullLifetimeMs.floatValue();
+				Long timeElapsedMs = fullLifetimeMs - restLifetimeMs;
 
-				int startingColor = Color.argb(255, 0, (int) (255 * lifetimeCoef), 0);
-
-				/*ColorDrawable[] color = {
-						new ColorDrawable(startingColor),
-						new ColorDrawable(Color.RED)}; //only 2 allowed
-				TransitionDrawable trans = new TransitionDrawable(color);
-				userView.setBackground(trans);
-				trans.startTransition((int) session.getRestLifetime().getMillis());*/
-
-
-				/*final GradientDrawable background = (GradientDrawable) userView.getBackground();
-				//background.mutate();
-
-				final int[] colors = new int[]{userBornColor, userAliveColor, userAliveColor, userDeadColor};
-				background.setGradientType(GradientDrawable.LINEAR_GRADIENT);
-				background.setColors(colors);
-				//colors[0] = userDeadColor; colors[1] = userDeadColor; colors[2] = userDeadColor;
-				TimeAnimator timeAnimator = new TimeAnimator();
-				final long duration = restLifetimeMs;
-				final View finalUserView = userView;
-				final int[] x = {0};
-				timeAnimator.setTimeListener(new TimeAnimator.TimeListener() {
-					@Override
-					public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
-						if (totalTime > duration) {
-							animation.cancel();
-						}
-
-						if (totalTime / 250 > x[0]) {
-							x[0] = x[0] + 1;
-
-							float coef = (float) (totalTime) / duration;
-							//colors[0] = (int) (coef * 0xFF0000) + 0xFF000000;
-							//Log.d("TAG", String.format("%f[coef] - %d[colors[0]] :: %d[pointer]", coef, colors[0], colors.hashCode()));
-							colors[0] = colors[0] + 10000;
-							colors[1] = colors[1] + 20000;
-							colors[2] = colors[2] + 70000;
-							colors[3] = colors[3] + 150000;
-							//background.invalidateSelf();
-							//finalUserView.postInvalidate();
-							finalUserView.setBackground(background);
-						}
-					}
-				});
-				timeAnimator.start();*/
-				//ObjectAnimator dyingColorAnimation = ObjectAnimator.ofInt(userView, "backgroundColor", userBornColor, userAliveColor, userDeadColor);
-
-				/*ObjectAnimator dyingColorAnimation = ObjectAnimator.ofInt(userView, "backgroundColor", userBornColor, userAliveColor, userDeadColor);
-				dyingColorAnimation.setDuration(restLifetimeMs);
-				dyingColorAnimation.setEvaluator(new ArgbEvaluator());
-				dyingColorAnimation.setInterpolator(new LinearInterpolator());
-				dyingColorAnimation.start(); // how to use startingColor??*/
+				userView.setLifetime(fullLifetimeMs, timeElapsedMs);
+				userView.startGradientAnimation();
 			}
 		}
 

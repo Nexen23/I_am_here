@@ -10,8 +10,8 @@
         <!--<item name="android:textStyle">bold</item>-->
         <item name="android:gravity">center</item>
 
-        <item name="android:layout_width">@dimen/button_imhere_size_default</item>
-        <item name="android:layout_height">@dimen/button_imhere_size_default</item>
+        <item name="android:layout_width">@dimen/button_imhere_size</item>
+        <item name="android:layout_height">@dimen/button_imhere_size</item>
 
         <item name="android:textColor">@color/button_imhere</item>
         <item name="android:background">@drawable/button_imhere</item>

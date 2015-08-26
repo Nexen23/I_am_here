@@ -38,6 +38,10 @@ class TemporaryElement<T> implements Comparable {
 		TemporaryElement a = this,
 				b = (TemporaryElement) another;
 
+		if (a.object.equals(b.object)) {
+			return 0;
+		}
+
 		int datesComparisionResult = a.deathTime.compareTo(b.deathTime);
 		int objectsComparisionResult = a.hashCode() - b.hashCode();
 		return (datesComparisionResult != 0) ? datesComparisionResult : objectsComparisionResult;

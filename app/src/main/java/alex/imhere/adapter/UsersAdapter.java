@@ -54,7 +54,6 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 
 		/*String sessionLoggingString = "null";
 		String userViewLoggingString = "null";
-		String animationLoggingString = "null";
 
 		if (session != null) {
 			sessionLoggingString = session.getUdid();
@@ -62,22 +61,17 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 
 		if (userView != null) {
 			userViewLoggingString = String.format("%d", userView.hashCode());
-
-			Animation userViewAnimation = userView.getAnimation();
-			if (userViewAnimation != null) {
-				animationLoggingString = String.format("%d", userViewAnimation.hashCode());
-			}
 		}
 
-		String loggingString = String.format("[UsersAdapter] [%d - %s] {userView == %s} {animation == %s}",
-				position, sessionLoggingString, userViewLoggingString, animationLoggingString);
+		String loggingString = String.format("[UsersAdapter] [%d - %s] {userView == %s}",
+				position, sessionLoggingString, userViewLoggingString);
 		Log.d("TAG", loggingString);*/
 
-		if (userView == null)
+		if (userView == null || userView.getTag() == null || userView.getTag() != session)
 		{
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			userView = (UserLayout) inflater.inflate(resourceId, parent, false);
-
+			userView.setTag(session);
 
 			if (session != null) {
 				Long restLifetimeMs = session.getRestLifetime().getMillis();

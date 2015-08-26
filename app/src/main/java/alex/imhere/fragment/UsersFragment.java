@@ -78,11 +78,10 @@ public class UsersFragment extends ListFragment implements AbstractView {
 				usersAdapter.clear();
 				break;
 
-			/*default :
+			default :
 				usersAdapter.notifyDataSetChanged();
-				break;*/
+				break;
 		}
-		usersAdapter.notifyDataSetChanged();
 
 		currentSessionWasAlive = currentSessionIsAlive;
 	}

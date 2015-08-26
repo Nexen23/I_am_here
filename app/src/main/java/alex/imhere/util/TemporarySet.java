@@ -5,6 +5,7 @@ import org.joda.time.LocalDateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.Timer;
@@ -49,11 +50,9 @@ public class TemporarySet<T> extends ListObservable {
 
 	private synchronized boolean _add(TemporaryElement<T> isertingElement) {
 		// TODO: 18.08.2015 implement unique add to List
-		boolean wasAdded = sortedElementsSet.add(isertingElement);
+		boolean wasInserted = _insertElementUnique(isertingElement);
 
-		if (wasAdded) {
-			list.add(0, isertingElement.object);
-
+		if (wasInserted) {
 			if (nextElementToDie != null &&
 					nextElementToDie.deathTime.isAfter(isertingElement.deathTime)) {
 				cancelNextDeath();
@@ -66,16 +65,14 @@ public class TemporarySet<T> extends ListObservable {
 			notifyCollectionChanged(Notification.ADD, isertingElement.object);
 		}
 
-		return wasAdded;
+		return wasInserted;
 	}
 
 	private synchronized boolean _remove(TemporaryElement<T> deletingElement) {
 		// TODO: 18.08.2015 implement unique add to List
-		boolean wasRemoved = sortedElementsSet.remove(deletingElement);
+		boolean wasDeleted = _deleteElementByObject(deletingElement);
 
-		if (wasRemoved) {
-			list.remove(deletingElement.object);
-
+		if (wasDeleted) {
 			if (nextElementToDie.equals(deletingElement)) {
 				cancelNextDeath();
 				openNextDeath();
@@ -84,7 +81,7 @@ public class TemporarySet<T> extends ListObservable {
 			notifyCollectionChanged(Notification.REMOVE, deletingElement.object);
 		}
 
-		return wasRemoved;
+		return wasDeleted;
 	}
 
 	private synchronized void openNextDeath() {
@@ -114,5 +111,41 @@ public class TemporarySet<T> extends ListObservable {
 		timer.purge();
 		nextElementToDie = null;
 		timerTask = null;
+	}
+
+	private synchronized Iterator<TemporaryElement<T>> findElement(TemporaryElement<T> searchingElement) {
+		Iterator<TemporaryElement<T>> resultIterator = null;
+		for (Iterator<TemporaryElement<T>> iterator = sortedElementsSet.iterator(); iterator.hasNext() && resultIterator == null;) {
+			if (iterator.next().equals(searchingElement)) {
+				resultIterator = iterator;
+			}
+		}
+		return resultIterator;
+	}
+
+	private synchronized boolean _insertElementUnique(TemporaryElement<T> element) {
+		boolean wasInserted = false;
+
+		Iterator<TemporaryElement<T>> iterator = findElement(element);
+		if (iterator == null) {
+			wasInserted = true;
+			sortedElementsSet.add(element);
+			list.add(element.object);
+		}
+
+		return wasInserted;
+	}
+
+	private synchronized boolean _deleteElementByObject(TemporaryElement<T> element) {
+		boolean wasDeleted = false;
+
+		Iterator<TemporaryElement<T>> iterator = findElement(element);
+		if (iterator != null) {
+			wasDeleted = true;
+			iterator.remove();
+			list.remove(element.object);
+		}
+
+		return wasDeleted;
 	}
 }

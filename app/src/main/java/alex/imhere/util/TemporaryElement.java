@@ -13,7 +13,7 @@ class TemporaryElement<T> implements Comparable {
 		this.object = object;
 	}
 
-	protected TemporaryElement(@NonNull T object) {
+	public TemporaryElement(@NonNull T object) {
 		this(object, new LocalDateTime(0));
 	}
 
@@ -37,10 +37,6 @@ class TemporaryElement<T> implements Comparable {
 	public int compareTo(Object another) {
 		TemporaryElement a = this,
 				b = (TemporaryElement) another;
-
-		if (a.object.equals(b.object)) {
-			return 0;
-		}
 
 		int datesComparisionResult = a.deathTime.compareTo(b.deathTime);
 		int objectsComparisionResult = a.hashCode() - b.hashCode();

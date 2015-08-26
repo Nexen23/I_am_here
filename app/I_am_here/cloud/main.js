@@ -6,7 +6,7 @@ var moment = require('moment'); // jshint ignore:line
 
 // Constants
 var sessionObjName = "IMH_Session";
-var sessionLifetimeSec = 10;
+var sessionLifetimeSec = 13;
 
 var channelName = "events";
 var publishKey = "pub-c-6271f363-519a-432d-9059-e65a7203ce0e",
@@ -40,6 +40,12 @@ var errorHandler = function(error) {
     Log(error.message, "error");
 };
 
+function DeleteSession(obj) {
+	obj.set("loginedAt", obj.get("aliveTo"));
+	SendEvent(obj); 
+    obj.destroy();
+}
+
 function DeleteDeadSessions() {
     "use strict";
 
@@ -48,7 +54,7 @@ function DeleteDeadSessions() {
         .each(function(obj)
          {
              Log(obj, "Delete dead session");
-             obj.destroy();
+			 DeleteSession(obj);
          }
     );
 	return promise;
@@ -199,7 +205,7 @@ var API_Logout = function(request, response) {
 
     query.each( function(obj) {
         Log(obj, "Logout:destroy");
-	    obj.destroy();
+		DeleteSession(obj);
     }).done( function() {response.success();} );
 };
 
@@ -211,12 +217,13 @@ Parse.Cloud.afterSave(sessionObjName, function(request) { // jshint ignore:line
 	SendEvent(request.object);
 });
 
-Parse.Cloud.afterDelete(sessionObjName, function(request) { // jshint ignore:line
+/*Parse.Cloud.afterDelete(sessionObjName, function(request) { // jshint ignore:line
     "use strict";
 
-    request.object.set("aliveTo", request.object.get("loginedAt"));
+    //request.object.set("aliveTo", request.object.get("loginedAt"));
+	request.object.set("loginedAt", request.object.get("aliveTo"));
     SendEvent(request.object);
-});
+});*/
 
 
 // API definitions

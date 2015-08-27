@@ -173,7 +173,6 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener,
 	@Override
 	public void listenModel(BaseModel baseModel) {
 		this.model = baseModel;
-		baseModel.addEventsListener(eventsListener);
 		ImhereModel model = (ImhereModel) baseModel;
 
 		eventsListener = new ImhereModel.EventListener() {
@@ -203,6 +202,8 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener,
 				setStatusLoginned(false);
 			}
 		};
+
+		baseModel.addEventsListener(eventsListener);
 	}
 
 	@Override

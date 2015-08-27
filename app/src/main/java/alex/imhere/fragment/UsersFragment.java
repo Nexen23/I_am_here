@@ -54,42 +54,63 @@ public class UsersFragment extends ListFragment implements BaseModel.ModelListen
 		updatingTimer = new UpdatingTimer(uiHandler, this).start();
 	}
 
+	@UiThread
+	public void addUser(DyingUser dyingUser) {
+		usersAdapter.add(dyingUser);
+	}
+
+	@UiThread
+	public void removeUser(DyingUser dyingUser) {
+		usersAdapter.remove(dyingUser);
+	}
+
+	@UiThread
+	public void clearUsers() {
+		usersAdapter.clear();
+	}
+
+	@UiThread
+	public void notifyUsersDataChanged() {
+		usersAdapter.notifyDataSetChanged();
+	}
+
 	@Override
 	public void listenModel(BaseModel baseModel) {
 		this.model = baseModel;
-		baseModel.addEventsListener(eventsListener);
 		ImhereModel model = (ImhereModel) baseModel;
 
 		eventsListener = new ImhereModel.EventListener() {
-			@Override @UiThread
+			@Override
 			public void onLoginUser(DyingUser dyingUser) {
-				usersAdapter.add(dyingUser);
+				addUser(dyingUser);
 			}
 
-			@Override @UiThread
+			@Override
 			public void onLogoutUser(DyingUser dyingUser) {
-				usersAdapter.remove(dyingUser);
+				removeUser(dyingUser);
 			}
 
-			@Override @UiThread
+			@Override
 			public void onClearUsers() {
-				usersAdapter.clear();
+				clearUsers();
 			}
 
-			@Override @UiThread
+			@Override
 			public void onLogin(DyingUser currentUser) {
-				usersAdapter.notifyDataSetChanged();
+				notifyUsersDataChanged();
 			}
 
-			@Override @UiThread
+			@Override
 			public void onLogout() {
-				usersAdapter.notifyDataSetChanged();
+				notifyUsersDataChanged();
 			}
 		};
+
+		baseModel.addEventsListener(eventsListener);
 	}
 
-	@Override @UiThread
+	@Override
 	public void onTimerTick() {
-		usersAdapter.notifyDataSetChanged();
+		notifyUsersDataChanged();
 	}
 }

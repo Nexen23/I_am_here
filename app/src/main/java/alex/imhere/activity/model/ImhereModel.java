@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import com.parse.ParseException;
 
 import org.joda.time.Duration;
-import org.joda.time.LocalDateTime;
 
 import java.util.List;
 import java.util.Observable;
@@ -62,7 +61,7 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
 	private ChannelService channel;
 
 	private String udid;
-	private DyingUser currentDyingUser = null;
+	private DyingUser currentUser = null;
 	private TemporarySet<DyingUser> onlineUsersSet = new TemporarySet<>();
 	private Observer onlineUsersObserver = new Observer() {
 		@Override
@@ -115,11 +114,11 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
 	}
 
 	public boolean isCurrentSessionAlive() {
-		return currentDyingUser != null && currentDyingUser.getRestLifetime().getMillis() != 0;
+		return currentUser != null && currentUser.getRestLifetime().getMillis() != 0;
 	}
 
 	public Duration getCurrentSessionLifetime() {
-		return currentDyingUser.getRestLifetime();
+		return currentUser.getRestLifetime();
 	}
 
 	/*public final List<DyingUser> getOnlineUsersSet() {
@@ -129,11 +128,11 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
 	public DyingUser openNewSession(final Runnable onSessionClosed) throws ParseException {
 		//TODO: log exception
 		onlineUsersSet.clear();
-		DyingUser currentDyingUser = api.login(udid);
+		currentUser = api.login(udid);
 		channel.connect();
 		// TODO: 18.08.2015 log exception
 
-		List<DyingUser> onlineUsers = api.getOnlineUsers(currentDyingUser);
+		List<DyingUser> onlineUsers = api.getOnlineUsers(currentUser);
 		for (DyingUser dyingUser : onlineUsers) {
 			onlineUsersSet.add(dyingUser, dyingUser.getAliveTo());
 		}
@@ -145,24 +144,23 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
 				onSessionClosed.run();
 			}
 		};
-		timer.schedule(timerTask, currentDyingUser.getAliveTo().toDate());
+		timer.schedule(timerTask, currentUser.getAliveTo().toDate());
 
-		this.currentDyingUser = currentDyingUser;
-		notifier.onLogin(currentDyingUser);
+		notifier.onLogin(currentUser);
 
-		return currentDyingUser;
+		return currentUser;
 	}
 
 	public void cancelCurrentSession() {
-		if (currentDyingUser != null) {
+		if (currentUser != null) {
 			channel.disconnect();
-			api.logout(currentDyingUser);
+			api.logout(currentUser);
 
 			timerTask.cancel();
 			timer.purge();
 			timerTask = null;
 
-			currentDyingUser = null;
+			currentUser = null;
 			//onlineUsersSet.clear();
 
 			notifier.onClearUsers();

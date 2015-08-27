@@ -44,8 +44,8 @@ public class ImhereActivity extends AppCompatActivity
 	@Override
 	public void onAttachFragment(Fragment fragment) {
 		super.onAttachFragment(fragment);
-		BaseModel.ModelListener modeListener = (BaseModel.ModelListener) fragment;
-		modeListener.listenModel(model);
+		BaseModel.ModelListener modelListener = (BaseModel.ModelListener) fragment;
+		modelListener.listenModel(model);
 	}
 
 	@Override

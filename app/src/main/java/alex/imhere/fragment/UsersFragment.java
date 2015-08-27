@@ -21,7 +21,7 @@ import alex.imhere.adapter.UsersAdapter;
 import alex.imhere.layer.server.DyingUser;
 import alex.imhere.view.UpdatingTimer;
 
-@EFragment(R.layout.fragment_users)
+@EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment implements BaseModel.ModelListener, UpdatingTimer.TimerListener {
 	BaseModel model;
 	BaseModel.EventListener eventsListener;

@@ -17,24 +17,48 @@ import android.widget.TextView;
 
 import com.skyfishjy.library.RippleBackground;
 
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.UiThread;
+
 import alex.imhere.R;
-import alex.imhere.activity.model.AbstractModel;
 import alex.imhere.activity.model.ImhereModel;
-import alex.imhere.fragment.view.AbstractView;
-import alex.imhere.fragment.view.UiRunnable;
-import alex.imhere.fragment.view.UpdatingViewTimer;
+import alex.imhere.layer.server.Session;
+import alex.imhere.view.UiRunnable;
+import alex.imhere.view.UpdatingViewTimer;
 import alex.imhere.service.TimeFormatter;
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import hugo.weaving.DebugLog;
 
-/*import com.github.stephanenicolas.loglifecycle.LogLifeCycle;
+@EFragment
+public class StatusFragment extends Fragment implements ImhereModel.EventsListenerOwner {
+	ImhereModel.EventsListener eventsListener = new ImhereModel.EventsListener() {
+		@Override
+		public void onAddUser(Session session) {
 
-@LogLifeCycle*/
+		}
 
-@DebugLog
-public class StatusFragment extends Fragment implements AbstractView {
-	FragmentInteractionListener mListener;
+		@Override
+		public void onRemoveUser(Session session) {
+
+		}
+
+		@Override
+		public void onClearUsers() {
+
+		}
+
+		@Override
+		public void onLogin(Session session) {
+
+		}
+
+		@Override
+		public void onLogout() {
+
+		}
+	};
+
+	FragmentInteractionsListener interactionsListener;
 	ImhereModel model;
 	boolean currentSessionWasAlive = false;
 
@@ -50,13 +74,6 @@ public class StatusFragment extends Fragment implements AbstractView {
 
 	public StatusFragment() {
 		// Required empty public constructor
-	}
-
-	public static StatusFragment newInstance() {
-		StatusFragment fragment = new StatusFragment();
-		Bundle args = new Bundle();
-		fragment.setArguments(args);
-		return fragment;
 	}
 
 	@Override
@@ -82,7 +99,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 		imhereButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				if (mListener != null) {
+				if (interactionsListener != null) {
 
 					UiRunnable onPreExecute = new UiRunnable(uiHandler, new Runnable() {
 						@Override
@@ -101,7 +118,7 @@ public class StatusFragment extends Fragment implements AbstractView {
 					});
 
 					onPreExecute.run();
-					mListener.onImhereClick(onPostExecute);
+					interactionsListener.onImhereClick(onPostExecute);
 				}
 			}
 		});
@@ -113,20 +130,20 @@ public class StatusFragment extends Fragment implements AbstractView {
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			mListener = (FragmentInteractionListener) activity;
+			interactionsListener = (FragmentInteractionsListener) activity;
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
-					+ " must implement FragmentInteractionListener");
+					+ " must implement FragmentInteractionsListener");
 		}
 	}
 
 	@Override
 	public void onDetach() {
 		super.onDetach();
-		mListener = null;
+		interactionsListener = null;
 	}
 
-	@Override
+	@Override @UiThread
 	public void onDataUpdate(final int notification, final Object data) {
 		boolean currentSessionIsAlive = model.isCurrentSessionAlive(),
 				statusChanged = currentSessionIsAlive != currentSessionWasAlive;
@@ -187,7 +204,12 @@ public class StatusFragment extends Fragment implements AbstractView {
 		}
 	}
 
-	public interface FragmentInteractionListener {
+	@Override
+	public ImhereModel.EventsListener getEventsListener() {
+		return eventsListener;
+	}
+
+	public interface FragmentInteractionsListener {
 		void onImhereClick(final @NonNull UiRunnable onPostExecute);
 	}
 

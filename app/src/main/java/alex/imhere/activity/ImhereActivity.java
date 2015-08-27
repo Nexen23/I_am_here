@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Handler;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -17,15 +16,16 @@ import android.widget.Toast;
 
 import com.parse.ParseException;
 
+import org.androidannotations.annotations.EActivity;
+
 import alex.imhere.R;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.fragment.StatusFragment;
-import alex.imhere.fragment.view.AbstractView;
-import alex.imhere.fragment.view.UiRunnable;
+import alex.imhere.view.UiRunnable;
 
-
+@EActivity
 public class ImhereActivity extends AppCompatActivity
-		implements StatusFragment.FragmentInteractionListener {
+		implements StatusFragment.FragmentInteractionsListener {
 
 	ImhereModel model;
 
@@ -34,7 +34,7 @@ public class ImhereActivity extends AppCompatActivity
 		super.onCreate(savedInstanceState);
 
 		final String udid = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-		model = new ImhereModel(new Handler(), udid);
+		model = new ImhereModel(udid);
 
 		setContentView(R.layout.activity_main);
 	}
@@ -42,8 +42,8 @@ public class ImhereActivity extends AppCompatActivity
 	@Override
 	public void onAttachFragment(Fragment fragment) {
 		super.onAttachFragment(fragment);
-		AbstractView abstractView = (AbstractView) fragment;
-		abstractView.setModel(model);
+		ImhereModel.EventsListenerOwner listenerOwner = (ImhereModel.EventsListenerOwner) fragment;
+		model.addEventsListener(listenerOwner.getEventsListener());
 	}
 
 	@Override

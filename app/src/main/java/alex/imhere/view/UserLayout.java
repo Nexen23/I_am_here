@@ -1,4 +1,4 @@
-package alex.imhere.fragment.view;
+package alex.imhere.view;
 
 import android.animation.TimeAnimator;
 import android.content.Context;
@@ -34,20 +34,25 @@ public class UserLayout extends FrameLayout {
 	private long accumulatorMs = 0;
 	private float gradientOffset = 0f;
 	private float sidesGap;
-	private Path shapePath, shapeBorderPath, tempPath = new Path();;
+	private Path shapePath, shapeBorderPath, tempPath = new Path();
 
 	public UserLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
 
-		parseAttrs(attrs, 0);
-		onInitialize();
+		if (!isInEditMode()) {
+			parseAttrs(attrs, 0);
+			onInitialize();
+		}
 	}
 
 	public UserLayout(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 
-		parseAttrs(attrs, defStyleAttr);
-		onInitialize();
+		if (!isInEditMode()) {
+			parseAttrs(attrs, defStyleAttr);
+			onInitialize();
+		}
+		// TODO: 26.08.2015 make it previewable (must use constant params instead of runtime)
 	}
 
 	public void parseAttrs(AttributeSet attrs, int defStyleAttr) {
@@ -112,8 +117,8 @@ public class UserLayout extends FrameLayout {
 				colors, null, Shader.TileMode.REPEAT);
 		fillPaint.setShader(gradient);
 
-		shapePath = getParallelogrammPath(width, height, sidesGap);
-		shapeBorderPath = getParallelogrammPath(width, height, sidesGap);
+		shapePath = getParallelogramPath(width, height, sidesGap);
+		shapeBorderPath = getParallelogramPath(width, height, sidesGap);
 
 		resolveTimeElapsed();
 		if (startAnimationOnCreation) {
@@ -137,7 +142,7 @@ public class UserLayout extends FrameLayout {
 		super.onDraw(canvas);
 	}
 
-	private Path getParallelogrammPath(float width, float height, float sidesGap) {
+	private Path getParallelogramPath(float width, float height, float sidesGap) {
 		Path path = new Path();
 
 		float[] pLeftBottom = {0f, height - 1},

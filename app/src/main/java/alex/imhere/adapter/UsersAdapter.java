@@ -11,7 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 import alex.imhere.R;
-import alex.imhere.fragment.view.UserLayout;
+import alex.imhere.view.UserLayout;
 import alex.imhere.layer.server.Session;
 import alex.imhere.service.TimeFormatter;
 

@@ -7,18 +7,47 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.UiThread;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import alex.imhere.R;
-import alex.imhere.activity.model.AbstractModel;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.adapter.UsersAdapter;
-import alex.imhere.fragment.view.AbstractView;
-import alex.imhere.fragment.view.UpdatingViewTimer;
+import alex.imhere.view.UpdatingViewTimer;
 import alex.imhere.layer.server.Session;
 
-public class UsersFragment extends ListFragment implements AbstractView {
+@EFragment
+public class UsersFragment extends ListFragment implements ImhereModel.EventsListenerOwner {
+	ImhereModel.EventsListener eventsListener = new ImhereModel.EventsListener() {
+		@Override
+		public void onAddUser(Session session) {
+
+		}
+
+		@Override
+		public void onRemoveUser(Session session) {
+
+		}
+
+		@Override
+		public void onClearUsers() {
+
+		}
+
+		@Override
+		public void onLogin(Session session) {
+
+		}
+
+		@Override
+		public void onLogout() {
+
+		}
+	};
+
 	private UsersAdapter usersAdapter;
 	private List<Session> readOnlyUsers = new ArrayList<>();
 	private ImhereModel model;
@@ -59,7 +88,7 @@ public class UsersFragment extends ListFragment implements AbstractView {
 	}
 
 
-	@Override
+	@Override @UiThread
 	public void onDataUpdate(final int notification, final Object data) {
 		boolean currentSessionIsAlive = model.isCurrentSessionAlive(),
 				statusChanged = currentSessionIsAlive != currentSessionWasAlive;
@@ -92,5 +121,10 @@ public class UsersFragment extends ListFragment implements AbstractView {
 		model.addEventListener(this);
 
 		//readOnlyUsers = model.getOnlineUsersSet();
+	}
+
+	@Override
+	public ImhereModel.EventsListener getEventsListener() {
+		return eventsListener
 	}
 }

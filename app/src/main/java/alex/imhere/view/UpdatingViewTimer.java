@@ -1,11 +1,9 @@
-package alex.imhere.fragment.view;
+package alex.imhere.view;
 
 import android.os.Handler;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import alex.imhere.activity.model.AbstractModel;
 
 public class UpdatingViewTimer {
 	private AbstractView view;

@@ -1,4 +1,4 @@
-package alex.imhere.fragment.view;
+package alex.imhere.view;
 
 import android.os.Handler;
 import android.support.annotation.NonNull;

@@ -19,13 +19,43 @@ import alex.imhere.service.ChannelService;
 import alex.imhere.util.ListObservable;
 import alex.imhere.util.TemporarySet;
 
-public class ImhereModel extends AbstractModel {
-	// TODO: 25.08.2015 make smart flags without chances of collision
-	static public final int ADD_USER_NOTIFICATION = 1 + LAST_NOTIFICATION_FLAG;
-	static public final int REMOVE_USER_NOTIFICATION = 2 + LAST_NOTIFICATION_FLAG;
-	static public final int CLEAR_USER_NOTIFICATION = 3 + LAST_NOTIFICATION_FLAG;
-	static public final int LOGIN_NOTIFICATION = 4 + LAST_NOTIFICATION_FLAG;
-	//static protected final int LAST_NOTIFICATION_FLAG = 5;
+public class ImhereModel extends BaseModel<ImhereModel.EventsListener> {
+	EventsListener notifier = new EventsListener() {
+		@Override
+		public void onAddUser(final Session session) {
+			for (EventsListener listener : listeners) {
+				listener.onAddUser(session);
+			}
+		}
+
+		@Override
+		public void onRemoveUser(final Session session) {
+			for (EventsListener listener : listeners) {
+				listener.onRemoveUser(session);
+			}
+		}
+
+		@Override
+		public void onClearUsers() {
+			for (EventsListener listener : listeners) {
+				listener.onClearUsers();
+			}
+		}
+
+		@Override
+		public void onLogin(final Session session) {
+			for (EventsListener listener : listeners) {
+				listener.onLogin(session);
+			}
+		}
+
+		@Override
+		public void onLogout() {
+			for (EventsListener listener : listeners) {
+				listener.onLogout();
+			}
+		}
+	};
 
 	//TODO: exerpt methods to Service! This is too complex for Model in MVC
 	private ServerAPI api = new ServerAPI();
@@ -41,13 +71,13 @@ public class ImhereModel extends AbstractModel {
 				ListObservable.NotificationData notificationData = (ListObservable.NotificationData) data;
 
 				if (notificationData.notification == ListObservable.Notification.ADD) {
-					notifyDataChanged(ADD_USER_NOTIFICATION, notificationData.data);
+					notifier.onAddUser((Session) notificationData.data);
 				}
 				if (notificationData.notification == ListObservable.Notification.REMOVE) {
-					notifyDataChanged(REMOVE_USER_NOTIFICATION, notificationData.data);
+					notifier.onRemoveUser((Session) notificationData.data);
 				}
 				if (notificationData.notification == ListObservable.Notification.CLEAR) {
-					notifyDataChanged(UNIVERSAL_NOTIFICATION, null);
+					notifier.onClearUsers();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -60,10 +90,7 @@ public class ImhereModel extends AbstractModel {
 	private Timer timer = new Timer();
 	private TimerTask timerTask;
 
-	/*LocalDateTime now = new LocalDateTime();*/
-
-	public ImhereModel(@NonNull Handler uiHandler, @NonNull String udid) {
-		super(uiHandler);
+	public ImhereModel(@NonNull String udid) {
 		this.udid = udid;
 
 		ChannelService.ChannelEventsListener channelListener = new ChannelService.ChannelEventsListener() {
@@ -99,13 +126,6 @@ public class ImhereModel extends AbstractModel {
 		return onlineUsersSet.asReadonlyList();
 	}
 
-	/*public DateTime getNow() throws ParseException {
-		//TODO: log exception
-		// TODO: 17.08.2015 session can be null
-		now = api.getNow(currentSession);
-		return now;
-	}*/
-
 	public Session openNewSession(final Runnable onSessionClosed) throws ParseException {
 		//TODO: log exception
 		onlineUsersSet.clear();
@@ -128,7 +148,7 @@ public class ImhereModel extends AbstractModel {
 		timer.schedule(timerTask, currentSession.getAliveTo().toDate());
 
 		this.currentSession = currentSession;
-		notifyDataChanged(LOGIN_NOTIFICATION);
+		notifier.onLogin(currentSession);
 
 		return currentSession;
 	}
@@ -145,7 +165,21 @@ public class ImhereModel extends AbstractModel {
 			currentSession = null;
 			//onlineUsersSet.clear();
 
-			notifyDataChanged(CLEAR_USER_NOTIFICATION);
+			notifier.onClearUsers();
+			notifier.onLogout();
 		}
+	}
+
+	public interface EventsListener extends BaseModel.EventsListener {
+		void onAddUser(final Session session);
+		void onRemoveUser(final Session session);
+		void onClearUsers();
+
+		void onLogin(final Session session);
+		void onLogout();
+	}
+
+	public interface EventsListenerOwner {
+		public EventsListener getEventsListener();
 	}
 }

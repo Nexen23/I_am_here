@@ -9,7 +9,7 @@ import org.joda.time.LocalDateTime;
 import org.parceler.Parcel;
 
 @Parcel
-public class Session {
+public class DyingUser {
 	@SerializedName("udid")
 	String udid = "";
 	@SerializedName("loginedAt")
@@ -17,15 +17,15 @@ public class Session {
 	@SerializedName("aliveTo")
 	LocalDateTime aliveTo = new LocalDateTime(0);
 
-	public Session() {
+	public DyingUser() {
 	}
 
 	//region Protected
-	protected Session(Session session) {
-		this(session.udid, session.loginedAt, session.aliveTo);
+	protected DyingUser(DyingUser dyingUser) {
+		this(dyingUser.udid, dyingUser.loginedAt, dyingUser.aliveTo);
 	}
 
-	protected Session(String udid, LocalDateTime loginedAt, LocalDateTime aliveTo) {
+	protected DyingUser(String udid, LocalDateTime loginedAt, LocalDateTime aliveTo) {
 		setUdid(udid);
 		setLoginedAt(loginedAt);
 		setAliveTo(aliveTo);
@@ -76,9 +76,9 @@ public class Session {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		Session session = (Session) o;
+		DyingUser dyingUser = (DyingUser) o;
 
-		return getUdid().equals(session.getUdid());
+		return getUdid().equals(dyingUser.getUdid());
 
 	}
 

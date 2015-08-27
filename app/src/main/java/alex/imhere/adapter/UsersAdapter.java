@@ -11,16 +11,16 @@ import android.widget.TextView;
 import java.util.List;
 
 import alex.imhere.R;
+import alex.imhere.layer.server.DyingUser;
 import alex.imhere.view.UserLayout;
-import alex.imhere.layer.server.Session;
 import alex.imhere.service.TimeFormatter;
 
-public class UsersAdapter extends ArrayAdapter<Session> {
+public class UsersAdapter extends ArrayAdapter<DyingUser> {
 	private final int resourceId;
 	private Context context;
-	List<Session> items;
+	List<DyingUser> items;
 
-	public UsersAdapter(Activity activity, int item_user, List<Session> items) {
+	public UsersAdapter(Activity activity, int item_user, List<DyingUser> items) {
 		super(activity, item_user, items);
 		this.items = items;
 
@@ -29,20 +29,20 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 	}
 
 	@Override
-	public void add(Session insertingSession) {
+	public void add(DyingUser insertingDyingUser) {
 		if (getCount() == 0) {
-			super.add(insertingSession);
+			super.add(insertingDyingUser);
 		} else {
 			boolean notInserted = true;
 			for( int i = 0; i < getCount() && notInserted; i++ ) {
-				Session session = getItem(i);
-				if (session.getRestLifetime().getMillis() >= insertingSession.getRestLifetime().getMillis()) {
-					insert(insertingSession, i);
+				DyingUser dyingUser = getItem(i);
+				if (dyingUser.getRestLifetime().getMillis() >= insertingDyingUser.getRestLifetime().getMillis()) {
+					insert(insertingDyingUser, i);
 					notInserted = false;
 				}
 			}
 			if (notInserted) {
-				super.add(insertingSession);
+				super.add(insertingDyingUser);
 			}
 		}
 	}
@@ -50,13 +50,13 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		UserLayout userView = (UserLayout) convertView;
-		Session session = getItem(position);
+		DyingUser dyingUser = getItem(position);
 
 		/*String sessionLoggingString = "null";
 		String userViewLoggingString = "null";
 
-		if (session != null) {
-			sessionLoggingString = session.getUdid();
+		if (dyingUser != null) {
+			sessionLoggingString = dyingUser.getUdid();
 		}
 
 		if (userView != null) {
@@ -67,15 +67,15 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 				position, sessionLoggingString, userViewLoggingString);
 		Log.d("TAG", loggingString);*/
 
-		if (userView == null || userView.getTag() == null || userView.getTag() != session)
+		if (userView == null || userView.getTag() == null || userView.getTag() != dyingUser)
 		{
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			userView = (UserLayout) inflater.inflate(resourceId, parent, false);
-			userView.setTag(session);
+			userView.setTag(dyingUser);
 
-			if (session != null) {
-				Long restLifetimeMs = session.getRestLifetime().getMillis();
-				Long fullLifetimeMs = session.getFullLifetime().getMillis();
+			if (dyingUser != null) {
+				Long restLifetimeMs = dyingUser.getRestLifetime().getMillis();
+				Long fullLifetimeMs = dyingUser.getFullLifetime().getMillis();
 				Long timeElapsedMs = fullLifetimeMs - restLifetimeMs;
 
 				userView.setLifetime(fullLifetimeMs, timeElapsedMs);
@@ -83,21 +83,21 @@ public class UsersAdapter extends ArrayAdapter<Session> {
 			}
 		}
 
-		if (session != null) {
-			fillView(userView, session);
+		if (dyingUser != null) {
+			fillView(userView, dyingUser);
 		}
 
 		return userView;
 	}
 
-	private void fillView(View userView, Session session)
+	private void fillView(View userView, DyingUser dyingUser)
 	{
 		TextView tv_name = (TextView) userView.findViewById(R.id.tv_name);
-		tv_name.setText(session.getUdid());
+		tv_name.setText(dyingUser.getUdid());
 
 		TextView tv_singed_in_date = (TextView) userView.findViewById(R.id.tv_singed_in_date);
 
-		String result = new TimeFormatter().durationToMSString( session.getRestLifetime() );
+		String result = new TimeFormatter().durationToMSString( dyingUser.getRestLifetime() );
 
 		tv_singed_in_date.setText( result );
 	}

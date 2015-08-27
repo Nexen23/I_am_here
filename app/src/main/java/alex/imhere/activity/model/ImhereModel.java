@@ -1,6 +1,5 @@
 package alex.imhere.activity.model;
 
-import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import com.parse.ParseException;
@@ -13,45 +12,45 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import alex.imhere.layer.server.DyingUser;
 import alex.imhere.layer.server.ServerAPI;
-import alex.imhere.layer.server.Session;
 import alex.imhere.service.ChannelService;
 import alex.imhere.util.ListObservable;
 import alex.imhere.util.TemporarySet;
 
-public class ImhereModel extends BaseModel<ImhereModel.EventsListener> {
-	EventsListener notifier = new EventsListener() {
+public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
+	EventListener notifier = new EventListener() {
 		@Override
-		public void onAddUser(final Session session) {
-			for (EventsListener listener : listeners) {
-				listener.onAddUser(session);
+		public void onLoginUser(final DyingUser dyingUser) {
+			for (EventListener listener : listeners) {
+				listener.onLoginUser(dyingUser);
 			}
 		}
 
 		@Override
-		public void onRemoveUser(final Session session) {
-			for (EventsListener listener : listeners) {
-				listener.onRemoveUser(session);
+		public void onLogoutUser(final DyingUser dyingUser) {
+			for (EventListener listener : listeners) {
+				listener.onLogoutUser(dyingUser);
 			}
 		}
 
 		@Override
 		public void onClearUsers() {
-			for (EventsListener listener : listeners) {
+			for (EventListener listener : listeners) {
 				listener.onClearUsers();
 			}
 		}
 
 		@Override
-		public void onLogin(final Session session) {
-			for (EventsListener listener : listeners) {
-				listener.onLogin(session);
+		public void onLogin(final DyingUser currentUser) {
+			for (EventListener listener : listeners) {
+				listener.onLogin(currentUser);
 			}
 		}
 
 		@Override
 		public void onLogout() {
-			for (EventsListener listener : listeners) {
+			for (EventListener listener : listeners) {
 				listener.onLogout();
 			}
 		}
@@ -62,8 +61,8 @@ public class ImhereModel extends BaseModel<ImhereModel.EventsListener> {
 	private ChannelService channel;
 
 	private String udid;
-	private Session currentSession = null;
-	private TemporarySet<Session> onlineUsersSet = new TemporarySet<>();
+	private DyingUser currentDyingUser = null;
+	private TemporarySet<DyingUser> onlineUsersSet = new TemporarySet<>();
 	private Observer onlineUsersObserver = new Observer() {
 		@Override
 		public void update(Observable observable, Object data) {
@@ -71,10 +70,10 @@ public class ImhereModel extends BaseModel<ImhereModel.EventsListener> {
 				ListObservable.NotificationData notificationData = (ListObservable.NotificationData) data;
 
 				if (notificationData.notification == ListObservable.Notification.ADD) {
-					notifier.onAddUser((Session) notificationData.data);
+					notifier.onLoginUser((DyingUser) notificationData.data);
 				}
 				if (notificationData.notification == ListObservable.Notification.REMOVE) {
-					notifier.onRemoveUser((Session) notificationData.data);
+					notifier.onLogoutUser((DyingUser) notificationData.data);
 				}
 				if (notificationData.notification == ListObservable.Notification.CLEAR) {
 					notifier.onClearUsers();
@@ -95,14 +94,14 @@ public class ImhereModel extends BaseModel<ImhereModel.EventsListener> {
 
 		ChannelService.ChannelEventsListener channelListener = new ChannelService.ChannelEventsListener() {
 			@Override
-			public void onUserOnline(Session session) {
+			public void onUserOnline(DyingUser session) {
 				if ( isCurrentSessionAlive() && onlineUsersSet.add(session, session.getAliveTo()) ) {
 					//notifyDataChanged(ADD_USER_NOTIFICATION, session);
 				}
 			}
 
 			@Override
-			public void onUserOffline(Session session) {
+			public void onUserOffline(DyingUser session) {
 				if ( isCurrentSessionAlive() && onlineUsersSet.remove(session) ) {
 					//notifyDataChanged(REMOVE_USER_NOTIFICATION, session);
 				}
@@ -115,27 +114,27 @@ public class ImhereModel extends BaseModel<ImhereModel.EventsListener> {
 	}
 
 	public boolean isCurrentSessionAlive() {
-		return currentSession != null && currentSession.getRestLifetime().getMillis() != 0;
+		return currentDyingUser != null && currentDyingUser.getRestLifetime().getMillis() != 0;
 	}
 
 	public Duration getCurrentSessionLifetime() {
-		return currentSession.getRestLifetime();
+		return currentDyingUser.getRestLifetime();
 	}
 
-	public final List<Session> getOnlineUsersSet() {
+	/*public final List<DyingUser> getOnlineUsersSet() {
 		return onlineUsersSet.asReadonlyList();
-	}
+	}*/
 
-	public Session openNewSession(final Runnable onSessionClosed) throws ParseException {
+	public DyingUser openNewSession(final Runnable onSessionClosed) throws ParseException {
 		//TODO: log exception
 		onlineUsersSet.clear();
-		Session currentSession = api.login(udid);
+		DyingUser currentDyingUser = api.login(udid);
 		channel.connect();
 		// TODO: 18.08.2015 log exception
 
-		List<Session> onlineUsers = api.getOnlineUsers(currentSession);
-		for (Session session : onlineUsers) {
-			onlineUsersSet.add(session, session.getAliveTo());
+		List<DyingUser> onlineUsers = api.getOnlineUsers(currentDyingUser);
+		for (DyingUser dyingUser : onlineUsers) {
+			onlineUsersSet.add(dyingUser, dyingUser.getAliveTo());
 		}
 
 		timerTask = new TimerTask() {
@@ -145,24 +144,24 @@ public class ImhereModel extends BaseModel<ImhereModel.EventsListener> {
 				onSessionClosed.run();
 			}
 		};
-		timer.schedule(timerTask, currentSession.getAliveTo().toDate());
+		timer.schedule(timerTask, currentDyingUser.getAliveTo().toDate());
 
-		this.currentSession = currentSession;
-		notifier.onLogin(currentSession);
+		this.currentDyingUser = currentDyingUser;
+		notifier.onLogin(currentDyingUser);
 
-		return currentSession;
+		return currentDyingUser;
 	}
 
 	public void cancelCurrentSession() {
-		if (currentSession != null) {
+		if (currentDyingUser != null) {
 			channel.disconnect();
-			api.logout(currentSession);
+			api.logout(currentDyingUser);
 
 			timerTask.cancel();
 			timer.purge();
 			timerTask = null;
 
-			currentSession = null;
+			currentDyingUser = null;
 			//onlineUsersSet.clear();
 
 			notifier.onClearUsers();
@@ -170,16 +169,14 @@ public class ImhereModel extends BaseModel<ImhereModel.EventsListener> {
 		}
 	}
 
-	public interface EventsListener extends BaseModel.EventsListener {
-		void onAddUser(final Session session);
-		void onRemoveUser(final Session session);
+	public interface EventListener extends BaseModel.EventListener {
+		void onLoginUser(final DyingUser dyingUser);
+		void onLogoutUser(final DyingUser dyingUser);
+
+		//void onUsersLifetimeUpdate();
 		void onClearUsers();
 
-		void onLogin(final Session session);
+		void onLogin(final DyingUser currentUser);
 		void onLogout();
-	}
-
-	public interface EventsListenerOwner {
-		public EventsListener getEventsListener();
 	}
 }

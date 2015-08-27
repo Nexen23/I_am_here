@@ -17,8 +17,10 @@ import android.widget.Toast;
 import com.parse.ParseException;
 
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 
 import alex.imhere.R;
+import alex.imhere.activity.model.BaseModel;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.fragment.StatusFragment;
 import alex.imhere.view.UiRunnable;
@@ -42,8 +44,8 @@ public class ImhereActivity extends AppCompatActivity
 	@Override
 	public void onAttachFragment(Fragment fragment) {
 		super.onAttachFragment(fragment);
-		ImhereModel.EventsListenerOwner listenerOwner = (ImhereModel.EventsListenerOwner) fragment;
-		model.addEventsListener(listenerOwner.getEventsListener());
+		BaseModel.ModelListener modeListener = (BaseModel.ModelListener) fragment;
+		modeListener.listenModel(model);
 	}
 
 	@Override
@@ -65,29 +67,23 @@ public class ImhereActivity extends AppCompatActivity
 	}
 
 	public void showUsersFragment(final boolean doShow) {
-		final Activity activity = this;
-		model.getUiHandler().post(new Runnable() {
+		final FrameLayout usersView = (FrameLayout) findViewById(R.id.fl_fragment_users);
+		final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) usersView.getLayoutParams();
+		final int marginInPx = (int) getResources().getDimension(R.dimen.fragment_users_margin);
+		ValueAnimator animator = ValueAnimator.ofInt(marginInPx, 0);
+		if (doShow == false) {
+			animator = ValueAnimator.ofInt(0, marginInPx);
+		}
+		animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
 			@Override
-			public void run() {
-				final FrameLayout usersView = (FrameLayout) activity.findViewById(R.id.fl_fragment_users);
-				final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) usersView.getLayoutParams();
-				final int marginInPx = (int) getResources().getDimension(R.dimen.fragment_users_margin);
-				ValueAnimator animator = ValueAnimator.ofInt(marginInPx, 0);
-				if (doShow == false) {
-					animator = ValueAnimator.ofInt(0, marginInPx);
-				}
-				animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-					@Override
-					public void onAnimationUpdate(ValueAnimator valueAnimator)
-					{
-						params.rightMargin = (Integer) valueAnimator.getAnimatedValue();
-						usersView.requestLayout();
-					}
-				});
-				animator.setDuration( getResources().getInteger(R.integer.duration_users_fragment_sliding) );
-				animator.start();
+			public void onAnimationUpdate(ValueAnimator valueAnimator)
+			{
+				params.rightMargin = (Integer) valueAnimator.getAnimatedValue();
+				usersView.requestLayout();
 			}
 		});
+		animator.setDuration( getResources().getInteger(R.integer.duration_users_fragment_sliding) );
+		animator.start();
 	}
 
 	@Override

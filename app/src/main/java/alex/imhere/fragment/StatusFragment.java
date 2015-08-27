@@ -19,55 +19,31 @@ import com.skyfishjy.library.RippleBackground;
 
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
 
 import alex.imhere.R;
+import alex.imhere.activity.model.BaseModel;
 import alex.imhere.activity.model.ImhereModel;
-import alex.imhere.layer.server.Session;
+import alex.imhere.layer.server.DyingUser;
 import alex.imhere.view.UiRunnable;
 import alex.imhere.view.UpdatingViewTimer;
 import alex.imhere.service.TimeFormatter;
-import butterknife.Bind;
-import butterknife.ButterKnife;
 
 @EFragment
-public class StatusFragment extends Fragment implements ImhereModel.EventsListenerOwner {
-	ImhereModel.EventsListener eventsListener = new ImhereModel.EventsListener() {
-		@Override
-		public void onAddUser(Session session) {
-
-		}
-
-		@Override
-		public void onRemoveUser(Session session) {
-
-		}
-
-		@Override
-		public void onClearUsers() {
-
-		}
-
-		@Override
-		public void onLogin(Session session) {
-
-		}
-
-		@Override
-		public void onLogout() {
-
-		}
-	};
+public class StatusFragment extends Fragment implements BaseModel.ModelListener {
+	BaseModel model;
+	BaseModel.EventListener eventsListener;
 
 	FragmentInteractionsListener interactionsListener;
-	ImhereModel model;
+
 	boolean currentSessionWasAlive = false;
 
 	TimeFormatter timeFormatter = new TimeFormatter();
 
-	@Bind(R.id.ts_status) TextSwitcher tsStatus;
-	@Bind(R.id.tv_timer) TextView tvTimer;
-	@Bind(R.id.b_imhere) Button imhereButton;
-	@Bind(R.id.e_b_imhere) RippleBackground imhereButtonClickEffect;
+	@ViewById(R.id.ts_status) TextSwitcher tsStatus;
+	@ViewById(R.id.tv_timer) TextView tvTimer;
+	@ViewById(R.id.b_imhere) Button imhereButton;
+	@ViewById(R.id.e_b_imhere) RippleBackground imhereButtonClickEffect;
 
 	Handler uiHandler;
 	UpdatingViewTimer updatingViewTimer;
@@ -80,7 +56,6 @@ public class StatusFragment extends Fragment implements ImhereModel.EventsListen
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 	                         Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_status, container, false);
-		ButterKnife.bind(this, view);
 
 		uiHandler = new Handler();
 		updatingViewTimer = new UpdatingViewTimer(uiHandler, this);
@@ -155,12 +130,6 @@ public class StatusFragment extends Fragment implements ImhereModel.EventsListen
 		currentSessionWasAlive = currentSessionIsAlive;
 	}
 
-	@Override
-	public void setModel(AbstractModel abstractModel) {
-		model = (ImhereModel) abstractModel;
-		model.addEventListener(this);
-	}
-
 	void updateStatus(boolean statusChanged, boolean currentSessionIsAlive) {
 		if (statusChanged) {
 			if (currentSessionIsAlive) {
@@ -205,8 +174,37 @@ public class StatusFragment extends Fragment implements ImhereModel.EventsListen
 	}
 
 	@Override
-	public ImhereModel.EventsListener getEventsListener() {
-		return eventsListener;
+	public void listenModel(BaseModel baseModel) {
+		this.model = baseModel;
+		baseModel.addEventsListener(eventsListener);
+		ImhereModel model = (ImhereModel) baseModel;
+
+		eventsListener = new ImhereModel.EventListener() {
+			@Override
+			public void onLoginUser(DyingUser dyingUser) {
+
+			}
+
+			@Override
+			public void onLogoutUser(DyingUser dyingUser) {
+
+			}
+
+			@Override
+			public void onClearUsers() {
+
+			}
+
+			@Override
+			public void onLogin(DyingUser currentUser) {
+
+			}
+
+			@Override
+			public void onLogout() {
+
+			}
+		};
 	}
 
 	public interface FragmentInteractionsListener {

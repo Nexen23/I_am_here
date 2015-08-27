@@ -4,7 +4,7 @@ import android.support.annotation.Nullable;
 
 import java.util.ArrayList;
 
-public abstract class BaseModel<TEventsListener extends BaseModel.EventsListener> {
+public abstract class BaseModel<TEventsListener extends BaseModel.EventListener> {
 	ArrayList<TEventsListener> listeners = new ArrayList<>();
 
 	public void addEventsListener(@Nullable TEventsListener listener) {
@@ -19,6 +19,10 @@ public abstract class BaseModel<TEventsListener extends BaseModel.EventsListener
 		}
 	}
 
-	interface EventsListener {
+	public interface EventListener {
 	};
+
+	public interface ModelListener {
+		void listenModel(BaseModel baseModel);
+	}
 }

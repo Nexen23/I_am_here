@@ -2,13 +2,12 @@ package alex.imhere.service;
 
 import android.util.Log;
 
-import com.google.gson.Gson;
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
 
-import alex.imhere.layer.server.Session;
+import alex.imhere.layer.server.DyingUser;
 
 public class ChannelService {
 	// TODO: 18.08.2015 split it to MainService and Service for ServerAPI only (also no hardcoded strings!)
@@ -51,17 +50,17 @@ public class ChannelService {
 							Log.d("TAG", "SUBSCRIBE : " + channel + " : "
 									+ message.getClass() + " : " + message.toString() + " [" + timetoken + "]");
 
-							Session session = jsonParser.fromJson(message.toString(), Session.class);
-							int timeComparizion = session.getLoginedAt().compareTo(session.getAliveTo());
+							DyingUser dyingUser = jsonParser.fromJson(message.toString(), DyingUser.class);
+							int timeComparizion = dyingUser.getLoginedAt().compareTo(dyingUser.getAliveTo());
 							boolean sessionIsDead = false;
 							if (timeComparizion >= 0) {
 								sessionIsDead = true;
 							}
 
 							if (sessionIsDead) {
-								eventsListener.onUserOffline(session);
+								eventsListener.onUserOffline(dyingUser);
 							} else {
-								eventsListener.onUserOnline(session);
+								eventsListener.onUserOnline(dyingUser);
 							}
 						}
 
@@ -82,7 +81,7 @@ public class ChannelService {
 	}
 
 	public interface ChannelEventsListener {
-		void onUserOnline(Session session);
-		void onUserOffline(Session session);
+		void onUserOnline(DyingUser dyingUser);
+		void onUserOffline(DyingUser dyingUser);
 	}
 }

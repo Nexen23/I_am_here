@@ -14,50 +14,25 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alex.imhere.R;
+import alex.imhere.activity.model.BaseModel;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.adapter.UsersAdapter;
-import alex.imhere.view.UpdatingViewTimer;
-import alex.imhere.layer.server.Session;
+import alex.imhere.layer.server.DyingUser;
+import alex.imhere.view.UpdatingTimer;
 
 @EFragment
-public class UsersFragment extends ListFragment implements ImhereModel.EventsListenerOwner {
-	ImhereModel.EventsListener eventsListener = new ImhereModel.EventsListener() {
-		@Override
-		public void onAddUser(Session session) {
-
-		}
-
-		@Override
-		public void onRemoveUser(Session session) {
-
-		}
-
-		@Override
-		public void onClearUsers() {
-
-		}
-
-		@Override
-		public void onLogin(Session session) {
-
-		}
-
-		@Override
-		public void onLogout() {
-
-		}
-	};
+public class UsersFragment extends ListFragment implements BaseModel.ModelListener, UpdatingTimer.TimerListener {
+	BaseModel model;
+	BaseModel.EventListener eventsListener;
 
 	private UsersAdapter usersAdapter;
-	private List<Session> readOnlyUsers = new ArrayList<>();
-	private ImhereModel model;
+	private List<DyingUser> dyingUsers = new ArrayList<>();
 
 	private Handler uiHandler;
-	private UpdatingViewTimer updatingViewTimer;
-	private boolean currentSessionWasAlive = false;
+	private UpdatingTimer updatingTimer;
 
 	public static UsersFragment newInstance() {
-		UsersFragment fragment = new UsersFragment();
+		UsersFragment fragment = new UsersFragment_();
 		Bundle args = new Bundle();
 		fragment.setArguments(args);
 		return fragment;
@@ -71,60 +46,51 @@ public class UsersFragment extends ListFragment implements ImhereModel.EventsLis
 	}
 
 	@Override
-	public void onResume() {
-		super.onResume();
-		onDataUpdate(AbstractModel.UNIVERSAL_NOTIFICATION, null);
-	}
-
-	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		uiHandler = new Handler();
-		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, new ArrayList<Session>());
+		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, dyingUsers);
 
-		updatingViewTimer = new UpdatingViewTimer(uiHandler, this);
-		updatingViewTimer.start();
+		uiHandler = new Handler();
+		updatingTimer = new UpdatingTimer(uiHandler, this).start();
 
 		return inflater.inflate(R.layout.fragment_users, container);
 	}
 
+	@Override
+	public void listenModel(BaseModel baseModel) {
+		this.model = baseModel;
+		baseModel.addEventsListener(eventsListener);
+		ImhereModel model = (ImhereModel) baseModel;
 
-	@Override @UiThread
-	public void onDataUpdate(final int notification, final Object data) {
-		boolean currentSessionIsAlive = model.isCurrentSessionAlive(),
-				statusChanged = currentSessionIsAlive != currentSessionWasAlive;
+		eventsListener = new ImhereModel.EventListener() {
+			@Override
+			public void onLoginUser(DyingUser dyingUser) {
+				usersAdapter.add(dyingUser);
+			}
 
-		Session session = (Session) data;
-		switch (notification) {
-			case ImhereModel.ADD_USER_NOTIFICATION :
-				usersAdapter.add(session);
-				break;
+			@Override
+			public void onLogoutUser(DyingUser dyingUser) {
+				usersAdapter.remove(dyingUser);
+			}
 
-			case ImhereModel.REMOVE_USER_NOTIFICATION :
-				usersAdapter.remove(session);
-				break;
-
-			case ImhereModel.CLEAR_USER_NOTIFICATION :
+			@Override
+			public void onClearUsers() {
 				usersAdapter.clear();
-				break;
+			}
 
-			default :
+			@Override
+			public void onLogin(DyingUser currentUser) {
 				usersAdapter.notifyDataSetChanged();
-				break;
-		}
+			}
 
-		currentSessionWasAlive = currentSessionIsAlive;
+			@Override
+			public void onLogout() {
+				usersAdapter.notifyDataSetChanged();
+			}
+		};
 	}
 
 	@Override
-	public void setModel(AbstractModel abstractModel) {
-		model = (ImhereModel) abstractModel;
-		model.addEventListener(this);
-
-		//readOnlyUsers = model.getOnlineUsersSet();
-	}
-
-	@Override
-	public ImhereModel.EventsListener getEventsListener() {
-		return eventsListener
+	public void onTimerTick() {
+		usersAdapter.notifyDataSetChanged();
 	}
 }

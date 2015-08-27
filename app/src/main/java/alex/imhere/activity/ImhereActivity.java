@@ -66,6 +66,7 @@ public class ImhereActivity extends AppCompatActivity
 		return super.onOptionsItemSelected(item);
 	}
 
+	@UiThread
 	public void showUsersFragment(final boolean doShow) {
 		final FrameLayout usersView = (FrameLayout) findViewById(R.id.fl_fragment_users);
 		final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) usersView.getLayoutParams();

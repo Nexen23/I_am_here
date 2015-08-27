@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
 
@@ -20,16 +21,16 @@ import alex.imhere.adapter.UsersAdapter;
 import alex.imhere.layer.server.DyingUser;
 import alex.imhere.view.UpdatingTimer;
 
-@EFragment
+@EFragment(R.layout.fragment_users)
 public class UsersFragment extends ListFragment implements BaseModel.ModelListener, UpdatingTimer.TimerListener {
 	BaseModel model;
 	BaseModel.EventListener eventsListener;
 
-	private UsersAdapter usersAdapter;
-	private List<DyingUser> dyingUsers = new ArrayList<>();
+	UsersAdapter usersAdapter;
+	List<DyingUser> dyingUsers = new ArrayList<>();
 
-	private Handler uiHandler;
-	private UpdatingTimer updatingTimer;
+	Handler uiHandler;
+	UpdatingTimer updatingTimer;
 
 	public static UsersFragment newInstance() {
 		UsersFragment fragment = new UsersFragment_();
@@ -45,14 +46,12 @@ public class UsersFragment extends ListFragment implements BaseModel.ModelListen
 		setListAdapter(usersAdapter);
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+	@AfterViews
+	public void onViewsInjected() {
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, dyingUsers);
 
 		uiHandler = new Handler();
 		updatingTimer = new UpdatingTimer(uiHandler, this).start();
-
-		return inflater.inflate(R.layout.fragment_users, container);
 	}
 
 	@Override
@@ -62,34 +61,34 @@ public class UsersFragment extends ListFragment implements BaseModel.ModelListen
 		ImhereModel model = (ImhereModel) baseModel;
 
 		eventsListener = new ImhereModel.EventListener() {
-			@Override
+			@Override @UiThread
 			public void onLoginUser(DyingUser dyingUser) {
 				usersAdapter.add(dyingUser);
 			}
 
-			@Override
+			@Override @UiThread
 			public void onLogoutUser(DyingUser dyingUser) {
 				usersAdapter.remove(dyingUser);
 			}
 
-			@Override
+			@Override @UiThread
 			public void onClearUsers() {
 				usersAdapter.clear();
 			}
 
-			@Override
+			@Override @UiThread
 			public void onLogin(DyingUser currentUser) {
 				usersAdapter.notifyDataSetChanged();
 			}
 
-			@Override
+			@Override @UiThread
 			public void onLogout() {
 				usersAdapter.notifyDataSetChanged();
 			}
 		};
 	}
 
-	@Override
+	@Override @UiThread
 	public void onTimerTick() {
 		usersAdapter.notifyDataSetChanged();
 	}

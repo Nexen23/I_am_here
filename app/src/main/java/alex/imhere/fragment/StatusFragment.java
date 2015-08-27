@@ -17,57 +17,58 @@ import android.widget.TextView;
 
 import com.skyfishjy.library.RippleBackground;
 
+import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.joda.time.Duration;
+import org.joda.time.LocalDateTime;
 
 import alex.imhere.R;
 import alex.imhere.activity.model.BaseModel;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.layer.server.DyingUser;
 import alex.imhere.view.UiRunnable;
-import alex.imhere.view.UpdatingViewTimer;
 import alex.imhere.service.TimeFormatter;
+import alex.imhere.view.UpdatingTimer;
 
-@EFragment
-public class StatusFragment extends Fragment implements BaseModel.ModelListener {
+@EFragment(R.layout.fragment_status)
+public class StatusFragment extends Fragment implements BaseModel.ModelListener, UpdatingTimer.TimerListener {
 	BaseModel model;
 	BaseModel.EventListener eventsListener;
 
 	FragmentInteractionsListener interactionsListener;
 
-	boolean currentSessionWasAlive = false;
-
-	TimeFormatter timeFormatter = new TimeFormatter();
+	Handler uiHandler;
+	UpdatingTimer updatingTimer;
 
 	@ViewById(R.id.ts_status) TextSwitcher tsStatus;
 	@ViewById(R.id.tv_timer) TextView tvTimer;
 	@ViewById(R.id.b_imhere) Button imhereButton;
 	@ViewById(R.id.e_b_imhere) RippleBackground imhereButtonClickEffect;
+	TimeFormatter timeFormatter = new TimeFormatter();
 
-	Handler uiHandler;
-	UpdatingViewTimer updatingViewTimer;
+	boolean isCurrentUserLoginned = false;
+	LocalDateTime currentUserAliveTo = new LocalDateTime(0);
 
 	public StatusFragment() {
 		// Required empty public constructor
 	}
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container,
-	                         Bundle savedInstanceState) {
-		View view = inflater.inflate(R.layout.fragment_status, container, false);
-
+	@AfterViews
+	public void onViewsInjected() {
 		uiHandler = new Handler();
-		updatingViewTimer = new UpdatingViewTimer(uiHandler, this);
-		updatingViewTimer.start();
+		updatingTimer = new UpdatingTimer(uiHandler, this).start();
+
+		updateTimer();
 
 		tsStatus.setAnimateFirstView(false);
-		TextView tvSessionDead = (TextView) inflater.inflate(R.layout.textview_status, null);
+		TextView tvSessionDead = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
 		tvSessionDead.setText("Offline");
 		tsStatus.addView(tvSessionDead);
 		tsStatus.showNext();
 
-		TextView tvSessionAlive = (TextView) inflater.inflate(R.layout.textview_status, null);
+		TextView tvSessionAlive = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
 		tvSessionAlive.setText("Online");
 		tsStatus.addView(tvSessionAlive);
 
@@ -97,8 +98,6 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener 
 				}
 			}
 		});
-
-		return view;
 	}
 
 	@Override
@@ -118,59 +117,57 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener 
 		interactionsListener = null;
 	}
 
-	@Override @UiThread
-	public void onDataUpdate(final int notification, final Object data) {
-		boolean currentSessionIsAlive = model.isCurrentSessionAlive(),
-				statusChanged = currentSessionIsAlive != currentSessionWasAlive;
-		updateStatus(statusChanged, currentSessionIsAlive);
-		updateTimer(statusChanged, currentSessionIsAlive);
-		if (statusChanged) {
-			updateButton(currentSessionIsAlive);
-		}
-		currentSessionWasAlive = currentSessionIsAlive;
-	}
-
-	void updateStatus(boolean statusChanged, boolean currentSessionIsAlive) {
-		if (statusChanged) {
-			if (currentSessionIsAlive) {
-				tsStatus.setText("Online");
-			} else {
-				tsStatus.setText("Offline");
-			}
+	@UiThread
+	void updateStatus() {
+		if (isCurrentUserLoginned) {
+			tsStatus.setText("Online");
+		} else {
+			tsStatus.setText("Offline");
 		}
 	}
 
-	void updateTimer(boolean statusChanged, boolean currentSessionIsAlive) {
+	@UiThread
+	void updateTimer() {
 		int timerVisibility = View.INVISIBLE;
+		int animationType = R.anim.fade_out;
+		Animation timerAnimation;
 
-		if (currentSessionIsAlive) {
+		if (isCurrentUserLoginned) {
 			timerVisibility = View.VISIBLE;
-			String durationMsString = timeFormatter.durationToMSString(model.getCurrentSessionLifetime());
-			tvTimer.setText(durationMsString);
+			animationType = R.anim.fade_in;
+			updateTimerTick();
 		}
 
-		if (currentSessionWasAlive != currentSessionIsAlive) {
-			int animationType = R.anim.fade_in;
-			if (currentSessionIsAlive != true) {
-				animationType = R.anim.fade_out;
-			}
-			Animation timerAnimation = AnimationUtils.loadAnimation(getActivity(), animationType);
-
-			tvTimer.startAnimation(timerAnimation);
-		}
+		timerAnimation = AnimationUtils.loadAnimation(getActivity(), animationType);
+		tvTimer.startAnimation(timerAnimation);
 
 		tvTimer.setVisibility(timerVisibility);
 	}
 
-	void updateButton(boolean currentSessionIsAlive) {
+	@UiThread
+	void updateTimerTick() {
+		// TODO: 27.08.2015 really bad hack
+		String durationMsString = timeFormatter.durationToMSString( new Duration(new LocalDateTime().toDateTime(), currentUserAliveTo.toDateTime()) );
+		tvTimer.setText(durationMsString);
+	}
+
+	@UiThread
+	void updateImhereButton() {
 		TransitionDrawable drawable = (TransitionDrawable) imhereButton.getBackground();
-		if (currentSessionIsAlive) {
+		if (isCurrentUserLoginned) {
 			imhereButton.setText("I\'m out!");
 			drawable.startTransition(0);
 		} else {
 			imhereButton.setText("I\'m here!");
 			drawable.reverseTransition(0);
 		}
+	}
+
+	void setStatusLoginned(boolean currentUserIsLoggined) {
+		isCurrentUserLoginned = currentUserIsLoggined;
+		updateStatus();
+		updateImhereButton();
+		updateTimer();
 	}
 
 	@Override
@@ -197,14 +194,20 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener 
 
 			@Override
 			public void onLogin(DyingUser currentUser) {
-
+				currentUserAliveTo = currentUser.getAliveTo();
+				setStatusLoginned(true);
 			}
 
 			@Override
 			public void onLogout() {
-
+				setStatusLoginned(false);
 			}
 		};
+	}
+
+	@Override
+	public void onTimerTick() {
+		updateTimerTick();
 	}
 
 	public interface FragmentInteractionsListener {

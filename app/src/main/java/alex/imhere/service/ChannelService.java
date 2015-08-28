@@ -17,8 +17,19 @@ public class ChannelService {
 	private ChannelEventsListener eventsListener;
 	private JsonParser jsonParser = new JsonParser();
 
+	public ChannelService() {
+	}
+
 	public ChannelService(ChannelEventsListener eventsListener) {
+		setListener(eventsListener);
+	}
+
+	public void setListener(ChannelEventsListener eventsListener) {
 		this.eventsListener = eventsListener;
+	}
+
+	public void clearListener() {
+		this.eventsListener = null;
 	}
 
 	public void connect() {

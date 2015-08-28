@@ -5,6 +5,8 @@ import android.support.annotation.NonNull;
 import com.parse.ParseException;
 
 import org.joda.time.Duration;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Observable;
@@ -16,12 +18,17 @@ import alex.imhere.layer.server.DyingUser;
 import alex.imhere.layer.server.ServerAPI;
 import alex.imhere.service.ChannelService;
 import alex.imhere.util.ListObservable;
+import alex.imhere.util.ListeningController;
 import alex.imhere.util.TemporarySet;
+import hugo.weaving.DebugLog;
 
-public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
+public class ImhereModel extends BaseModel<ImhereModel.EventListener> implements ListeningController {
+	Logger l = LoggerFactory.getLogger(ImhereModel.class);
+
 	EventListener notifier = new EventListener() {
 		@Override
 		public void onLoginUser(final DyingUser dyingUser) {
+			l.info("user {} loginned", dyingUser.getUdid());
 			for (EventListener listener : listeners) {
 				listener.onLoginUser(dyingUser);
 			}
@@ -31,6 +38,13 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
 		public void onLogoutUser(final DyingUser dyingUser) {
 			for (EventListener listener : listeners) {
 				listener.onLogoutUser(dyingUser);
+			}
+		}
+
+		@Override
+		public void onUsersUpdate() {
+			for (EventListener listener : listeners) {
+				listener.onUsersUpdate();
 			}
 		}
 
@@ -58,59 +72,20 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
 
 	//TODO: exerpt methods to Service! This is too complex for Model in MVC
 	private ServerAPI api = new ServerAPI();
-	private ChannelService channel;
+	private ChannelService channel = new ChannelService();
+	ChannelService.ChannelEventsListener channelListener;
+
 
 	private String udid;
 	private DyingUser currentUser = null;
 	private TemporarySet<DyingUser> onlineUsersSet = new TemporarySet<>();
-	private Observer onlineUsersObserver = new Observer() {
-		@Override
-		public void update(Observable observable, Object data) {
-			try {
-				ListObservable.NotificationData notificationData = (ListObservable.NotificationData) data;
-
-				if (notificationData.notification == ListObservable.Notification.ADD) {
-					notifier.onLoginUser((DyingUser) notificationData.data);
-				}
-				if (notificationData.notification == ListObservable.Notification.REMOVE) {
-					notifier.onLogoutUser((DyingUser) notificationData.data);
-				}
-				if (notificationData.notification == ListObservable.Notification.CLEAR) {
-					notifier.onClearUsers();
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-				// TODO: 25.08.2015 log
-				throw e;
-			}
-		}
-	};
+	private Observer onlineUsersObserver;
 
 	private Timer timer = new Timer();
 	private TimerTask timerTask;
 
 	public ImhereModel(@NonNull String udid) {
 		this.udid = udid;
-
-		ChannelService.ChannelEventsListener channelListener = new ChannelService.ChannelEventsListener() {
-			@Override
-			public void onUserOnline(DyingUser session) {
-				if ( isCurrentSessionAlive() && onlineUsersSet.add(session, session.getAliveTo()) ) {
-					//notifyDataChanged(ADD_USER_NOTIFICATION, session);
-				}
-			}
-
-			@Override
-			public void onUserOffline(DyingUser session) {
-				if ( isCurrentSessionAlive() && onlineUsersSet.remove(session) ) {
-					//notifyDataChanged(REMOVE_USER_NOTIFICATION, session);
-				}
-			}
-		};
-
-		onlineUsersSet.addObserver(onlineUsersObserver);
-
-		channel = new ChannelService(channelListener);
 	}
 
 	public boolean isCurrentSessionAlive() {
@@ -132,10 +107,7 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
 		channel.connect();
 		// TODO: 18.08.2015 log exception
 
-		List<DyingUser> onlineUsers = api.getOnlineUsers(currentUser);
-		for (DyingUser dyingUser : onlineUsers) {
-			onlineUsersSet.add(dyingUser, dyingUser.getAliveTo());
-		}
+		updateOnlineUsers();
 
 		timerTask = new TimerTask() {
 			@Override
@@ -149,6 +121,23 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
 		notifier.onLogin(currentUser);
 
 		return currentUser;
+	}
+
+	public void updateOnlineUsers() {
+		l.info("updateing online users");
+		if (isCurrentSessionAlive()) {
+			List<DyingUser> onlineUsers = null;
+			try {
+				onlineUsers = api.getOnlineUsers(currentUser);
+				for (DyingUser dyingUser : onlineUsers) {
+					boolean wasAdded = onlineUsersSet.add(dyingUser, dyingUser.getAliveTo());
+					l.info("User: {} was added ({})", dyingUser.getUdid(), Boolean.valueOf(wasAdded).toString());
+				}
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+		}
+		//notifier.onUsersUpdate();
 	}
 
 	public void cancelCurrentSession() {
@@ -168,11 +157,64 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> {
 		}
 	}
 
+	@Override
+	public void startListening() {
+		onlineUsersObserver = new Observer() {
+			@Override
+			public void update(Observable observable, Object data) {
+				try {
+					ListObservable.NotificationData notificationData = (ListObservable.NotificationData) data;
+
+					if (notificationData.notification == ListObservable.Notification.ADD) {
+						notifier.onLoginUser((DyingUser) notificationData.data);
+					}
+					if (notificationData.notification == ListObservable.Notification.REMOVE) {
+						notifier.onLogoutUser((DyingUser) notificationData.data);
+					}
+					if (notificationData.notification == ListObservable.Notification.CLEAR) {
+						notifier.onClearUsers();
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+					// TODO: 25.08.2015 log
+					throw e;
+				}
+			}
+		};
+		onlineUsersSet.addObserver(onlineUsersObserver);
+
+		channelListener = new ChannelService.ChannelEventsListener() {
+			@Override
+			public void onUserOnline(DyingUser session) {
+				if ( isCurrentSessionAlive() && onlineUsersSet.add(session, session.getAliveTo()) ) {
+					//notifyDataChanged(ADD_USER_NOTIFICATION, session);
+				}
+			}
+
+			@Override
+			public void onUserOffline(DyingUser session) {
+				if ( isCurrentSessionAlive() && onlineUsersSet.remove(session) ) {
+					//notifyDataChanged(REMOVE_USER_NOTIFICATION, session);
+				}
+			}
+		};
+		channel.setListener(channelListener);
+	}
+
+	@Override
+	public void stopListening() {
+		onlineUsersSet.deleteObserver(onlineUsersObserver);
+		onlineUsersObserver = null;
+
+		channel.clearListener();
+		channelListener = null;
+	}
+
 	public interface EventListener extends BaseModel.EventListener {
 		void onLoginUser(final DyingUser dyingUser);
 		void onLogoutUser(final DyingUser dyingUser);
 
-		//void onUsersLifetimeUpdate();
+		void onUsersUpdate();
 		void onClearUsers();
 
 		void onLogin(final DyingUser currentUser);

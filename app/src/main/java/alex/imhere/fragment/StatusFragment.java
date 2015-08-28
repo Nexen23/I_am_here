@@ -23,19 +23,25 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.joda.time.Duration;
 import org.joda.time.LocalDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import alex.imhere.R;
 import alex.imhere.activity.model.BaseModel;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.layer.server.DyingUser;
+import alex.imhere.util.ListeningController;
 import alex.imhere.view.UiRunnable;
 import alex.imhere.service.TimeFormatter;
 import alex.imhere.view.UpdatingTimer;
 
 @EFragment(R.layout.fragment_status)
-public class StatusFragment extends Fragment implements BaseModel.ModelListener, UpdatingTimer.TimerListener {
-	BaseModel model;
-	BaseModel.EventListener eventsListener;
+public class StatusFragment extends Fragment
+		implements BaseModel.ModelListener, UpdatingTimer.TimerListener, ListeningController {
+	Logger l = LoggerFactory.getLogger(StatusFragment.class);
+
+	ImhereModel model;
+	ImhereModel.EventListener eventsListener;
 
 	FragmentInteractionsListener interactionsListener;
 
@@ -120,13 +126,15 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener,
 	@Override
 	public void onResume() {
 		super.onResume();
-		subscribeModel();
+
+		startListening();
+		//l.info("subscribed to Model");
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		unsubscribeModel();
+		stopListening();
 	}
 
 	@UiThread
@@ -189,11 +197,11 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener,
 
 	@Override
 	public void setModel(BaseModel baseModel) {
-		this.model = baseModel;
+		this.model = (ImhereModel) baseModel;
 	}
 
 	@Override
-	public void subscribeModel() {
+	public void startListening() {
 		eventsListener = new ImhereModel.EventListener() {
 			@Override
 			public void onLoginUser(DyingUser dyingUser) {
@@ -202,6 +210,11 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener,
 
 			@Override
 			public void onLogoutUser(DyingUser dyingUser) {
+
+			}
+
+			@Override
+			public void onUsersUpdate() {
 
 			}
 
@@ -226,7 +239,7 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener,
 	}
 
 	@Override
-	public void unsubscribeModel() {
+	public void stopListening() {
 		model.removeEventsListener(eventsListener);
 		eventsListener = null;
 	}

@@ -17,6 +17,8 @@ import com.parse.ParseException;
 
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import alex.imhere.R;
 import alex.imhere.activity.model.BaseModel;
@@ -27,6 +29,7 @@ import alex.imhere.view.UiRunnable;
 @EActivity
 public class ImhereActivity extends AppCompatActivity
 		implements StatusFragment.FragmentInteractionsListener {
+	Logger l = LoggerFactory.getLogger(ImhereActivity.class);
 
 	ImhereModel model;
 
@@ -45,6 +48,19 @@ public class ImhereActivity extends AppCompatActivity
 		super.onAttachFragment(fragment);
 		BaseModel.ModelListener modelListener = (BaseModel.ModelListener) fragment;
 		modelListener.setModel(model);
+	}
+
+	@Override
+	protected void onResumeFragments() {
+		super.onResumeFragments();
+		model.startListening();
+		model.updateOnlineUsers();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		model.stopListening();
 	}
 
 	@Override

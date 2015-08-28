@@ -11,6 +11,8 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
 import org.parceler.transfuse.annotations.OnActivityCreated;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,12 +22,16 @@ import alex.imhere.activity.model.BaseModel;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.adapter.UsersAdapter;
 import alex.imhere.layer.server.DyingUser;
+import alex.imhere.util.ListeningController;
 import alex.imhere.view.UpdatingTimer;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
-public class UsersFragment extends ListFragment implements BaseModel.ModelListener, UpdatingTimer.TimerListener {
-	BaseModel model;
-	BaseModel.EventListener eventsListener;
+public class UsersFragment extends ListFragment
+		implements BaseModel.ModelListener, UpdatingTimer.TimerListener, ListeningController {
+	Logger l = LoggerFactory.getLogger(UsersFragment.class);
+
+	ImhereModel model;
+	ImhereModel.EventListener eventsListener;
 
 	UsersAdapter usersAdapter;
 	List<DyingUser> dyingUsers = new ArrayList<>();
@@ -58,13 +64,14 @@ public class UsersFragment extends ListFragment implements BaseModel.ModelListen
 	@Override
 	public void onResume() {
 		super.onResume();
-		subscribeModel();
+		startListening();
+		//l.info("subscribed to Model");
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		unsubscribeModel();
+		stopListening();
 	}
 
 	@UiThread
@@ -88,12 +95,17 @@ public class UsersFragment extends ListFragment implements BaseModel.ModelListen
 	}
 
 	@Override
-	public void setModel(BaseModel baseModel) {
-		this.model = baseModel;
+	public void onTimerTick() {
+		notifyUsersDataChanged();
 	}
 
 	@Override
-	public void subscribeModel() {
+	public void setModel(BaseModel baseModel) {
+		this.model = (ImhereModel) baseModel;
+	}
+
+	@Override
+	public void startListening() {
 		eventsListener = new ImhereModel.EventListener() {
 			@Override
 			public void onLoginUser(DyingUser dyingUser) {
@@ -103,6 +115,11 @@ public class UsersFragment extends ListFragment implements BaseModel.ModelListen
 			@Override
 			public void onLogoutUser(DyingUser dyingUser) {
 				removeUser(dyingUser);
+			}
+
+			@Override
+			public void onUsersUpdate() {
+				notifyUsersDataChanged();
 			}
 
 			@Override
@@ -125,13 +142,8 @@ public class UsersFragment extends ListFragment implements BaseModel.ModelListen
 	}
 
 	@Override
-	public void unsubscribeModel() {
+	public void stopListening() {
 		model.removeEventsListener(eventsListener);
 		eventsListener = null;
-	}
-
-	@Override
-	public void onTimerTick() {
-		notifyUsersDataChanged();
 	}
 }

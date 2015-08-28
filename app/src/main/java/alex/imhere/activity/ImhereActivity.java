@@ -1,7 +1,6 @@
 package alex.imhere.activity;
 
 import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -45,7 +44,7 @@ public class ImhereActivity extends AppCompatActivity
 	public void onAttachFragment(Fragment fragment) {
 		super.onAttachFragment(fragment);
 		BaseModel.ModelListener modelListener = (BaseModel.ModelListener) fragment;
-		modelListener.listenModel(model);
+		modelListener.setModel(model);
 	}
 
 	@Override

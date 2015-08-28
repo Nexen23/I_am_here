@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
+import org.parceler.transfuse.annotations.OnActivityCreated;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,6 +55,18 @@ public class UsersFragment extends ListFragment implements BaseModel.ModelListen
 		updatingTimer = new UpdatingTimer(uiHandler, this).start();
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		subscribeModel();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		unsubscribeModel();
+	}
+
 	@UiThread
 	public void addUser(DyingUser dyingUser) {
 		usersAdapter.add(dyingUser);
@@ -75,10 +88,12 @@ public class UsersFragment extends ListFragment implements BaseModel.ModelListen
 	}
 
 	@Override
-	public void listenModel(BaseModel baseModel) {
+	public void setModel(BaseModel baseModel) {
 		this.model = baseModel;
-		ImhereModel model = (ImhereModel) baseModel;
+	}
 
+	@Override
+	public void subscribeModel() {
 		eventsListener = new ImhereModel.EventListener() {
 			@Override
 			public void onLoginUser(DyingUser dyingUser) {
@@ -106,7 +121,13 @@ public class UsersFragment extends ListFragment implements BaseModel.ModelListen
 			}
 		};
 
-		baseModel.addEventsListener(eventsListener);
+		model.addEventsListener(eventsListener);
+	}
+
+	@Override
+	public void unsubscribeModel() {
+		model.removeEventsListener(eventsListener);
+		eventsListener = null;
 	}
 
 	@Override

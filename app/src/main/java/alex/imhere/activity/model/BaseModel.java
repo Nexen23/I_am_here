@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import java.util.ArrayList;
 
 public abstract class BaseModel<TEventsListener extends BaseModel.EventListener> {
+	// TODO: 28.08.2015 store weak ref (than make forEach with Runnable to check if Null)
 	ArrayList<TEventsListener> listeners = new ArrayList<>();
 
 	public void addEventsListener(@Nullable TEventsListener listener) {
@@ -20,9 +21,11 @@ public abstract class BaseModel<TEventsListener extends BaseModel.EventListener>
 	}
 
 	public interface EventListener {
-	};
+	}
 
 	public interface ModelListener {
-		void listenModel(BaseModel baseModel);
+		void setModel(BaseModel baseModel);
+		void subscribeModel();
+		void unsubscribeModel();
 	}
 }

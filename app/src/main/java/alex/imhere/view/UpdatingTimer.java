@@ -1,6 +1,7 @@
 package alex.imhere.view;
 
 import android.os.Handler;
+import android.os.Looper;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,6 +11,7 @@ public class UpdatingTimer {
 	// TODO: 27.08.2015 should I place it to Model? Or to Service.GlobalTimer? Or model listen to GlobalTimer!
 	private TimerListener listener;
 	private Handler uiHandler;
+	//private Handler uiHandler = new Handler(Looper.getMainLooper());
 
 	private final long updatingPeriodMs;
 	private final Timer timer = new Timer();

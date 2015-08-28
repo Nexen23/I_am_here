@@ -117,6 +117,18 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener,
 		interactionsListener = null;
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		subscribeModel();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		unsubscribeModel();
+	}
+
 	@UiThread
 	void updateStatus() {
 		if (isCurrentUserLoginned) {
@@ -171,10 +183,17 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener,
 	}
 
 	@Override
-	public void listenModel(BaseModel baseModel) {
-		this.model = baseModel;
-		ImhereModel model = (ImhereModel) baseModel;
+	public void onTimerTick() {
+		updateTimerTick();
+	}
 
+	@Override
+	public void setModel(BaseModel baseModel) {
+		this.model = baseModel;
+	}
+
+	@Override
+	public void subscribeModel() {
 		eventsListener = new ImhereModel.EventListener() {
 			@Override
 			public void onLoginUser(DyingUser dyingUser) {
@@ -203,12 +222,13 @@ public class StatusFragment extends Fragment implements BaseModel.ModelListener,
 			}
 		};
 
-		baseModel.addEventsListener(eventsListener);
+		model.addEventsListener(eventsListener);
 	}
 
 	@Override
-	public void onTimerTick() {
-		updateTimerTick();
+	public void unsubscribeModel() {
+		model.removeEventsListener(eventsListener);
+		eventsListener = null;
 	}
 
 	public interface FragmentInteractionsListener {

@@ -3,10 +3,11 @@ package alex.imhere.util;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import java.util.Set;
 import java.util.WeakHashMap;
 
 public abstract class Listenable<TEventListener extends Listenable.EventListener> {
-	WeakHashMap<TEventListener, Void> listeners = new WeakHashMap<>();
+	private WeakHashMap<TEventListener, Void> listeners = new WeakHashMap<>();
 
 	public void addListener(@Nullable final TEventListener listener) {
 		listeners.put(listener, null);
@@ -24,6 +25,10 @@ public abstract class Listenable<TEventListener extends Listenable.EventListener
 		for (TEventListener listener : listeners.keySet()) {
 			listenerRunnable.runWith(listener);
 		}
+	}
+
+	public Set<TEventListener> getListenersSet() {
+		return listeners.keySet();
 	}
 
 	public interface EventListener {

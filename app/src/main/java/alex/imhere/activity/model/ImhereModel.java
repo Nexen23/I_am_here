@@ -28,62 +28,44 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> implements
 	EventListener notifier = new EventListener() {
 		@Override
 		public void onLoginUser(final DyingUser dyingUser) {
-			forEachListener(new ListenerRunnable<EventListener>() {
-				@Override
-				public void run() {
-					getListener().onLoginUser(dyingUser);
-				}
-			});
+			for (EventListener listener : getListenersSet()) {
+				listener.onLoginUser(dyingUser);
+			}
 		}
 
 		@Override
 		public void onLogoutUser(final DyingUser dyingUser) {
-			forEachListener(new ListenerRunnable<EventListener>() {
-				@Override
-				public void run() {
-					getListener().onLogoutUser(dyingUser);
-				}
-			});
+			for (EventListener listener : getListenersSet()) {
+				listener.onLogoutUser(dyingUser);
+			}
 		}
 
 		@Override
 		public void onUsersUpdate() {
-			forEachListener(new ListenerRunnable<EventListener>() {
-				@Override
-				public void run() {
-					getListener().onUsersUpdate();
-				}
-			});
+			for (EventListener listener : getListenersSet()) {
+				listener.onUsersUpdate();
+			}
 		}
 
 		@Override
 		public void onClearUsers() {
-			forEachListener(new ListenerRunnable<EventListener>() {
-				@Override
-				public void run() {
-					getListener().onClearUsers();
-				}
-			});
+			for (EventListener listener : getListenersSet()) {
+				listener.onClearUsers();
+			}
 		}
 
 		@Override
 		public void onLogin(final DyingUser currentUser) {
-			forEachListener(new ListenerRunnable<EventListener>() {
-				@Override
-				public void run() {
-					getListener().onLogin(currentUser);
-				}
-			});
+			for (EventListener listener : getListenersSet()) {
+				listener.onLogin(currentUser);
+			}
 		}
 
 		@Override
 		public void onLogout() {
-			forEachListener(new ListenerRunnable<EventListener>() {
-				@Override
-				public void run() {
-					getListener().onLogout();
-				}
-			});
+			for (EventListener listener : getListenersSet()) {
+				listener.onLogout();
+			}
 		}
 	};
 

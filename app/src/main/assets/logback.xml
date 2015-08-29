@@ -1,3 +1,5 @@
+<!-- http://logback.qos.ch/manual/layouts.html#conversionWord -->
+
 <configuration>
 	<!-- Create a file appender for a log in the application's data directory -->
 	<!--<appender name="file" class="ch.qos.logback.core.FileAppender">
@@ -9,7 +11,8 @@
 
 	<appender name="logcat" class="ch.qos.logback.classic.android.LogcatAppender">
 		<encoder>
-			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+			<!--<pattern>%d{HH:mm:ss.SSS} %8.8r %.14([%.-1level-%thread]) %logger{0}::%M\(\) - %msg%n</pattern>-->
+			<pattern>%8.8r \(%d{HH:mm:ss.SSS}\) %11.-11(%10.-10([%thread)]) %M\(\) - %msg%n</pattern>
 		</encoder>
 	</appender>
 

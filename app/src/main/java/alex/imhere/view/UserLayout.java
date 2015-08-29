@@ -23,18 +23,19 @@ public class UserLayout extends FrameLayout {
 	static public final float SIDES_GAP_DEFAULT = 0f;
 	static public final boolean START_ANIMATION_ON_CREATION_DEFAULT = false;
 
-	private Paint borderPaint, fillPaint;
+	Paint borderPaint, fillPaint;
+	Path shapePath, shapeBorderPath, tempPath = new Path();
 
-	private int colors[] = {};
-	private int height = 0, width = 0;
+	int colors[] = {};
+	int height = 0, width = 0;
+	float sidesGap;
 
-	private boolean startAnimationOnCreation;
-	private TimeAnimator gradientAnimation = new TimeAnimator();
-	private long lifetime = LIFETIME_DEAFULT, updateTickMs = 25, timeElapsed = 0;
-	private long accumulatorMs = 0;
-	private float gradientOffset = 0f;
-	private float sidesGap;
-	private Path shapePath, shapeBorderPath, tempPath = new Path();
+	boolean startAnimationOnCreation;
+	TimeAnimator gradientAnimation = new TimeAnimator();
+
+	long lifetime;
+	long timeElapsed = 0, accumulatorMs = 0, updateTickMs = 25;
+	float gradientOffset = 0f;
 
 	public UserLayout(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -56,7 +57,6 @@ public class UserLayout extends FrameLayout {
 	}
 
 	public void parseAttrs(AttributeSet attrs, int defStyleAttr) {
-		// TODO: 24.08.2015 what is defStyleAttr?
 		TypedArray attributes = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.UserLayout, defStyleAttr, 0);
 		try
 		{
@@ -81,13 +81,10 @@ public class UserLayout extends FrameLayout {
 		finally
 		{
 			attributes.recycle();
-
-			int sidesGapCeiled = (int) Math.ceil(sidesGap);
-			setPadding(sidesGapCeiled, 0, sidesGapCeiled, 0);
 		}
 	}
 
-	private void onInitialize() {
+	protected void onInitialize() {
 		setWillNotDraw(false);
 
 		borderPaint = new Paint();
@@ -186,6 +183,8 @@ public class UserLayout extends FrameLayout {
 
 	public void setSidesGap(float sidesGap) {
 		this.sidesGap = sidesGap;
+		int sidesGapCeiled = (int) Math.ceil(sidesGap);
+		setPadding(sidesGapCeiled, 0, sidesGapCeiled, 0);
 	}
 
 	public void startGradientAnimation() {
@@ -197,8 +196,6 @@ public class UserLayout extends FrameLayout {
 		gradientAnimation.setTimeListener(new TimeAnimator.TimeListener() {
 			@Override
 			public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
-				//totalTime = totalTime % lifetime; // TODO: 24.08.2015 delete this after debugging
-
 				final long gradientWidth = width * colorsCount;
 				if (totalTime > (lifetime - timeElapsed)) {
 					animation.cancel();

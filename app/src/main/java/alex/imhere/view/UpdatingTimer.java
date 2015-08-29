@@ -2,50 +2,65 @@ package alex.imhere.view;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.support.annotation.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.Timer;
 import java.util.TimerTask;
 
 public class UpdatingTimer {
 	private static final long UPDATING_PERIOD_MS_DEFAULT = 500;
 	// TODO: 27.08.2015 should I place it to Model? Or to Service.GlobalTimer? Or model listen to GlobalTimer!
-	private TimerListener listener;
-	private Handler uiHandler;
-	//private Handler uiHandler = new Handler(Looper.getMainLooper());
+	WeakReference<TimerListener> listenerRef;
+	Handler uiHandler = new Handler(Looper.getMainLooper());
 
-	private final long updatingPeriodMs;
-	private final Timer timer = new Timer();
-	private final TimerTask updateTask = new TimerTask() {
+	long updatingPeriodMs;
+	final Timer timer = new Timer();
+	final TimerTask updateTask = new TimerTask() {
 		@Override
 		public void run() {
-			uiHandler.post( new Runnable() {
+			uiHandler.post(new Runnable() {
 				@Override
 				public void run() {
-					listener.onTimerTick();
+					TimerListener listener = listenerRef.get();
+					if (listener != null) {
+						listener.onTimerTick();
+					} else {
+						stop();
+					}
 				}
 			});
 		}
 	};
 
-	public UpdatingTimer(Handler uiHandler, TimerListener listener) {
-		this(uiHandler, listener, UPDATING_PERIOD_MS_DEFAULT);
+	public UpdatingTimer() {
+		this(null, UPDATING_PERIOD_MS_DEFAULT);
 	}
 
-	public UpdatingTimer(Handler uiHandler, TimerListener listener, long updatingPeriodMs) {
-		this.uiHandler = uiHandler;
-		this.listener = listener;
+	public UpdatingTimer(@Nullable TimerListener listener) {
+		this(listener, UPDATING_PERIOD_MS_DEFAULT);
+	}
+
+	public UpdatingTimer(@Nullable TimerListener listener, final long updatingPeriodMs) {
+		setListener(listener);
+		setUpdatingPeriodMs(updatingPeriodMs);
+	}
+
+	public void setListener(@Nullable TimerListener listener) {
+		this.listenerRef = new WeakReference<>(listener);
+	}
+
+	public void setUpdatingPeriodMs(final long updatingPeriodMs) {
 		this.updatingPeriodMs = updatingPeriodMs;
 	}
 
-	public synchronized UpdatingTimer start() {
+	public synchronized void start() {
 		timer.scheduleAtFixedRate(updateTask, 0, updatingPeriodMs);
-		return this;
 	}
 
-	public synchronized UpdatingTimer stop() {
+	public synchronized void stop() {
 		updateTask.cancel();
 		timer.purge();
-		return this;
 	}
 
 	public interface TimerListener {

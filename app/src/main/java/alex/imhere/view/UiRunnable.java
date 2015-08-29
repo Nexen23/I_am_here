@@ -1,22 +1,32 @@
 package alex.imhere.view;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-public class UiRunnable implements Runnable {
-	private Handler uiHandler;
-	private Runnable innerRunnable;
+import java.lang.ref.WeakReference;
 
-	public UiRunnable(@NonNull Handler uiHandler, @Nullable Runnable innerRunnable) {
-		this.uiHandler = uiHandler;
-		this.innerRunnable = innerRunnable;
+public class UiRunnable implements Runnable {
+	WeakReference<Runnable> taskRef;
+	Handler uiHandler = new Handler(Looper.getMainLooper());
+
+	public UiRunnable(@Nullable Runnable task) {
+		this.taskRef = new WeakReference<>(task);
 	}
 
 	@Override
 	public void run() {
-		if (uiHandler != null && innerRunnable != null) {
-			uiHandler.post(innerRunnable);
+		Runnable task = taskRef.get();
+		if (task != null) {
+			uiHandler.post(task);
+		}
+	}
+
+	public void stopRunning() {
+		Runnable task = taskRef.get();
+		if (task != null) {
+			uiHandler.removeCallbacks(task);
 		}
 	}
 }

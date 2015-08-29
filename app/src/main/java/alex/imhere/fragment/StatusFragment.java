@@ -64,7 +64,8 @@ public class StatusFragment extends Fragment
 	@AfterViews
 	public void onViewsInjected() {
 		uiHandler = new Handler();
-		updatingTimer = new UpdatingTimer(uiHandler, this).start();
+		updatingTimer = new UpdatingTimer(this);
+		updatingTimer.start();
 
 		updateTimer();
 
@@ -83,7 +84,7 @@ public class StatusFragment extends Fragment
 			public void onClick(View v) {
 				if (interactionsListener != null) {
 
-					UiRunnable onPreExecute = new UiRunnable(uiHandler, new Runnable() {
+					UiRunnable onPreExecute = new UiRunnable(new Runnable() {
 						@Override
 						public void run() {
 							imhereButtonClickEffect.startRippleAnimation();
@@ -91,16 +92,9 @@ public class StatusFragment extends Fragment
 							tsStatus.setText("   Connecting...");
 						}
 					});
-					UiRunnable onPostExecute = new UiRunnable(uiHandler, new Runnable() {
-						@Override
-						public void run() {
-							imhereButton.setEnabled(true);
-							imhereButtonClickEffect.stopRippleAnimation();
-						}
-					});
 
 					onPreExecute.run();
-					interactionsListener.onImhereClick(onPostExecute);
+					interactionsListener.onImhereClick();
 				}
 			}
 		});
@@ -190,6 +184,12 @@ public class StatusFragment extends Fragment
 		updateTimer();
 	}
 
+	@UiThread
+	void setImhereButtonEnabled() {
+		imhereButton.setEnabled(true);
+		imhereButtonClickEffect.stopRippleAnimation();
+	}
+
 	@Override
 	public void onTimerTick() {
 		updateTimerTick();
@@ -205,7 +205,6 @@ public class StatusFragment extends Fragment
 		eventsListener = new ImhereModel.EventListener() {
 			@Override
 			public void onLoginUser(DyingUser dyingUser) {
-
 			}
 
 			@Override
@@ -227,25 +226,27 @@ public class StatusFragment extends Fragment
 			public void onLogin(DyingUser currentUser) {
 				currentUserAliveTo = currentUser.getAliveTo();
 				setStatusLoginned(true);
+				setImhereButtonEnabled();
 			}
 
 			@Override
 			public void onLogout() {
 				setStatusLoginned(false);
+				setImhereButtonEnabled();
 			}
 		};
 
-		model.addEventsListener(eventsListener);
+		model.addListener(eventsListener);
 	}
 
 	@Override
 	public void stopListening() {
-		model.removeEventsListener(eventsListener);
+		model.removeListener(eventsListener);
 		eventsListener = null;
 	}
 
 	public interface FragmentInteractionsListener {
-		void onImhereClick(final @NonNull UiRunnable onPostExecute);
+		void onImhereClick();
 	}
 
 }

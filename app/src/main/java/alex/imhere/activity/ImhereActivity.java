@@ -103,13 +103,12 @@ public class ImhereActivity extends AppCompatActivity
 	}
 
 	@Override
-	public void onImhereClick(@NonNull final UiRunnable onPostExecute) {
+	public void onImhereClick() {
 		if (model.isCurrentSessionAlive()) {
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
 					model.cancelCurrentSession();
-					onPostExecute.run();
 					showUsersFragment(false);
 				}
 			}).start();
@@ -127,7 +126,6 @@ public class ImhereActivity extends AppCompatActivity
 						};
 
 						model.openNewSession(onSessionClosed);
-						onPostExecute.run();
 						showUsersFragment(true);
 					} catch (ParseException e) {
 						e.printStackTrace();

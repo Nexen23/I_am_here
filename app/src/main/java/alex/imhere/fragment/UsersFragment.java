@@ -58,7 +58,8 @@ public class UsersFragment extends ListFragment
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, dyingUsers);
 
 		uiHandler = new Handler();
-		updatingTimer = new UpdatingTimer(uiHandler, this).start();
+		updatingTimer = new UpdatingTimer(this);
+		updatingTimer.start();
 	}
 
 	@Override
@@ -138,12 +139,12 @@ public class UsersFragment extends ListFragment
 			}
 		};
 
-		model.addEventsListener(eventsListener);
+		model.addListener(eventsListener);
 	}
 
 	@Override
 	public void stopListening() {
-		model.removeEventsListener(eventsListener);
+		model.removeListener(eventsListener);
 		eventsListener = null;
 	}
 }

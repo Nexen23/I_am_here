@@ -5,7 +5,7 @@ import android.support.annotation.Nullable;
 
 import java.util.WeakHashMap;
 
-public class Listenable<TEventListener extends Listenable.EventListener> {
+public abstract class Listenable<TEventListener extends Listenable.EventListener> {
 	WeakHashMap<TEventListener, Void> listeners = new WeakHashMap<>();
 
 	public void addListener(@Nullable final TEventListener listener) {
@@ -34,6 +34,10 @@ public class Listenable<TEventListener extends Listenable.EventListener> {
 
 		public void setListener(TEventListener listener) {
 			this.listener = listener;
+		}
+
+		public TEventListener getListener() {
+			return listener;
 		}
 
 		private void runWith(TEventListener listener) {

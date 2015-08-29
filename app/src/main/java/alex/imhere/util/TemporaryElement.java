@@ -25,7 +25,6 @@ class TemporaryElement<T> implements Comparable {
 		TemporaryElement<?> that = (TemporaryElement<?>) o;
 
 		return object.equals(that.object);
-
 	}
 
 	@Override

@@ -5,14 +5,14 @@ import android.test.ApplicationTestCase;
 
 import java.util.ArrayList;
 
-import alex.imhere.service.api.ServerAPI;
+import alex.imhere.service.api.UserApi;
 import alex.imhere.entity.DyingUser;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
  */
 public class ParseApplicationTest extends ApplicationTestCase<ParseApplication> {
-	private ServerAPI serverAPI;
+	private UserApi userApi;
 	private String udid;
 
 
@@ -25,14 +25,14 @@ public class ParseApplicationTest extends ApplicationTestCase<ParseApplication> 
 	public void setUp() throws Exception {
 		super.setUp();
 
-		serverAPI = new ServerAPI();
+		userApi = new UserApi();
 		udid = Settings.Secure.getString(this.getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 	}
 
 	public void testGetOnlineUsers() throws Exception {
-		DyingUser dyingUser = serverAPI.login(udid);
-		ArrayList<DyingUser> users = serverAPI.getOnlineUsers(dyingUser);
-		serverAPI.logout(dyingUser);
+		DyingUser dyingUser = userApi.login(udid);
+		ArrayList<DyingUser> users = userApi.getOnlineUsers(dyingUser);
+		userApi.logout(dyingUser);
 
 		assertEquals("Must be only one user", 1, users.size());
 	}

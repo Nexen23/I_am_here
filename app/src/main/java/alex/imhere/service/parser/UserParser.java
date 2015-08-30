@@ -17,10 +17,10 @@ import org.joda.time.LocalDateTime;
 
 import java.lang.reflect.Type;
 
-public class JsonParser {
+public class UserParser {
 	private Gson gson;
 
-	public JsonParser() {
+	public UserParser() {
 		JsonDeserializer<LocalDateTime> deserializer = new JsonDeserializer<LocalDateTime>() {
 			@Override
 			public LocalDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

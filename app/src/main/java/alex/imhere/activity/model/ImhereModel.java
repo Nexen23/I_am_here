@@ -15,8 +15,8 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import alex.imhere.entity.DyingUser;
-import alex.imhere.service.api.ServerAPI;
-import alex.imhere.service.channel.ChannelService;
+import alex.imhere.service.api.UserApi;
+import alex.imhere.service.channel.PubnubBroadcastChannel;
 import alex.imhere.util.ListObservable;
 import alex.imhere.util.ListeningController;
 import alex.imhere.util.TemporarySet;
@@ -69,9 +69,9 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> implements
 	};
 
 	//TODO: exerpt methods to Service! This is too complex for Model in MVC
-	private ServerAPI api = new ServerAPI();
-	private ChannelService channel = new ChannelService();
-	ChannelService.ChannelEventsListener channelListener;
+	private UserApi api = new UserApi();
+	private PubnubBroadcastChannel channel = new PubnubBroadcastChannel();
+	PubnubBroadcastChannel.ChannelEventsListener channelListener;
 
 
 	private String udid;
@@ -181,7 +181,7 @@ public class ImhereModel extends BaseModel<ImhereModel.EventListener> implements
 		};
 		onlineUsersSet.addObserver(onlineUsersObserver);
 
-		channelListener = new ChannelService.ChannelEventsListener() {
+		channelListener = new PubnubBroadcastChannel.ChannelEventsListener() {
 			@Override
 			public void onUserOnline(DyingUser session) {
 				if ( isCurrentSessionAlive() && onlineUsersSet.add(session, session.getAliveTo()) ) {

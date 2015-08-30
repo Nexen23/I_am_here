@@ -8,14 +8,16 @@ import com.parse.ParseException;
 import org.joda.time.DateTime;
 
 import alex.imhere.entity.DyingUser;
+import alex.imhere.service.Service;
+import alex.imhere.service.domain.ParserService;
 import alex.imhere.service.parser.UserParser;
 
 public class DateApi extends Api {
 	static final String
 			API_GetNow = "GetNow";
 
-	public DateApi(UserParser parser) {
-		super(parser);
+	public DateApi(@NonNull ParserService parserService) {
+		super(parserService);
 	}
 
 	public DateTime getNow(@NonNull final DyingUser dyingUser) throws DateApi.Exception {

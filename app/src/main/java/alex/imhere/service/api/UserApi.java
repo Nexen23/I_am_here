@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alex.imhere.entity.DyingUser;
+import alex.imhere.service.Service;
+import alex.imhere.service.domain.ParserService;
 import alex.imhere.service.parser.UserParser;
 
 public class UserApi extends Api {
@@ -18,8 +20,8 @@ public class UserApi extends Api {
 			API_Logout = "Logout",
 			API_GetOnlineUsers = "GetOnlineUsers";
 
-	public UserApi(UserParser parser) {
-		super(parser);
+	public UserApi(@NonNull ParserService parserService) {
+		super(parserService);
 	}
 
 	public DyingUser login(@NonNull final String udid) throws UserApi.Exception {

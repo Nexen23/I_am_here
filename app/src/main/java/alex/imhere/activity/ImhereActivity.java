@@ -20,23 +20,26 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import alex.imhere.R;
-import alex.imhere.model.BaseModel;
-import alex.imhere.model.ImhereModel;
+import alex.imhere.model.AbstractModel;
+import alex.imhere.model.ImhereRoomModel;
 import alex.imhere.fragment.StatusFragment;
+import alex.imhere.service.ImhereService;
+import alex.imhere.service.Service;
 
 @EActivity
 public class ImhereActivity extends AppCompatActivity
 		implements StatusFragment.FragmentInteractionsListener {
 	Logger l = LoggerFactory.getLogger(ImhereActivity.class);
 
-	ImhereModel model;
+	ImhereRoomModel model;
+	Service service = new ImhereService();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
 		final String udid = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-		model = new ImhereModel(udid);
+		model = new ImhereRoomModel(service, udid);
 
 		setContentView(R.layout.activity_main);
 	}
@@ -44,7 +47,7 @@ public class ImhereActivity extends AppCompatActivity
 	@Override
 	public void onAttachFragment(Fragment fragment) {
 		super.onAttachFragment(fragment);
-		BaseModel.ModelListener modelListener = (BaseModel.ModelListener) fragment;
+		AbstractModel.ModelListener modelListener = (AbstractModel.ModelListener) fragment;
 		modelListener.setModel(model);
 	}
 
@@ -106,30 +109,16 @@ public class ImhereActivity extends AppCompatActivity
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					model.cancelCurrentSession();
+					model.logout();
 					showUsersFragment(false);
 				}
 			}).start();
 		} else {
-			final Context context = this;
 			new Thread(new Runnable() {
 				@Override
 				public void run() {
-					try {
-						Runnable onSessionClosed = new Runnable() {
-							@Override
-							public void run() {
-								showUsersFragment(false);
-							}
-						};
-
-						model.openNewSession(onSessionClosed);
-						showUsersFragment(true);
-					} catch (ParseException e) {
-						e.printStackTrace();
-						String toaskString = "Error logining to server: " + e.getMessage();
-						Toast.makeText(context, toaskString, Toast.LENGTH_SHORT).show();
-					}
+					model.login();
+					showUsersFragment(true);
 				}
 			}).start();
 		}

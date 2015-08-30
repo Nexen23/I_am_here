@@ -29,7 +29,7 @@ public abstract class BroadcastChannel {
 	public abstract void connect() throws BroadcastChannel.Exception;
 	public abstract void disconnect();
 
-	interface EventListener {
+	public interface EventListener {
 		void onConnect(String channel, String greeting);
 		void onDisconnect(String channel, String reason);
 		void onReconnect(String channel, String reason);

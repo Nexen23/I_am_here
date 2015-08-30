@@ -37,19 +37,6 @@ public class PubnubBroadcastChannel extends BroadcastChannel {
 		@Override
 		public void successCallback(String channel, Object message, String timetoken) {
 			listener.onMessageRecieve(channel, message.toString(), timetoken);
-
-			/*DyingUser dyingUser = userParser.fromJson(message.toString(), DyingUser.class);
-			int timeComparizion = dyingUser.getLoginedAt().compareTo(dyingUser.getAliveTo());
-			boolean sessionIsDead = false;
-			if (timeComparizion >= 0) {
-				sessionIsDead = true;
-			}
-
-			if (sessionIsDead) {
-				eventsListener.onUserOffline(dyingUser);
-			} else {
-				eventsListener.onUserOnline(dyingUser);
-			}*/
 		}
 
 		@Override

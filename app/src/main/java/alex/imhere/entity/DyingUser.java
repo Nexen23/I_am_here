@@ -68,6 +68,14 @@ public class DyingUser {
 		Duration duration = new Duration(loginedAt.toDateTime(), aliveTo.toDateTime());
 		return (duration.getMillis() < 0) ? new Duration(0) : duration;
 	}
+
+	public boolean isDead() {
+		return getRestLifetime().getMillis() == 0;
+	}
+
+	public boolean isAlive() {
+		return !isDead();
+	}
 	//endregion
 
 	//region Override

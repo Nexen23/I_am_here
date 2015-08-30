@@ -23,8 +23,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import alex.imhere.R;
-import alex.imhere.model.BaseModel;
-import alex.imhere.model.ImhereModel;
+import alex.imhere.model.AbstractModel;
+import alex.imhere.model.ImhereRoomModel;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.util.listening.ListeningLifecycle;
 import alex.imhere.util.wrapper.UiRunnable;
@@ -33,11 +33,11 @@ import alex.imhere.util.datetime.UpdatingTimer;
 
 @EFragment(R.layout.fragment_status)
 public class StatusFragment extends Fragment
-		implements BaseModel.ModelListener, UpdatingTimer.TimerListener, ListeningLifecycle {
+		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, ListeningLifecycle {
 	Logger l = LoggerFactory.getLogger(StatusFragment.class);
 
-	ImhereModel model;
-	ImhereModel.EventListener eventsListener;
+	ImhereRoomModel model;
+	ImhereRoomModel.EventListener eventsListener;
 
 	FragmentInteractionsListener interactionsListener;
 
@@ -193,19 +193,24 @@ public class StatusFragment extends Fragment
 	}
 
 	@Override
-	public void setModel(BaseModel baseModel) {
-		this.model = (ImhereModel) baseModel;
+	public void setModel(AbstractModel abstractModel) {
+		this.model = (ImhereRoomModel) abstractModel;
 	}
 
 	@Override
 	public void startListening() {
-		eventsListener = new ImhereModel.EventListener() {
+		eventsListener = new ImhereRoomModel.EventListener() {
 			@Override
-			public void onLoginUser(DyingUser dyingUser) {
+			public void onModelDataChanged(AbstractModel abstractModel) {
+
 			}
 
 			@Override
-			public void onLogoutUser(DyingUser dyingUser) {
+			public void onUserLogin(DyingUser dyingUser) {
+			}
+
+			@Override
+			public void onUserLogout(DyingUser dyingUser) {
 
 			}
 

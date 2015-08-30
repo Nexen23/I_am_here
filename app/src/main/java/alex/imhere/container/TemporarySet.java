@@ -176,7 +176,7 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 		return wasDeleted;
 	}
 
-	interface EventListener extends Listenable.EventListener {
+	public interface EventListener extends Listenable.EventListener {
 		void onClear();
 		void onAdd(Object item);
 		void onRemove(Object item);

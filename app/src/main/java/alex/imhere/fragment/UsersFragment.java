@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alex.imhere.R;
-import alex.imhere.model.BaseModel;
-import alex.imhere.model.ImhereModel;
+import alex.imhere.model.AbstractModel;
+import alex.imhere.model.ImhereRoomModel;
 import alex.imhere.view.adapter.UsersAdapter;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.util.listening.ListeningLifecycle;
@@ -23,11 +23,11 @@ import alex.imhere.util.datetime.UpdatingTimer;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment
-		implements BaseModel.ModelListener, UpdatingTimer.TimerListener, ListeningLifecycle {
+		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, ListeningLifecycle {
 	Logger l = LoggerFactory.getLogger(UsersFragment.class);
 
-	ImhereModel model;
-	ImhereModel.EventListener eventsListener;
+	ImhereRoomModel model;
+	ImhereRoomModel.EventListener eventsListener;
 
 	UsersAdapter usersAdapter;
 	List<DyingUser> dyingUsers = new ArrayList<>();
@@ -97,20 +97,25 @@ public class UsersFragment extends ListFragment
 	}
 
 	@Override
-	public void setModel(BaseModel baseModel) {
-		this.model = (ImhereModel) baseModel;
+	public void setModel(AbstractModel abstractModel) {
+		this.model = (ImhereRoomModel) abstractModel;
 	}
 
 	@Override
 	public void startListening() {
-		eventsListener = new ImhereModel.EventListener() {
+		eventsListener = new ImhereRoomModel.EventListener() {
 			@Override
-			public void onLoginUser(DyingUser dyingUser) {
+			public void onModelDataChanged(AbstractModel abstractModel) {
+
+			}
+
+			@Override
+			public void onUserLogin(DyingUser dyingUser) {
 				addUser(dyingUser);
 			}
 
 			@Override
-			public void onLogoutUser(DyingUser dyingUser) {
+			public void onUserLogout(DyingUser dyingUser) {
 				removeUser(dyingUser);
 			}
 

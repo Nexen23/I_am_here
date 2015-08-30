@@ -1,4 +1,4 @@
-package alex.imhere.adapter;
+package alex.imhere.view.adapter;
 
 import android.app.Activity;
 import android.content.Context;
@@ -13,7 +13,7 @@ import java.util.List;
 import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.view.UserLayout;
-import alex.imhere.util.TimeFormatter;
+import alex.imhere.util.datetime.TimeFormatter;
 
 public class UsersAdapter extends ArrayAdapter<DyingUser> {
 	private final int resourceId;

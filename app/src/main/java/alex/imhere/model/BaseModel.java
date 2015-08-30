@@ -1,14 +1,14 @@
-package alex.imhere.activity.model;
+package alex.imhere.model;
 
-import alex.imhere.util.Listenable;
-import alex.imhere.util.ListeningController;
+import alex.imhere.util.listening.Listenable;
+import alex.imhere.util.listening.ListeningLifecycle;
 
 public abstract class BaseModel<TEventsListener extends BaseModel.EventListener> extends Listenable<TEventsListener> {
 
 	public interface EventListener extends Listenable.EventListener {
 	}
 
-	public interface ModelListener extends ListeningController {
+	public interface ModelListener extends ListeningLifecycle {
 		void setModel(BaseModel baseModel);
 	}
 }

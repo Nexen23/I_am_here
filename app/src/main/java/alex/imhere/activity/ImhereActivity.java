@@ -20,9 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import alex.imhere.R;
-import alex.imhere.activity.model.BaseModel;
-import alex.imhere.activity.model.ImhereModel;
-import alex.imhere.activity.fragment.StatusFragment;
+import alex.imhere.model.BaseModel;
+import alex.imhere.model.ImhereModel;
+import alex.imhere.fragment.StatusFragment;
 
 @EActivity
 public class ImhereActivity extends AppCompatActivity

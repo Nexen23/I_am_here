@@ -1,4 +1,4 @@
-package alex.imhere.activity.fragment;
+package alex.imhere.fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,16 +14,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alex.imhere.R;
-import alex.imhere.activity.model.BaseModel;
-import alex.imhere.activity.model.ImhereModel;
-import alex.imhere.adapter.UsersAdapter;
+import alex.imhere.model.BaseModel;
+import alex.imhere.model.ImhereModel;
+import alex.imhere.view.adapter.UsersAdapter;
 import alex.imhere.entity.DyingUser;
-import alex.imhere.util.ListeningController;
-import alex.imhere.util.UpdatingTimer;
+import alex.imhere.util.listening.ListeningLifecycle;
+import alex.imhere.util.datetime.UpdatingTimer;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment
-		implements BaseModel.ModelListener, UpdatingTimer.TimerListener, ListeningController {
+		implements BaseModel.ModelListener, UpdatingTimer.TimerListener, ListeningLifecycle {
 	Logger l = LoggerFactory.getLogger(UsersFragment.class);
 
 	ImhereModel model;

@@ -1,4 +1,4 @@
-package alex.imhere.activity.model;
+package alex.imhere.model;
 
 import android.support.annotation.NonNull;
 
@@ -17,11 +17,11 @@ import java.util.TimerTask;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.service.api.UserApi;
 import alex.imhere.service.channel.PubnubBroadcastChannel;
-import alex.imhere.util.ListObservable;
-import alex.imhere.util.ListeningController;
-import alex.imhere.util.TemporarySet;
+import alex.imhere.container.ListObservable;
+import alex.imhere.util.listening.ListeningLifecycle;
+import alex.imhere.container.TemporarySet;
 
-public class ImhereModel extends BaseModel<ImhereModel.EventListener> implements ListeningController {
+public class ImhereModel extends BaseModel<ImhereModel.EventListener> implements ListeningLifecycle {
 	Logger l = LoggerFactory.getLogger(ImhereModel.class);
 
 	EventListener notifier = new EventListener() {

@@ -1,4 +1,4 @@
-package alex.imhere.activity.fragment;
+package alex.imhere.fragment;
 
 import android.app.Activity;
 import android.graphics.drawable.TransitionDrawable;
@@ -23,17 +23,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import alex.imhere.R;
-import alex.imhere.activity.model.BaseModel;
-import alex.imhere.activity.model.ImhereModel;
+import alex.imhere.model.BaseModel;
+import alex.imhere.model.ImhereModel;
 import alex.imhere.entity.DyingUser;
-import alex.imhere.util.ListeningController;
-import alex.imhere.util.UiRunnable;
-import alex.imhere.util.TimeFormatter;
-import alex.imhere.util.UpdatingTimer;
+import alex.imhere.util.listening.ListeningLifecycle;
+import alex.imhere.util.wrapper.UiRunnable;
+import alex.imhere.util.datetime.TimeFormatter;
+import alex.imhere.util.datetime.UpdatingTimer;
 
 @EFragment(R.layout.fragment_status)
 public class StatusFragment extends Fragment
-		implements BaseModel.ModelListener, UpdatingTimer.TimerListener, ListeningController {
+		implements BaseModel.ModelListener, UpdatingTimer.TimerListener, ListeningLifecycle {
 	Logger l = LoggerFactory.getLogger(StatusFragment.class);
 
 	ImhereModel model;

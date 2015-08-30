@@ -1,4 +1,4 @@
-package alex.imhere.util;
+package alex.imhere.util.datetime;
 
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;

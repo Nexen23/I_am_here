@@ -1,4 +1,4 @@
-package alex.imhere.service;
+package alex.imhere.service.parser;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

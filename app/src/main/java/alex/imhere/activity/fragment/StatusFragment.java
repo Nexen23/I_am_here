@@ -1,14 +1,10 @@
-package alex.imhere.fragment;
+package alex.imhere.activity.fragment;
 
 import android.app.Activity;
 import android.graphics.drawable.TransitionDrawable;
-import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.Button;
@@ -29,11 +25,11 @@ import org.slf4j.LoggerFactory;
 import alex.imhere.R;
 import alex.imhere.activity.model.BaseModel;
 import alex.imhere.activity.model.ImhereModel;
-import alex.imhere.layer.server.DyingUser;
+import alex.imhere.entity.DyingUser;
 import alex.imhere.util.ListeningController;
-import alex.imhere.view.UiRunnable;
-import alex.imhere.service.TimeFormatter;
-import alex.imhere.view.UpdatingTimer;
+import alex.imhere.util.UiRunnable;
+import alex.imhere.util.TimeFormatter;
+import alex.imhere.util.UpdatingTimer;
 
 @EFragment(R.layout.fragment_status)
 public class StatusFragment extends Fragment
@@ -79,6 +75,7 @@ public class StatusFragment extends Fragment
 		tvSessionAlive.setText("Online");
 		tsStatus.addView(tvSessionAlive);
 
+		final Fragment thisFragment = this;
 		imhereButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -94,7 +91,7 @@ public class StatusFragment extends Fragment
 					});
 
 					onPreExecute.run();
-					interactionsListener.onImhereClick();
+					interactionsListener.onImhereClick(thisFragment);
 				}
 			}
 		});
@@ -246,7 +243,7 @@ public class StatusFragment extends Fragment
 	}
 
 	public interface FragmentInteractionsListener {
-		void onImhereClick();
+		void onImhereClick(Fragment fragment);
 	}
 
 }

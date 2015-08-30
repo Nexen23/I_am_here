@@ -14,13 +14,12 @@ import java.util.Observer;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import alex.imhere.layer.server.DyingUser;
-import alex.imhere.layer.server.ServerAPI;
-import alex.imhere.service.ChannelService;
+import alex.imhere.entity.DyingUser;
+import alex.imhere.service.api.ServerAPI;
+import alex.imhere.service.channel.ChannelService;
 import alex.imhere.util.ListObservable;
 import alex.imhere.util.ListeningController;
 import alex.imhere.util.TemporarySet;
-import hugo.weaving.DebugLog;
 
 public class ImhereModel extends BaseModel<ImhereModel.EventListener> implements ListeningController {
 	Logger l = LoggerFactory.getLogger(ImhereModel.class);

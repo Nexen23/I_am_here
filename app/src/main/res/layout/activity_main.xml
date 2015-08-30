@@ -19,7 +19,7 @@
         android:layout_weight="1">
 
         <fragment android:id="@+id/fragment_status"
-				  android:name="alex.imhere.fragment.StatusFragment_"
+				  android:name="alex.imhere.activity.fragment.StatusFragment_"
 				  tools:layout="@layout/fragment_status"
 				  android:layout_width="match_parent"
 				  android:layout_height="match_parent"/>
@@ -41,7 +41,7 @@
         >
 
         <fragment android:id="@+id/fragment_users"
-				  android:name="alex.imhere.fragment.UsersFragment_"
+				  android:name="alex.imhere.activity.fragment.UsersFragment_"
 				  android:layout_width="match_parent"
 				  android:layout_height="match_parent"
 				  tools:layout="@layout/fragment_users"

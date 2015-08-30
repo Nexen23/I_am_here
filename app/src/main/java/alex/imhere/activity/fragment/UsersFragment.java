@@ -1,16 +1,12 @@
-package alex.imhere.fragment;
+package alex.imhere.activity.fragment;
 
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.ListFragment;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
-import org.parceler.transfuse.annotations.OnActivityCreated;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,9 +17,9 @@ import alex.imhere.R;
 import alex.imhere.activity.model.BaseModel;
 import alex.imhere.activity.model.ImhereModel;
 import alex.imhere.adapter.UsersAdapter;
-import alex.imhere.layer.server.DyingUser;
+import alex.imhere.entity.DyingUser;
 import alex.imhere.util.ListeningController;
-import alex.imhere.view.UpdatingTimer;
+import alex.imhere.util.UpdatingTimer;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment

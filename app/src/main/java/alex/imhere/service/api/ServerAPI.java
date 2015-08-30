@@ -1,4 +1,4 @@
-package alex.imhere.layer.server;
+package alex.imhere.service.api;
 
 import android.support.annotation.NonNull;
 
@@ -13,7 +13,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import alex.imhere.service.JsonParser;
+import alex.imhere.entity.DyingUser;
+import alex.imhere.service.parser.JsonParser;
 
 public class ServerAPI {
 	static final String

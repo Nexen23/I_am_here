@@ -1,4 +1,4 @@
-package alex.imhere.layer.server;
+package alex.imhere.entity;
 
 import android.support.annotation.NonNull;
 

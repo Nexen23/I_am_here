@@ -4,7 +4,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -23,8 +22,7 @@ import org.slf4j.LoggerFactory;
 import alex.imhere.R;
 import alex.imhere.activity.model.BaseModel;
 import alex.imhere.activity.model.ImhereModel;
-import alex.imhere.fragment.StatusFragment;
-import alex.imhere.view.UiRunnable;
+import alex.imhere.activity.fragment.StatusFragment;
 
 @EActivity
 public class ImhereActivity extends AppCompatActivity
@@ -103,7 +101,7 @@ public class ImhereActivity extends AppCompatActivity
 	}
 
 	@Override
-	public void onImhereClick() {
+	public void onImhereClick(Fragment fragment) {
 		if (model.isCurrentSessionAlive()) {
 			new Thread(new Runnable() {
 				@Override

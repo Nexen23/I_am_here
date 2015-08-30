@@ -1,4 +1,4 @@
-package alex.imhere.view;
+package alex.imhere.util;
 
 import android.os.Handler;
 import android.os.Looper;

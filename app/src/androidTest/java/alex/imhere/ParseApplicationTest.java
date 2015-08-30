@@ -5,8 +5,8 @@ import android.test.ApplicationTestCase;
 
 import java.util.ArrayList;
 
-import alex.imhere.layer.server.ServerAPI;
-import alex.imhere.layer.server.DyingUser;
+import alex.imhere.service.api.ServerAPI;
+import alex.imhere.entity.DyingUser;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>

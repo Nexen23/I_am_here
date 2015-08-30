@@ -1,4 +1,4 @@
-package alex.imhere.service;
+package alex.imhere.service.channel;
 
 import android.util.Log;
 
@@ -7,11 +7,12 @@ import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
 
-import alex.imhere.layer.server.DyingUser;
+import alex.imhere.entity.DyingUser;
+import alex.imhere.service.parser.JsonParser;
 
 public class ChannelService {
 	// TODO: 18.08.2015 split it to MainService and Service for ServerAPI only (also no hardcoded strings!)
-	final static String CHANNEL_NAME = "events";
+	final static String CHANNEL_NAME = "events"; // TODO: 29.08.2015 get name from Server
 
 	private Pubnub pubnub = new Pubnub("", "sub-c-a3d06db8-410b-11e5-8bf2-0619f8945a4f");
 	private ChannelEventsListener eventsListener;
@@ -32,7 +33,7 @@ public class ChannelService {
 		this.eventsListener = null;
 	}
 
-	public void connect() {
+	public void connect() { // TODO: 29.08.2015 use String channelName here
 		try {
 			pubnub.subscribe(CHANNEL_NAME, new Callback() {
 						@Override

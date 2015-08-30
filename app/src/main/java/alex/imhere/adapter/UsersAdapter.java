@@ -11,9 +11,9 @@ import android.widget.TextView;
 import java.util.List;
 
 import alex.imhere.R;
-import alex.imhere.layer.server.DyingUser;
+import alex.imhere.entity.DyingUser;
 import alex.imhere.view.UserLayout;
-import alex.imhere.service.TimeFormatter;
+import alex.imhere.util.TimeFormatter;
 
 public class UsersAdapter extends ArrayAdapter<DyingUser> {
 	private final int resourceId;

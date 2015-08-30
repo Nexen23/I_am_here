@@ -39,7 +39,7 @@ public class StatusFragment extends Fragment
 	ImhereRoomModel model;
 	ImhereRoomModel.EventListener eventsListener;
 
-	FragmentInteractionsListener interactionsListener;
+	InteractionListener interactionsListener;
 
 	Handler uiHandler;
 	UpdatingTimer updatingTimer;
@@ -59,6 +59,7 @@ public class StatusFragment extends Fragment
 
 	@AfterViews
 	public void onViewsInjected() {
+		// TODO: 30.08.2015 make all string non hardcoded
 		uiHandler = new Handler();
 		updatingTimer = new UpdatingTimer(this);
 		updatingTimer.start();
@@ -81,16 +82,7 @@ public class StatusFragment extends Fragment
 			public void onClick(View v) {
 				if (interactionsListener != null) {
 
-					UiRunnable onPreExecute = new UiRunnable(new Runnable() {
-						@Override
-						public void run() {
-							imhereButtonClickEffect.startRippleAnimation();
-							imhereButton.setEnabled(false);
-							tsStatus.setText("   Connecting...");
-						}
-					});
-
-					onPreExecute.run();
+					imhereButtonClick();
 					interactionsListener.onImhereClick(thisFragment);
 				}
 			}
@@ -101,10 +93,10 @@ public class StatusFragment extends Fragment
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			interactionsListener = (FragmentInteractionsListener) activity;
+			interactionsListener = (InteractionListener) activity;
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
-					+ " must implement FragmentInteractionsListener");
+					+ " must implement InteractionListener");
 		}
 	}
 
@@ -117,9 +109,7 @@ public class StatusFragment extends Fragment
 	@Override
 	public void onResume() {
 		super.onResume();
-
 		startListening();
-		//l.info("subscribed to Model");
 	}
 
 	@Override
@@ -187,6 +177,18 @@ public class StatusFragment extends Fragment
 		imhereButtonClickEffect.stopRippleAnimation();
 	}
 
+	@UiThread
+	void imhereButtonClick() {
+		imhereButton.setEnabled(false);
+		// TODO: 30.08.2015 another hack
+		String text = "   Loging out...";
+		if (!isCurrentUserLoginned) {
+			text = "   Logining...";
+			imhereButtonClickEffect.startRippleAnimation();
+		}
+		tsStatus.setText(text);
+	}
+
 	@Override
 	public void onTimerTick() {
 		updateTimerTick();
@@ -232,6 +234,11 @@ public class StatusFragment extends Fragment
 			}
 
 			@Override
+			public void onPreLogout() {
+				imhereButtonClick();
+			}
+
+			@Override
 			public void onLogout() {
 				setStatusLoginned(false);
 				setImhereButtonEnabled();
@@ -247,8 +254,7 @@ public class StatusFragment extends Fragment
 		eventsListener = null;
 	}
 
-	public interface FragmentInteractionsListener {
+	public interface InteractionListener {
 		void onImhereClick(Fragment fragment);
 	}
-
 }

@@ -1,7 +1,9 @@
 package alex.imhere.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 
 import org.androidannotations.annotations.AfterViews;
@@ -28,6 +30,8 @@ public class UsersFragment extends ListFragment
 
 	ImhereRoomModel model;
 	ImhereRoomModel.EventListener eventsListener;
+
+	InteractionListener interactionsListener;
 
 	UsersAdapter usersAdapter;
 	List<DyingUser> dyingUsers = new ArrayList<>();
@@ -59,10 +63,26 @@ public class UsersFragment extends ListFragment
 	}
 
 	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			interactionsListener = (InteractionListener) activity;
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement InteractionListener");
+		}
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		interactionsListener = null;
+	}
+
+	@Override
 	public void onResume() {
 		super.onResume();
 		startListening();
-		//l.info("subscribed to Model");
 	}
 
 	@Override
@@ -103,6 +123,7 @@ public class UsersFragment extends ListFragment
 
 	@Override
 	public void startListening() {
+		final Fragment thisFragment = this;
 		eventsListener = new ImhereRoomModel.EventListener() {
 			@Override
 			public void onModelDataChanged(AbstractModel abstractModel) {
@@ -132,6 +153,12 @@ public class UsersFragment extends ListFragment
 			@Override
 			public void onLogin(DyingUser currentUser) {
 				notifyUsersDataChanged();
+				interactionsListener.onShow(thisFragment);
+			}
+
+			@Override
+			public void onPreLogout() {
+				interactionsListener.onHide(thisFragment);
 			}
 
 			@Override
@@ -147,5 +174,10 @@ public class UsersFragment extends ListFragment
 	public void stopListening() {
 		model.removeListener(eventsListener);
 		eventsListener = null;
+	}
+
+	public interface InteractionListener {
+		void onShow(Fragment fragment);
+		void onHide(Fragment fragment);
 	}
 }

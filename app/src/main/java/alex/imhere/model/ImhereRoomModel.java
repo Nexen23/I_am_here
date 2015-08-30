@@ -73,6 +73,15 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 		}
 
 		@Override
+		public void onPreLogout() {
+			for (EventListener listener : getListenersSet()) {
+				listener.onPreLogout();
+			}
+			onModelDataChanged(ImhereRoomModel.this);
+		}
+
+
+		@Override
 		public void onLogout() {
 			for (EventListener listener : getListenersSet()) {
 				listener.onLogout();
@@ -169,6 +178,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 
 	public void logout() {
 		if (currentUser != null) {
+			notifier.onPreLogout();
 			cancelLogoutAtCurrentUserDeath();
 
 			channel.disconnect();
@@ -240,6 +250,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 		channelListener = null;
 	}
 
+	// TODO: 30.08.2015 make default lazy class with null implementation! or do this for base class
 	public interface EventListener extends AbstractModel.EventListener {
 		void onUserLogin(final DyingUser dyingUser);
 		void onUserLogout(final DyingUser dyingUser);
@@ -248,6 +259,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 		void onClearUsers();
 
 		void onLogin(final DyingUser currentUser);
+		void onPreLogout();
 		void onLogout();
 	}
 }

@@ -1,7 +1,6 @@
 package alex.imhere.activity;
 
 import android.animation.ValueAnimator;
-import android.content.Context;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
@@ -10,9 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
-import android.widget.Toast;
-
-import com.parse.ParseException;
 
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.UiThread;
@@ -20,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import alex.imhere.R;
+import alex.imhere.fragment.UsersFragment;
 import alex.imhere.model.AbstractModel;
 import alex.imhere.model.ImhereRoomModel;
 import alex.imhere.fragment.StatusFragment;
@@ -28,7 +25,7 @@ import alex.imhere.service.Service;
 
 @EActivity
 public class ImhereActivity extends AppCompatActivity
-		implements StatusFragment.FragmentInteractionsListener {
+		implements StatusFragment.InteractionListener, UsersFragment.InteractionListener {
 	Logger l = LoggerFactory.getLogger(ImhereActivity.class);
 
 	ImhereRoomModel model;
@@ -110,7 +107,7 @@ public class ImhereActivity extends AppCompatActivity
 				@Override
 				public void run() {
 					model.logout();
-					showUsersFragment(false);
+
 				}
 			}).start();
 		} else {
@@ -118,9 +115,18 @@ public class ImhereActivity extends AppCompatActivity
 				@Override
 				public void run() {
 					model.login();
-					showUsersFragment(true);
 				}
 			}).start();
 		}
+	}
+
+	@Override
+	public void onShow(Fragment fragment) {
+		showUsersFragment(true);
+	}
+
+	@Override
+	public void onHide(Fragment fragment) {
+		showUsersFragment(false);
 	}
 }

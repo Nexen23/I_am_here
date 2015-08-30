@@ -243,11 +243,11 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 
 	@Override
 	public void stopListening() {
-		onlineUsers.removeListener(onlineUsersListener);
-		onlineUsersListener = null;
-
 		channel.clearListener();
 		channelListener = null;
+
+		onlineUsers.removeListener(onlineUsersListener);
+		onlineUsersListener = null;
 	}
 
 	// TODO: 30.08.2015 make default lazy class with null implementation! or do this for base class

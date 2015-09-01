@@ -51,14 +51,13 @@ public class ImhereActivity extends AppCompatActivity
 	@Override
 	protected void onResumeFragments() {
 		super.onResumeFragments();
-		model.startListening();
-		model.updateOnlineUsers();
+		model.resume();
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		model.stopListening();
+		model.pause();
 	}
 
 	@Override
@@ -81,6 +80,7 @@ public class ImhereActivity extends AppCompatActivity
 
 	@UiThread
 	public void showUsersFragment(final boolean doShow) {
+		//TODO : it MUST be in the Fragment
 		final FrameLayout usersView = (FrameLayout) findViewById(R.id.fl_fragment_users);
 		final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) usersView.getLayoutParams();
 		final int marginInPx = (int) getResources().getDimension(R.dimen.fragment_users_margin);
@@ -122,6 +122,7 @@ public class ImhereActivity extends AppCompatActivity
 
 	@Override
 	public void onShow(Fragment fragment) {
+		//TODO : pass real Fragment type (StatusFragment/UsersFragment) for retrieving data from it
 		showUsersFragment(true);
 	}
 

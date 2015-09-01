@@ -8,6 +8,8 @@ import org.joda.time.Duration;
 import org.joda.time.LocalDateTime;
 import org.parceler.Parcel;
 
+import alex.imhere.util.time.TimeUtils;
+
 @Parcel
 public class DyingUser {
 	@SerializedName("udid")
@@ -59,14 +61,12 @@ public class DyingUser {
 
 	@NonNull
 	public Duration getRestLifetime() {
-		Duration duration = new Duration(new LocalDateTime().toDateTime(), aliveTo.toDateTime());
-		return (duration.getMillis() < 0) ? new Duration(0) : duration;
+		return TimeUtils.GetNonNegativeDuration(new LocalDateTime().toDateTime(), aliveTo.toDateTime());
 	}
 
 	@NonNull
 	public Duration getFullLifetime() {
-		Duration duration = new Duration(loginedAt.toDateTime(), aliveTo.toDateTime());
-		return (duration.getMillis() < 0) ? new Duration(0) : duration;
+		return TimeUtils.GetNonNegativeDuration(loginedAt.toDateTime(), aliveTo.toDateTime());
 	}
 
 	public boolean isDead() {

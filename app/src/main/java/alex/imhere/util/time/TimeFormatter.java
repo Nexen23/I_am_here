@@ -1,11 +1,11 @@
-package alex.imhere.util.datetime;
+package alex.imhere.util.time;
 
 import org.joda.time.Duration;
 import org.joda.time.format.PeriodFormatter;
 import org.joda.time.format.PeriodFormatterBuilder;
 
-public class TimeFormatter {
-	public String durationToMSString(Duration duration) {
+public abstract class TimeFormatter {
+	static public String DurationToMSString(Duration duration) {
 		PeriodFormatter minutesAndSeconds = new PeriodFormatterBuilder()
 				.printZeroAlways()
 				.appendMinutes()

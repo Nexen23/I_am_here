@@ -1,11 +1,11 @@
 package alex.imhere.model;
 
 import alex.imhere.service.Service;
-import alex.imhere.util.listening.Listenable;
-import alex.imhere.util.listening.ListeningLifecycle;
+import alex.imhere.util.Listenable;
+import alex.imhere.util.Lifecycle;
 
 public abstract class AbstractModel<TEventsListener extends AbstractModel.EventListener>
-		extends Listenable<TEventsListener> implements ListeningLifecycle {
+		extends Listenable<TEventsListener> implements Lifecycle {
 
 	Service service;
 
@@ -17,7 +17,7 @@ public abstract class AbstractModel<TEventsListener extends AbstractModel.EventL
 		void onModelDataChanged(AbstractModel abstractModel);
 	}
 
-	public interface ModelListener extends ListeningLifecycle {
+	public interface ModelListener extends Lifecycle {
 		void setModel(AbstractModel abstractModel);
 	}
 }

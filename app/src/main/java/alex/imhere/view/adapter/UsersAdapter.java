@@ -13,7 +13,7 @@ import java.util.List;
 import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.view.UserLayout;
-import alex.imhere.util.datetime.TimeFormatter;
+import alex.imhere.util.time.TimeFormatter;
 
 public class UsersAdapter extends ArrayAdapter<DyingUser> {
 	private final int resourceId;
@@ -97,7 +97,7 @@ public class UsersAdapter extends ArrayAdapter<DyingUser> {
 
 		TextView tv_singed_in_date = (TextView) userView.findViewById(R.id.tv_singed_in_date);
 
-		String result = new TimeFormatter().durationToMSString( dyingUser.getRestLifetime() );
+		String result = TimeFormatter.DurationToMSString(dyingUser.getRestLifetime());
 
 		tv_singed_in_date.setText( result );
 	}

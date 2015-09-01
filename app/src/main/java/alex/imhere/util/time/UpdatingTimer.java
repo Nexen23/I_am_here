@@ -1,4 +1,4 @@
-package alex.imhere.util.datetime;
+package alex.imhere.util.time;
 
 import android.os.Handler;
 import android.os.Looper;

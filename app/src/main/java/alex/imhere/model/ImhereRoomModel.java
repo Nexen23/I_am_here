@@ -3,8 +3,6 @@ package alex.imhere.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.parse.ParseException;
-
 import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +16,10 @@ import alex.imhere.service.Service;
 import alex.imhere.service.api.UserApi;
 import alex.imhere.service.channel.BroadcastChannel;
 import alex.imhere.service.parser.UserParser;
-import alex.imhere.util.listening.ListeningLifecycle;
+import alex.imhere.util.Lifecycle;
 import alex.imhere.container.TemporarySet;
 
-public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener> implements ListeningLifecycle {
+public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener> implements Lifecycle {
 	Logger l = LoggerFactory.getLogger(ImhereRoomModel.class);
 
 	EventListener notifier = new EventListener() {
@@ -114,13 +112,15 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 	}
 
 	private void scheduleLogoutAtCurrentUserDeath() {
-		logoutTask = new TimerTask() {
-			@Override
-			public void run() {
-				logout();
-			}
-		};
-		timer.schedule(logoutTask, currentUser.getAliveTo().toDate());
+		if (currentUser != null) {
+			logoutTask = new TimerTask() {
+				@Override
+				public void run() {
+					logout();
+				}
+			};
+			timer.schedule(logoutTask, currentUser.getAliveTo().toDate());
+		}
 	}
 
 	private void cancelLogoutAtCurrentUserDeath() {
@@ -192,7 +192,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 	}
 
 	@Override
-	public void startListening() {
+	public void resume() {
 		onlineUsersListener = new TemporarySet.EventListener() {
 			@Override
 			public void onClear() {
@@ -239,10 +239,18 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 			}
 		};
 		channel.setListener(channelListener);
+
+		onlineUsers.clear();
+		scheduleLogoutAtCurrentUserDeath();
+		if (isCurrentSessionAlive()) {
+			updateOnlineUsers();
+		}
 	}
 
 	@Override
-	public void stopListening() {
+	public void pause() {
+		cancelLogoutAtCurrentUserDeath();
+
 		channel.clearListener();
 		channelListener = null;
 

@@ -20,12 +20,12 @@ import alex.imhere.model.AbstractModel;
 import alex.imhere.model.ImhereRoomModel;
 import alex.imhere.view.adapter.UsersAdapter;
 import alex.imhere.entity.DyingUser;
-import alex.imhere.util.listening.ListeningLifecycle;
-import alex.imhere.util.datetime.UpdatingTimer;
+import alex.imhere.util.Lifecycle;
+import alex.imhere.util.time.UpdatingTimer;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment
-		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, ListeningLifecycle {
+		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, Lifecycle {
 	Logger l = LoggerFactory.getLogger(UsersFragment.class);
 
 	ImhereRoomModel model;
@@ -82,13 +82,13 @@ public class UsersFragment extends ListFragment
 	@Override
 	public void onResume() {
 		super.onResume();
-		startListening();
+		resume();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		stopListening();
+		pause();
 	}
 
 	@UiThread
@@ -122,7 +122,7 @@ public class UsersFragment extends ListFragment
 	}
 
 	@Override
-	public void startListening() {
+	public void resume() {
 		final Fragment thisFragment = this;
 		eventsListener = new ImhereRoomModel.EventListener() {
 			@Override
@@ -171,7 +171,7 @@ public class UsersFragment extends ListFragment
 	}
 
 	@Override
-	public void stopListening() {
+	public void pause() {
 		model.removeListener(eventsListener);
 		eventsListener = null;
 	}

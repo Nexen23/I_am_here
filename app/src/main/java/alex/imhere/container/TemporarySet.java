@@ -12,7 +12,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
-import alex.imhere.util.listening.Listenable;
+import alex.imhere.util.Listenable;
 
 public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> {
 	// TODO: 18.08.2015 make sure it's thread-safe implementation

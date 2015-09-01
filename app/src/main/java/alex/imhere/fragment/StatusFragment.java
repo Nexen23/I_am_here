@@ -26,14 +26,14 @@ import alex.imhere.R;
 import alex.imhere.model.AbstractModel;
 import alex.imhere.model.ImhereRoomModel;
 import alex.imhere.entity.DyingUser;
-import alex.imhere.util.listening.ListeningLifecycle;
-import alex.imhere.util.wrapper.UiRunnable;
-import alex.imhere.util.datetime.TimeFormatter;
-import alex.imhere.util.datetime.UpdatingTimer;
+import alex.imhere.util.Lifecycle;
+import alex.imhere.util.time.TimeFormatter;
+import alex.imhere.util.time.TimeUtils;
+import alex.imhere.util.time.UpdatingTimer;
 
 @EFragment(R.layout.fragment_status)
 public class StatusFragment extends Fragment
-		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, ListeningLifecycle {
+		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, Lifecycle {
 	Logger l = LoggerFactory.getLogger(StatusFragment.class);
 
 	ImhereRoomModel model;
@@ -48,7 +48,6 @@ public class StatusFragment extends Fragment
 	@ViewById(R.id.tv_timer) TextView tvTimer;
 	@ViewById(R.id.b_imhere) Button imhereButton;
 	@ViewById(R.id.e_b_imhere) RippleBackground imhereButtonClickEffect;
-	TimeFormatter timeFormatter = new TimeFormatter();
 
 	boolean isCurrentUserLoginned = false;
 	LocalDateTime currentUserAliveTo = new LocalDateTime(0);
@@ -109,13 +108,13 @@ public class StatusFragment extends Fragment
 	@Override
 	public void onResume() {
 		super.onResume();
-		startListening();
+		resume();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		stopListening();
+		pause();
 	}
 
 	@UiThread
@@ -148,7 +147,8 @@ public class StatusFragment extends Fragment
 	@UiThread
 	void updateTimerTick() {
 		// TODO: 27.08.2015 really bad hack
-		String durationMsString = timeFormatter.durationToMSString( new Duration(new LocalDateTime().toDateTime(), currentUserAliveTo.toDateTime()) );
+		Duration restTime = TimeUtils.GetNonNegativeDuration(new LocalDateTime().toDateTime(), currentUserAliveTo.toDateTime());
+		String durationMsString = TimeFormatter.DurationToMSString(restTime);
 		tvTimer.setText(durationMsString);
 	}
 
@@ -200,7 +200,7 @@ public class StatusFragment extends Fragment
 	}
 
 	@Override
-	public void startListening() {
+	public void resume() {
 		eventsListener = new ImhereRoomModel.EventListener() {
 			@Override
 			public void onModelDataChanged(AbstractModel abstractModel) {
@@ -249,7 +249,7 @@ public class StatusFragment extends Fragment
 	}
 
 	@Override
-	public void stopListening() {
+	public void pause() {
 		model.removeListener(eventsListener);
 		eventsListener = null;
 	}

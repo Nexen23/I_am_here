@@ -16,10 +16,10 @@ import alex.imhere.service.Service;
 import alex.imhere.service.api.UserApi;
 import alex.imhere.service.channel.BroadcastChannel;
 import alex.imhere.service.parser.UserParser;
-import alex.imhere.util.Lifecycle;
+import alex.imhere.util.Resumable;
 import alex.imhere.container.TemporarySet;
 
-public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener> implements Lifecycle {
+public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener> implements Resumable {
 	Logger l = LoggerFactory.getLogger(ImhereRoomModel.class);
 
 	EventListener notifier = new EventListener() {
@@ -210,6 +210,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 			}
 		};
 		onlineUsers.addListener(onlineUsersListener);
+		onlineUsers.resume();
 
 		channelListener = new BroadcastChannel.EventListener() {
 			@Override
@@ -239,6 +240,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 			}
 		};
 		channel.setListener(channelListener);
+		channel.resume();
 
 		onlineUsers.clear();
 		scheduleLogoutAtCurrentUserDeath();

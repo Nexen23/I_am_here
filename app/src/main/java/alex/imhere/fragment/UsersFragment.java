@@ -20,12 +20,12 @@ import alex.imhere.model.AbstractModel;
 import alex.imhere.model.ImhereRoomModel;
 import alex.imhere.view.adapter.UsersAdapter;
 import alex.imhere.entity.DyingUser;
-import alex.imhere.util.Lifecycle;
+import alex.imhere.util.Resumable;
 import alex.imhere.util.time.UpdatingTimer;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment
-		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, Lifecycle {
+		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, Resumable {
 	Logger l = LoggerFactory.getLogger(UsersFragment.class);
 
 	ImhereRoomModel model;

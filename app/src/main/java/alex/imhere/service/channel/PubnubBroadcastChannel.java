@@ -1,17 +1,9 @@
 package alex.imhere.service.channel;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.util.Log;
-
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
-
-import alex.imhere.entity.DyingUser;
-import alex.imhere.service.Service;
-import alex.imhere.service.parser.UserParser;
 
 public class PubnubBroadcastChannel extends BroadcastChannel {
 	static private final String CHANNEL_NAME = "events"; // TODO: 29.08.2015 get name from Server & sub-key
@@ -21,35 +13,35 @@ public class PubnubBroadcastChannel extends BroadcastChannel {
 	Callback pubnubCallback = new Callback() {
 		@Override
 		public void connectCallback(String channel, Object message) {
-			if (listener != null) {
+			if (listener != null && isResumed()) {
 				listener.onConnect(channel, "Connected: " + message.toString());
 			}
 		}
 
 		@Override
 		public void disconnectCallback(String channel, Object message) {
-			if (listener != null) {
+			if (listener != null && isResumed()) {
 				listener.onDisconnect(channel, "Disconnected: " + message.toString());
 			}
 		}
 
 		@Override
 		public void reconnectCallback(String channel, Object message) {
-			if (listener != null) {
+			if (listener != null && isResumed()) {
 				listener.onReconnect(channel, "Reconnected: " + message.toString());
 			}
 		}
 
 		@Override
 		public void successCallback(String channel, Object message, String timetoken) {
-			if (listener != null) {
+			if (listener != null && isResumed()) {
 				listener.onMessageRecieve(channel, message.toString(), timetoken);
 			}
 		}
 
 		@Override
 		public void errorCallback(String channel, PubnubError error) {
-			if (listener != null) {
+			if (listener != null && isResumed()) {
 				listener.onErrorOccur(channel, "Error occured: " + error.toString());
 			}
 		}

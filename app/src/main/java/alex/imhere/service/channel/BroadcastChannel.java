@@ -2,7 +2,9 @@ package alex.imhere.service.channel;
 
 import android.support.annotation.NonNull;
 
-public abstract class BroadcastChannel {
+import alex.imhere.util.AbstractResumable;
+
+public abstract class BroadcastChannel extends AbstractResumable {
 	private String name;
 	protected BroadcastChannel.EventListener listener;
 

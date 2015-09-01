@@ -12,7 +12,9 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
+import alex.imhere.util.Resumable;
 import alex.imhere.util.Listenable;
+import alex.imhere.util.time.TimeUtils;
 
 public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> {
 	// TODO: 18.08.2015 make sure it's thread-safe implementation
@@ -121,13 +123,10 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 				}
 			};
 
-
 			LocalDateTime now = new LocalDateTime();
-			Duration duration = new Duration(now.toDateTime(), nextElementToDie.deathTime.toDateTime());
-			long lifetimeMillis = duration.getMillis();
-			long delay = Math.max(0, lifetimeMillis);
+			Duration duration = TimeUtils.GetNonNegativeDuration(now.toDateTime(), nextElementToDie.deathTime.toDateTime());
 
-			timer.schedule(timerTask, delay);
+			timer.schedule(timerTask, duration.getMillis());
 		}
 	}
 
@@ -174,6 +173,18 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 		}
 
 		return wasDeleted;
+	}
+
+	@Override
+	public void resume() {
+		super.resume();
+		openNextDeath();
+	}
+
+	@Override
+	public void pause() {
+		cancelNextDeath();
+		super.pause();
 	}
 
 	public interface EventListener extends Listenable.EventListener {

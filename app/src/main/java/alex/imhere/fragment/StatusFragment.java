@@ -26,14 +26,14 @@ import alex.imhere.R;
 import alex.imhere.model.AbstractModel;
 import alex.imhere.model.ImhereRoomModel;
 import alex.imhere.entity.DyingUser;
-import alex.imhere.util.Lifecycle;
+import alex.imhere.util.Resumable;
 import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
 import alex.imhere.util.time.UpdatingTimer;
 
 @EFragment(R.layout.fragment_status)
 public class StatusFragment extends Fragment
-		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, Lifecycle {
+		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, Resumable {
 	Logger l = LoggerFactory.getLogger(StatusFragment.class);
 
 	ImhereRoomModel model;

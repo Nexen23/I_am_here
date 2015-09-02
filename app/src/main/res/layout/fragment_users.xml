@@ -6,7 +6,7 @@
 
 	<TextView android:layout_width="wrap_content"
 			  android:layout_height="wrap_content"
-			  android:text="Online users"
+			  android:text="@string/lv_users_header"
 			  android:layout_margin="@dimen/margin_default"
 			  android:layout_gravity="center_horizontal">
 	</TextView>
@@ -19,7 +19,7 @@
 			  android:layout_width="match_parent"
 			  android:layout_height="match_parent"
 			  android:gravity="center"
-			  android:text="No users">
+			  android:text="@string/lv_users_empty">
 	</TextView>
 
 </LinearLayout>

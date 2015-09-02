@@ -60,26 +60,31 @@ public class UserLayout extends FrameLayout {
 		TypedArray attributes = getContext().getTheme().obtainStyledAttributes(attrs, R.styleable.UserLayout, defStyleAttr, 0);
 		try
 		{
-			setLifetime( attributes.getInt(R.styleable.UserLayout_lifetime, LIFETIME_DEAFULT) );
-			setSidesGap( attributes.getDimension(R.styleable.UserLayout_sides_gaps, SIDES_GAP_DEFAULT));
+			setLifetime(attributes.getInt(R.styleable.UserLayout_lifetime, LIFETIME_DEAFULT));
+			setSidesGap(attributes.getDimension(R.styleable.UserLayout_sides_gaps, SIDES_GAP_DEFAULT));
 			setStartAnimationOnCreation( attributes.getBoolean(R.styleable.UserLayout_start_animation_on_creation, START_ANIMATION_ON_CREATION_DEFAULT) );
 
 			int statesColorsResourceId = attributes.getResourceId(R.styleable.UserLayout_states_colors, 0);
 			TypedArray colorsResources = getResources().obtainTypedArray(statesColorsResourceId);
-			int[] colorsInts = new int[colorsResources.length()];
-			for (int i = 0; i < colorsResources.length(); ++i) {
-				colorsInts[i] = colorsResources.getColor(i, Color.BLACK);
+			try {
+				int[] colorsInts = new int[colorsResources.length()];
+				for (int i = 0; i < colorsResources.length(); ++i) {
+					colorsInts[i] = colorsResources.getColor(i, Color.BLACK);
+				}
+				setGradientStatesColors(colorsInts);
+			} catch (Exception e) {
+				e.printStackTrace();
 			}
-			setGradientStatesColors(colorsInts);
+			finally {
+				colorsResources.recycle();
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			setLifetime(LIFETIME_DEAFULT);
-			setGradientStatesColors(COLORS_DEFAULT.clone());
 			setSidesGap(SIDES_GAP_DEFAULT);
+			setGradientStatesColors(COLORS_DEFAULT.clone());
 			setStartAnimationOnCreation(START_ANIMATION_ON_CREATION_DEFAULT);
-		}
-		finally
-		{
+		} finally {
 			attributes.recycle();
 		}
 	}

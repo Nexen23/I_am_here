@@ -18,7 +18,7 @@ class TemporaryElement<T> implements Comparable {
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(@NonNull Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
@@ -33,7 +33,7 @@ class TemporaryElement<T> implements Comparable {
 	}
 
 	@Override
-	public int compareTo(Object another) {
+	public int compareTo(@NonNull Object another) {
 		TemporaryElement a = this,
 				b = (TemporaryElement) another;
 

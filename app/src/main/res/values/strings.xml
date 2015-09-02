@@ -4,11 +4,14 @@
 
     <string name="non_initialized">_ERROR_</string>
 
-    <string name="b_imhere_logouted">I'm out!</string>
-    <string name="b_imhere_logined">I'm here!</string>
+    <string name="b_imhere_logouted">I\'m here!</string>
+    <string name="b_imhere_logined">I\'m out!</string>
 
     <string name="ts_status_loginned">Online</string>
     <string name="ts_status_logouted">Offline</string>
     <string name="ts_status_logining"> Logining…</string>
     <string name="ts_status_logouting"> Loging out…</string>
+
+    <string name="lv_users_empty">No users</string>
+    <string name="lv_users_header">Online users</string>
 </resources>

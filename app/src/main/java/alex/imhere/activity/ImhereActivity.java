@@ -1,25 +1,20 @@
 package alex.imhere.activity;
 
-import android.animation.ValueAnimator;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
-import android.view.MenuItem;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.UiThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import alex.imhere.R;
+import alex.imhere.fragment.StatusFragment;
 import alex.imhere.fragment.UsersFragment;
 import alex.imhere.model.AbstractModel;
 import alex.imhere.model.ImhereRoomModel;
-import alex.imhere.fragment.StatusFragment;
 import alex.imhere.service.ImhereService;
 import alex.imhere.service.Service;
 

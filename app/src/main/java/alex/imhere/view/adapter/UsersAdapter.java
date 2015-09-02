@@ -12,8 +12,8 @@ import java.util.List;
 
 import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
-import alex.imhere.view.UserLayout;
 import alex.imhere.util.time.TimeFormatter;
+import alex.imhere.view.UserLayout;
 
 public class UsersAdapter extends ArrayAdapter<DyingUser> {
 	private final int resourceId;

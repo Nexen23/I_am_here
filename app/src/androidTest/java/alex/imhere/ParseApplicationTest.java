@@ -3,11 +3,7 @@ package alex.imhere;
 import android.provider.Settings;
 import android.test.ApplicationTestCase;
 
-import java.util.ArrayList;
-
 import alex.imhere.service.api.UserApi;
-import alex.imhere.entity.DyingUser;
-import alex.imhere.service.parser.UserParser;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>

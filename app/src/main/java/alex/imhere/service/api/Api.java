@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import alex.imhere.service.Service;
 import alex.imhere.service.domain.ParserService;
 import alex.imhere.service.parser.UserParser;
 

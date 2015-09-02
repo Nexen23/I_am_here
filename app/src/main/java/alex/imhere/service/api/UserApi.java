@@ -10,9 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alex.imhere.entity.DyingUser;
-import alex.imhere.service.Service;
 import alex.imhere.service.domain.ParserService;
-import alex.imhere.service.parser.UserParser;
 
 public class UserApi extends Api {
 	static final String

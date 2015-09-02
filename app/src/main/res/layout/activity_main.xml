@@ -4,18 +4,13 @@
               android:layout_height="match_parent"
               android:baselineAligned="false"
               android:orientation="horizontal"
-              android:background="@drawable/bg_stripes"
-    >
+              android:background="@drawable/bg_stripes">
 
     <FrameLayout
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
         android:id="@+id/fl_fragment_status"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true"
         android:padding="@dimen/padding_default"
-        android:layout_alignParentEnd="false"
-        android:layout_toLeftOf="@+id/fl_fragment_users"
         android:layout_weight="1">
 
         <fragment android:id="@+id/fragment_status"
@@ -29,15 +24,11 @@
         android:layout_width="@dimen/fragment_users_width"
         android:layout_height="match_parent"
         android:id="@+id/fl_fragment_users"
-        android:layout_alignWithParentIfMissing="false"
         android:clickable="false"
         android:padding="@dimen/padding_default"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="false"
-        android:layout_alignParentEnd="true"
         android:animateLayoutChanges="false"
         android:longClickable="false"
-        android:layout_marginRight="@dimen/fragment_users_margin"
+        android:layout_marginEnd="@dimen/fragment_users_margin"
         >
 
         <fragment android:id="@+id/fragment_users"
@@ -45,7 +36,7 @@
 				  android:layout_width="match_parent"
 				  android:layout_height="match_parent"
 				  tools:layout="@layout/fragment_users"
-                  android:layout_gravity="right|top"/>
+                  android:layout_gravity="end|top"/>
     </FrameLayout>
 
 </LinearLayout>

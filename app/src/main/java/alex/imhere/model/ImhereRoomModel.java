@@ -11,13 +11,13 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.service.Service;
 import alex.imhere.service.api.UserApi;
 import alex.imhere.service.channel.BroadcastChannel;
 import alex.imhere.service.parser.UserParser;
 import alex.imhere.util.Resumable;
-import alex.imhere.container.TemporarySet;
 
 public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener> implements Resumable {
 	Logger l = LoggerFactory.getLogger(ImhereRoomModel.class);

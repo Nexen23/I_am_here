@@ -3,9 +3,6 @@ package alex.imhere.fragment;
 import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -20,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alex.imhere.R;
+import alex.imhere.entity.DyingUser;
 import alex.imhere.model.AbstractModel;
 import alex.imhere.model.ImhereRoomModel;
-import alex.imhere.view.adapter.UsersAdapter;
-import alex.imhere.entity.DyingUser;
 import alex.imhere.util.Resumable;
 import alex.imhere.util.time.UpdatingTimer;
+import alex.imhere.view.adapter.UsersAdapter;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment

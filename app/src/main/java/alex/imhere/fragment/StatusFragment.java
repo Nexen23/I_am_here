@@ -18,6 +18,7 @@ import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.AnimationRes;
+import org.androidannotations.annotations.res.StringRes;
 import org.joda.time.Duration;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -58,6 +59,16 @@ public class StatusFragment extends Fragment
 
 	@AnimationRes(R.anim.fade_in) Animation fadeInAnim;
 	@AnimationRes(R.anim.fade_out) Animation fadeOutAnim;
+
+	@StringRes(R.string.non_initialized) String nonInitialized;
+
+	@StringRes(R.string.b_imhere_logined) String imhereButtonLogined;
+	@StringRes(R.string.b_imhere_logouted) String imhereButtonLogouted;
+
+	@StringRes(R.string.ts_status_loginned) String statusLoginned;
+	@StringRes(R.string.ts_status_logouted) String statusLogouted;
+	@StringRes(R.string.ts_status_logining) String statusLogining;
+	@StringRes(R.string.ts_status_logouting) String statusLogouting;
 
 	DateTime currentUserAliveTo = new DateTime(0);
 
@@ -127,22 +138,22 @@ public class StatusFragment extends Fragment
 
 	@UiThread
 	void updateStatus() {
-		String status = "_ERROR_";
+		String status = nonInitialized;
 		switch (state) {
 			case LOGINING_STATE :
-				status = "   Logining...";
+				status = statusLogining;
 				break;
 
 			case LOGINNED_STATE :
-				status = "Online";
+				status = statusLoginned;
 				break;
 
 			case LOGOUTED_STATE :
-				status = "Offline";
+				status = statusLogouted;
 				break;
 
 			case LOGOUTING_STATE :
-				status = "   Loging out...";
+				status = statusLogouting;
 				break;
 		}
 		tsStatus.setText(status);
@@ -153,12 +164,12 @@ public class StatusFragment extends Fragment
 		TransitionDrawable drawable = (TransitionDrawable) imhereButton.getBackground();
 		switch (state) {
 			case LOGINNED_STATE :
-				imhereButton.setText("I\'m out!");
+				imhereButton.setText(imhereButtonLogined);
 				drawable.startTransition(0);
 				break;
 
 			case LOGOUTED_STATE :
-				imhereButton.setText("I\'m here!");
+				imhereButton.setText(imhereButtonLogouted);
 				drawable.resetTransition();
 				break;
 		}

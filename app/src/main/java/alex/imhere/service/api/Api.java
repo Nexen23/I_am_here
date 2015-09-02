@@ -29,22 +29,4 @@ public abstract class Api {
 		result.put("udid", udid);
 		return result;
 	}
-
-	static public class Exception extends java.lang.Exception {
-		public Exception() {
-			super();
-		}
-
-		public Exception(String detailMessage) {
-			super(detailMessage);
-		}
-
-		public Exception(String detailMessage, Throwable throwable) {
-			super(detailMessage, throwable);
-		}
-
-		public Exception(Throwable throwable) {
-			super(throwable);
-		}
-	}
 }

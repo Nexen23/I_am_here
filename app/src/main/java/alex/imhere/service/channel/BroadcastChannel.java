@@ -2,6 +2,7 @@ package alex.imhere.service.channel;
 
 import android.support.annotation.NonNull;
 
+import alex.imhere.exception.BroadcastChannelException;
 import alex.imhere.util.AbstractResumable;
 
 public abstract class BroadcastChannel extends AbstractResumable {
@@ -28,7 +29,7 @@ public abstract class BroadcastChannel extends AbstractResumable {
 		return name;
 	}
 
-	public abstract void connect() throws BroadcastChannel.Exception;
+	public abstract void connect() throws BroadcastChannelException;
 	public abstract void disconnect();
 
 	public interface EventListener {
@@ -37,23 +38,5 @@ public abstract class BroadcastChannel extends AbstractResumable {
 		void onReconnect(String channel, String reason);
 		void onMessageRecieve(String channel, String message, String timetoken);
 		void onErrorOccur(String channel, String error);
-	}
-
-	static public class Exception extends java.lang.Exception {
-		public Exception() {
-			super();
-		}
-
-		public Exception(String detailMessage) {
-			super(detailMessage);
-		}
-
-		public Exception(String detailMessage, Throwable throwable) {
-			super(detailMessage, throwable);
-		}
-
-		public Exception(Throwable throwable) {
-			super(throwable);
-		}
 	}
 }

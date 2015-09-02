@@ -8,6 +8,7 @@ import com.parse.ParseException;
 import org.joda.time.DateTime;
 
 import alex.imhere.entity.DyingUser;
+import alex.imhere.exception.ApiException;
 import alex.imhere.service.domain.ParserService;
 
 public class DateApi extends Api {
@@ -18,33 +19,15 @@ public class DateApi extends Api {
 		super(parserService);
 	}
 
-	public DateTime getNow(@NonNull final DyingUser dyingUser) throws DateApi.Exception {
+	public DateTime getNow(@NonNull final DyingUser dyingUser) throws ApiException {
 		DateTime date = null;
 		try {
 			String jsonDate = ParseCloud.callFunction(API_GetNow, constructRequestForUser(dyingUser.getUdid()));
 			date = parser.fromJson(jsonDate, DateTime.class);
 		} catch (ParseException e) {
 			e.printStackTrace();
-			throw new DateApi.Exception("cannot get now date", e);
+			throw new ApiException("cannot get now date", e);
 		}
 		return date;
 	}
-
-	static public class Exception extends Api.Exception {
-		public Exception() {
-			super();
-		}
-
-		public Exception(String detailMessage) {
-			super(detailMessage);
-		}
-
-		public Exception(String detailMessage, Throwable throwable) {
-			super(detailMessage, throwable);
-		}
-
-		public Exception(Throwable throwable) {
-			super(throwable);
-		}
-	};
 }

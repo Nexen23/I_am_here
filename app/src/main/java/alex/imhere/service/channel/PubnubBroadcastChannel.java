@@ -5,6 +5,8 @@ import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
 
+import alex.imhere.exception.BroadcastChannelException;
+
 public class PubnubBroadcastChannel extends BroadcastChannel {
 	static private final String CHANNEL_NAME = "events"; // TODO: 29.08.2015 get name from Server & sub-key
 	static private final String SUBSCRIBE_KEY = "sub-c-a3d06db8-410b-11e5-8bf2-0619f8945a4f";
@@ -52,12 +54,12 @@ public class PubnubBroadcastChannel extends BroadcastChannel {
 	}
 
 	@Override
-	public void connect() throws BroadcastChannel.Exception {
+	public void connect() throws BroadcastChannelException {
 		try {
 			pubnub.subscribe(CHANNEL_NAME, pubnubCallback);
 		} catch (PubnubException e) {
 			e.printStackTrace();
-			throw new BroadcastChannel.Exception("cannot connect", e);
+			throw new BroadcastChannelException("cannot connect", e);
 		}
 	}
 

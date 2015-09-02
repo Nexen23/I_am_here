@@ -13,7 +13,7 @@ import com.google.gson.JsonSerializer;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 import java.lang.reflect.Type;
 
@@ -21,24 +21,24 @@ public class UserParser {
 	private Gson gson;
 
 	public UserParser() {
-		JsonDeserializer<LocalDateTime> deserializer = new JsonDeserializer<LocalDateTime>() {
+		JsonDeserializer<DateTime> deserializer = new JsonDeserializer<DateTime>() {
 			@Override
-			public LocalDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-				LocalDateTime localDateTime = new LocalDateTime(0);
+			public DateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+				DateTime dateTime = new DateTime(0);
 				if (json != null) {
 					JsonObject asJsonObject = json.getAsJsonObject();
 					String dateTimeString = asJsonObject.get("iso").getAsString();
 
 					//DateTimeZone localTZ = DateTimeZone.getDefault();
-					//localDateTime = new LocalDateTime( localTZ.convertUTCToLocal(new DateTime(dateTimeString).getMillis()) );
-					localDateTime = new DateTime(dateTimeString).toLocalDateTime();
+					//dateTime = new DateTime( localTZ.convertUTCToLocal(new DateTime(dateTimeString).getMillis()) );
+					dateTime = new DateTime(dateTimeString);
 				}
-				return localDateTime;
+				return dateTime;
 			}
 		};
 
 		gson = new GsonBuilder()
-				.registerTypeAdapter(LocalDateTime.class, deserializer).create();
+				.registerTypeAdapter(DateTime.class, deserializer).create();
 	}
 
 	public <T> T fromJson(String json, Type type) {

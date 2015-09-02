@@ -2,19 +2,19 @@ package alex.imhere.container;
 
 import android.support.annotation.NonNull;
 
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 class TemporaryElement<T> implements Comparable {
 	protected T object = null;
-	protected LocalDateTime deathTime;
+	protected DateTime deathTime;
 
-	public TemporaryElement(@NonNull T object, @NonNull LocalDateTime deathTime) {
+	public TemporaryElement(@NonNull T object, @NonNull DateTime deathTime) {
 		this.deathTime = deathTime;
 		this.object = object;
 	}
 
 	public TemporaryElement(@NonNull T object) {
-		this(object, new LocalDateTime(0));
+		this(object, new DateTime(0));
 	}
 
 	@Override

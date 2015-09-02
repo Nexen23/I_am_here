@@ -19,7 +19,7 @@ import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.AnimationRes;
 import org.joda.time.Duration;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +59,7 @@ public class StatusFragment extends Fragment
 	@AnimationRes(R.anim.fade_in) Animation fadeInAnim;
 	@AnimationRes(R.anim.fade_out) Animation fadeOutAnim;
 
-	LocalDateTime currentUserAliveTo = new LocalDateTime(0);
+	DateTime currentUserAliveTo = new DateTime(0);
 
 	public StatusFragment() {
 		// Required empty public constructor
@@ -211,7 +211,7 @@ public class StatusFragment extends Fragment
 	@UiThread
 	void updateTimerTick() {
 		// TODO: 27.08.2015 really bad hack
-		Duration restTime = TimeUtils.GetNonNegativeDuration(new LocalDateTime().toDateTime(), currentUserAliveTo.toDateTime());
+		Duration restTime = TimeUtils.GetNonNegativeDuration(new DateTime(), currentUserAliveTo);
 		String durationMsString = TimeFormatter.DurationToMSString(restTime);
 		tvTimer.setText(durationMsString);
 	}

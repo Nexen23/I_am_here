@@ -1,7 +1,7 @@
 package alex.imhere.container;
 
 import org.joda.time.Duration;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,7 +50,7 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 		};
 	}
 
-	public boolean add(TItem object, LocalDateTime deathTime) {
+	public boolean add(TItem object, DateTime deathTime) {
 		TemporaryElement<TItem> element = new TemporaryElement<>(object, deathTime);
 		return _add(element);
 	}
@@ -123,8 +123,8 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 				}
 			};
 
-			LocalDateTime now = new LocalDateTime();
-			Duration duration = TimeUtils.GetNonNegativeDuration(now.toDateTime(), nextElementToDie.deathTime.toDateTime());
+			DateTime now = new DateTime();
+			Duration duration = TimeUtils.GetNonNegativeDuration(now, nextElementToDie.deathTime);
 
 			timer.schedule(timerTask, duration.getMillis());
 		}

@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.Duration;
-import org.joda.time.LocalDateTime;
+import org.joda.time.DateTime;
 import org.parceler.Parcel;
 
 import alex.imhere.util.time.TimeUtils;
@@ -15,9 +15,9 @@ public class DyingUser {
 	@SerializedName("udid")
 	String udid = "";
 	@SerializedName("loginedAt")
-	LocalDateTime loginedAt = new LocalDateTime(0);
+	DateTime loginedAt = new DateTime(0);
 	@SerializedName("aliveTo")
-	LocalDateTime aliveTo = new LocalDateTime(0);
+	DateTime aliveTo = new DateTime(0);
 
 	public DyingUser() {
 	}
@@ -27,17 +27,17 @@ public class DyingUser {
 		this(dyingUser.udid, dyingUser.loginedAt, dyingUser.aliveTo);
 	}
 
-	protected DyingUser(String udid, LocalDateTime loginedAt, LocalDateTime aliveTo) {
+	protected DyingUser(String udid, DateTime loginedAt, DateTime aliveTo) {
 		setUdid(udid);
 		setLoginedAt(loginedAt);
 		setAliveTo(aliveTo);
 	}
 
-	protected void setLoginedAt(LocalDateTime loginedAt) {
+	protected void setLoginedAt(DateTime loginedAt) {
 		this.loginedAt = loginedAt;
 	}
 
-	protected void setAliveTo(LocalDateTime aliveTo) {
+	protected void setAliveTo(DateTime aliveTo) {
 		this.aliveTo = aliveTo;
 	}
 	//endregion
@@ -51,22 +51,22 @@ public class DyingUser {
 		this.udid = udid;
 	}
 
-	public LocalDateTime getAliveTo() {
+	public DateTime getAliveTo() {
 		return aliveTo;
 	}
 
-	public LocalDateTime getLoginedAt() {
+	public DateTime getLoginedAt() {
 		return loginedAt;
 	}
 
 	@NonNull
 	public Duration getRestLifetime() {
-		return TimeUtils.GetNonNegativeDuration(new LocalDateTime().toDateTime(), aliveTo.toDateTime());
+		return TimeUtils.GetNonNegativeDuration(new DateTime(), aliveTo);
 	}
 
 	@NonNull
 	public Duration getFullLifetime() {
-		return TimeUtils.GetNonNegativeDuration(loginedAt.toDateTime(), aliveTo.toDateTime());
+		return TimeUtils.GetNonNegativeDuration(loginedAt, aliveTo);
 	}
 
 	public boolean isDead() {

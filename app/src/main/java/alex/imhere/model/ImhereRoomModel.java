@@ -22,6 +22,7 @@ import alex.imhere.container.TemporarySet;
 public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener> implements Resumable {
 	Logger l = LoggerFactory.getLogger(ImhereRoomModel.class);
 
+	int state;
 	EventListener notifier = new EventListener() {
 		@Override
 		public void onModelDataChanged(AbstractModel abstractModel) {
@@ -71,9 +72,9 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 		}
 
 		@Override
-		public void onPreLogout() {
+		public void onCurrentUserTimeout() {
 			for (EventListener listener : getListenersSet()) {
-				listener.onPreLogout();
+				listener.onCurrentUserTimeout();
 			}
 			onModelDataChanged(ImhereRoomModel.this);
 		}
@@ -116,6 +117,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 			logoutTask = new TimerTask() {
 				@Override
 				public void run() {
+					notifier.onCurrentUserTimeout();
 					logout();
 				}
 			};
@@ -124,9 +126,11 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 	}
 
 	private void cancelLogoutAtCurrentUserDeath() {
-		logoutTask.cancel();
+		if (logoutTask != null) {
+			logoutTask.cancel();
+			logoutTask = null;
+		}
 		timer.purge();
-		logoutTask = null;
 	}
 
 	public boolean isCurrentSessionAlive() {
@@ -155,7 +159,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 	}
 
 	@Nullable
-	public final DyingUser login() {
+	public synchronized final DyingUser login() {
 		currentUser = null;
 		// TODO: 30.08.2015 log exceptions
 		try {
@@ -176,9 +180,8 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 		return currentUser;
 	}
 
-	public void logout() {
+	public synchronized void logout() {
 		if (currentUser != null) {
-			notifier.onPreLogout();
 			cancelLogoutAtCurrentUserDeath();
 
 			channel.disconnect();
@@ -228,11 +231,14 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 			@Override
 			public void onMessageRecieve(String channel, String message, String timetoken) {
 				DyingUser dyingUser = userParser.fromJson(message, DyingUser.class);
+				Boolean wasRemoved = false, wasAdded = false;
 				if (dyingUser.isDead()) {
-					onlineUsers.remove(dyingUser);
+					wasRemoved = onlineUsers.remove(dyingUser);
 				} else {
-					onlineUsers.add(dyingUser, dyingUser.getAliveTo());
+					wasAdded = onlineUsers.add(dyingUser, dyingUser.getAliveTo());
 				}
+				l.info("[{} : dead({})] wasRemoved == {}, wasAdded == {}",
+						dyingUser.getUdid(), Boolean.valueOf(dyingUser.isDead()), wasAdded.toString(), wasRemoved.toString());
 			}
 
 			@Override
@@ -243,10 +249,13 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 		channel.resume();
 
 		onlineUsers.clear();
-		scheduleLogoutAtCurrentUserDeath();
-		if (isCurrentSessionAlive()) {
+
+		if (isCurrentSessionAlive())
+		{
+			notifier.onLogin(currentUser);
 			updateOnlineUsers();
 		}
+		scheduleLogoutAtCurrentUserDeath();
 	}
 
 	@Override
@@ -269,7 +278,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 		void onClearUsers();
 
 		void onLogin(final DyingUser currentUser);
-		void onPreLogout();
+		void onCurrentUserTimeout();
 		void onLogout();
 	}
 }

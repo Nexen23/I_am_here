@@ -2,7 +2,6 @@ package alex.imhere.fragment;
 
 import android.app.Activity;
 import android.graphics.drawable.TransitionDrawable;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.animation.Animation;
@@ -14,9 +13,11 @@ import android.widget.TextView;
 import com.skyfishjy.library.RippleBackground;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.res.AnimationRes;
 import org.joda.time.Duration;
 import org.joda.time.LocalDateTime;
 import org.slf4j.Logger;
@@ -34,6 +35,13 @@ import alex.imhere.util.time.UpdatingTimer;
 @EFragment(R.layout.fragment_status)
 public class StatusFragment extends Fragment
 		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, Resumable {
+	// TODO: 02.09.2015 place it to Model?
+	static final int LOGINNED_STATE = 1;
+	static final int LOGOUTED_STATE = 2;
+	static final int LOGINING_STATE = 3;
+	static final int LOGOUTING_STATE = 4;
+	int state = LOGOUTED_STATE, prevState = LOGOUTED_STATE;
+
 	Logger l = LoggerFactory.getLogger(StatusFragment.class);
 
 	ImhereRoomModel model;
@@ -41,7 +49,6 @@ public class StatusFragment extends Fragment
 
 	InteractionListener interactionsListener;
 
-	Handler uiHandler;
 	UpdatingTimer updatingTimer;
 
 	@ViewById(R.id.ts_status) TextSwitcher tsStatus;
@@ -49,7 +56,9 @@ public class StatusFragment extends Fragment
 	@ViewById(R.id.b_imhere) Button imhereButton;
 	@ViewById(R.id.e_b_imhere) RippleBackground imhereButtonClickEffect;
 
-	boolean isCurrentUserLoginned = false;
+	@AnimationRes(R.anim.fade_in) Animation fadeInAnim;
+	@AnimationRes(R.anim.fade_out) Animation fadeOutAnim;
+
 	LocalDateTime currentUserAliveTo = new LocalDateTime(0);
 
 	public StatusFragment() {
@@ -59,33 +68,17 @@ public class StatusFragment extends Fragment
 	@AfterViews
 	public void onViewsInjected() {
 		// TODO: 30.08.2015 make all string non hardcoded
-		uiHandler = new Handler();
 		updatingTimer = new UpdatingTimer(this);
 		updatingTimer.start();
 
-		updateTimer();
-
 		tsStatus.setAnimateFirstView(false);
-		TextView tvSessionDead = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
-		tvSessionDead.setText("Offline");
-		tsStatus.addView(tvSessionDead);
+		TextView tv1 = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
+		tsStatus.addView(tv1);
+		TextView tv2 = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
+		tsStatus.addView(tv2);
 		tsStatus.showNext();
 
-		TextView tvSessionAlive = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
-		tvSessionAlive.setText("Online");
-		tsStatus.addView(tvSessionAlive);
-
-		final Fragment thisFragment = this;
-		imhereButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if (interactionsListener != null) {
-
-					imhereButtonClick();
-					interactionsListener.onImhereClick(thisFragment);
-				}
-			}
-		});
+		setState(LOGOUTED_STATE);
 	}
 
 	@Override
@@ -117,31 +110,102 @@ public class StatusFragment extends Fragment
 		pause();
 	}
 
+	@Click(R.id.b_imhere)
+	void imhereButtonClick() {
+		setImhereButtonEnabled(false);
+		interactionsListener.onImhereClick(this);
+	}
+
+	void setState(int state) {
+		prevState = this.state;
+		this.state = state;
+
+		updateStatus();
+		updateImhereButton();
+		updateTimer();
+	}
+
 	@UiThread
 	void updateStatus() {
-		if (isCurrentUserLoginned) {
-			tsStatus.setText("Online");
-		} else {
-			tsStatus.setText("Offline");
+		String status = "_ERROR_";
+		switch (state) {
+			case LOGINING_STATE :
+				status = "   Logining...";
+				break;
+
+			case LOGINNED_STATE :
+				status = "Online";
+				break;
+
+			case LOGOUTED_STATE :
+				status = "Offline";
+				break;
+
+			case LOGOUTING_STATE :
+				status = "   Loging out...";
+				break;
+		}
+		tsStatus.setText(status);
+	}
+
+	@UiThread
+	void updateImhereButton() {
+		TransitionDrawable drawable = (TransitionDrawable) imhereButton.getBackground();
+		switch (state) {
+			case LOGINNED_STATE :
+				imhereButton.setText("I\'m out!");
+				drawable.startTransition(0);
+				break;
+
+			case LOGOUTED_STATE :
+				imhereButton.setText("I\'m here!");
+				drawable.resetTransition();
+				break;
 		}
 	}
 
 	@UiThread
 	void updateTimer() {
-		int timerVisibility = View.INVISIBLE;
-		int animationType = R.anim.fade_out;
-		Animation timerAnimation;
+		switch (state) {
+			case LOGINNED_STATE :
+				tvTimer.startAnimation(fadeInAnim);
+				tvTimer.setVisibility(View.VISIBLE);
+				updateTimerTick();
+				break;
 
-		if (isCurrentUserLoginned) {
-			timerVisibility = View.VISIBLE;
-			animationType = R.anim.fade_in;
-			updateTimerTick();
+			case LOGOUTED_STATE :
+				tvTimer.startAnimation(fadeOutAnim);
+				tvTimer.setVisibility(View.INVISIBLE);
+				break;
 		}
+	}
 
-		timerAnimation = AnimationUtils.loadAnimation(getActivity(), animationType);
-		tvTimer.startAnimation(timerAnimation);
+	@UiThread
+	void setImhereButtonEnabled(boolean isEnabled) {
+		imhereButton.setEnabled(isEnabled);
+		if (isEnabled) {
+			imhereButtonClickEffect.stopRippleAnimation();
+			switch (state) {
+				case LOGOUTING_STATE :
+					setState(LOGOUTED_STATE);
+					break;
 
-		tvTimer.setVisibility(timerVisibility);
+				case LOGINING_STATE :
+					setState(LOGINNED_STATE);
+					break;
+			}
+		} else {
+			imhereButtonClickEffect.startRippleAnimation();
+			switch (state) {
+				case LOGINNED_STATE :
+					setState(LOGOUTING_STATE);
+					break;
+
+				case LOGOUTED_STATE :
+					setState(LOGINING_STATE);
+					break;
+			}
+		}
 	}
 
 	@UiThread
@@ -150,43 +214,6 @@ public class StatusFragment extends Fragment
 		Duration restTime = TimeUtils.GetNonNegativeDuration(new LocalDateTime().toDateTime(), currentUserAliveTo.toDateTime());
 		String durationMsString = TimeFormatter.DurationToMSString(restTime);
 		tvTimer.setText(durationMsString);
-	}
-
-	@UiThread
-	void updateImhereButton() {
-		TransitionDrawable drawable = (TransitionDrawable) imhereButton.getBackground();
-		if (isCurrentUserLoginned) {
-			imhereButton.setText("I\'m out!");
-			drawable.startTransition(0);
-		} else {
-			imhereButton.setText("I\'m here!");
-			drawable.reverseTransition(0);
-		}
-	}
-
-	void setStatusLoginned(boolean currentUserIsLoggined) {
-		isCurrentUserLoginned = currentUserIsLoggined;
-		updateStatus();
-		updateImhereButton();
-		updateTimer();
-	}
-
-	@UiThread
-	void setImhereButtonEnabled() {
-		imhereButton.setEnabled(true);
-		imhereButtonClickEffect.stopRippleAnimation();
-	}
-
-	@UiThread
-	void imhereButtonClick() {
-		imhereButton.setEnabled(false);
-		// TODO: 30.08.2015 another hack
-		String text = "   Loging out...";
-		if (!isCurrentUserLoginned) {
-			text = "   Logining...";
-			imhereButtonClickEffect.startRippleAnimation();
-		}
-		tsStatus.setText(text);
 	}
 
 	@Override
@@ -229,19 +256,17 @@ public class StatusFragment extends Fragment
 			@Override
 			public void onLogin(DyingUser currentUser) {
 				currentUserAliveTo = currentUser.getAliveTo();
-				setStatusLoginned(true);
-				setImhereButtonEnabled();
+				setImhereButtonEnabled(true);
 			}
 
 			@Override
-			public void onPreLogout() {
-				imhereButtonClick();
+			public void onCurrentUserTimeout() {
+				setImhereButtonEnabled(false);
 			}
 
 			@Override
 			public void onLogout() {
-				setStatusLoginned(false);
-				setImhereButtonEnabled();
+				setImhereButtonEnabled(true);
 			}
 		};
 

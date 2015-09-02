@@ -1,10 +1,14 @@
 package alex.imhere.fragment;
 
+import android.animation.ValueAnimator;
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.ListFragment;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
@@ -32,11 +36,11 @@ public class UsersFragment extends ListFragment
 	ImhereRoomModel.EventListener eventsListener;
 
 	InteractionListener interactionsListener;
+	boolean isShown = false;
 
 	UsersAdapter usersAdapter;
 	List<DyingUser> dyingUsers = new ArrayList<>();
 
-	Handler uiHandler;
 	UpdatingTimer updatingTimer;
 
 	public static UsersFragment newInstance() {
@@ -57,7 +61,6 @@ public class UsersFragment extends ListFragment
 	public void onViewsInjected() {
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, dyingUsers);
 
-		uiHandler = new Handler();
 		updatingTimer = new UpdatingTimer(this);
 		updatingTimer.start();
 	}
@@ -121,9 +124,32 @@ public class UsersFragment extends ListFragment
 		this.model = (ImhereRoomModel) abstractModel;
 	}
 
+	@UiThread
+	public void showFragment(final boolean doShow) {
+		if (isShown != doShow) {
+			final FrameLayout usersView = (FrameLayout) getActivity().findViewById(R.id.fl_fragment_users);
+			final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) usersView.getLayoutParams();
+			final int marginInPx = (int) getResources().getDimension(R.dimen.fragment_users_margin);
+			ValueAnimator animator = ValueAnimator.ofInt(marginInPx, 0);
+			if (!doShow) {
+				animator = ValueAnimator.ofInt(0, marginInPx);
+			}
+			animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+				@Override
+				public void onAnimationUpdate(ValueAnimator valueAnimator) {
+					params.rightMargin = (Integer) valueAnimator.getAnimatedValue();
+					usersView.requestLayout();
+				}
+			});
+			animator.setDuration(getResources().getInteger(R.integer.duration_users_fragment_sliding));
+			animator.start();
+
+			isShown = doShow;
+		}
+	}
+
 	@Override
 	public void resume() {
-		final Fragment thisFragment = this;
 		eventsListener = new ImhereRoomModel.EventListener() {
 			@Override
 			public void onModelDataChanged(AbstractModel abstractModel) {
@@ -153,16 +179,17 @@ public class UsersFragment extends ListFragment
 			@Override
 			public void onLogin(DyingUser currentUser) {
 				notifyUsersDataChanged();
-				interactionsListener.onShow(thisFragment);
+				showFragment(true);
 			}
 
 			@Override
-			public void onPreLogout() {
-				interactionsListener.onHide(thisFragment);
+			public void onCurrentUserTimeout() {
+				showFragment(false);
 			}
 
 			@Override
 			public void onLogout() {
+				showFragment(false);
 				notifyUsersDataChanged();
 			}
 		};
@@ -177,7 +204,5 @@ public class UsersFragment extends ListFragment
 	}
 
 	public interface InteractionListener {
-		void onShow(Fragment fragment);
-		void onHide(Fragment fragment);
 	}
 }

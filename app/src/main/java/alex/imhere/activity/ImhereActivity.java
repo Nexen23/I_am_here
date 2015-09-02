@@ -62,42 +62,7 @@ public class ImhereActivity extends AppCompatActivity
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		getMenuInflater().inflate(R.menu.menu_main, menu);
-		return true;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		int id = item.getItemId();
-
-		//noinspection SimplifiableIfStatement
-		if (id == R.id.action_settings) {
-			return true;
-		}
-
-		return super.onOptionsItemSelected(item);
-	}
-
-	@UiThread
-	public void showUsersFragment(final boolean doShow) {
-		//TODO : it MUST be in the Fragment
-		final FrameLayout usersView = (FrameLayout) findViewById(R.id.fl_fragment_users);
-		final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) usersView.getLayoutParams();
-		final int marginInPx = (int) getResources().getDimension(R.dimen.fragment_users_margin);
-		ValueAnimator animator = ValueAnimator.ofInt(marginInPx, 0);
-		if (doShow == false) {
-			animator = ValueAnimator.ofInt(0, marginInPx);
-		}
-		animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-			@Override
-			public void onAnimationUpdate(ValueAnimator valueAnimator)
-			{
-				params.rightMargin = (Integer) valueAnimator.getAnimatedValue();
-				usersView.requestLayout();
-			}
-		});
-		animator.setDuration( getResources().getInteger(R.integer.duration_users_fragment_sliding) );
-		animator.start();
+		return false;
 	}
 
 	@Override
@@ -118,16 +83,5 @@ public class ImhereActivity extends AppCompatActivity
 				}
 			}).start();
 		}
-	}
-
-	@Override
-	public void onShow(Fragment fragment) {
-		//TODO : pass real Fragment type (StatusFragment/UsersFragment) for retrieving data from it
-		showUsersFragment(true);
-	}
-
-	@Override
-	public void onHide(Fragment fragment) {
-		showUsersFragment(false);
 	}
 }

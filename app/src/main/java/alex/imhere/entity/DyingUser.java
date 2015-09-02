@@ -70,7 +70,7 @@ public class DyingUser {
 	}
 
 	public boolean isDead() {
-		return getRestLifetime().getMillis() == 0;
+		return getFullLifetime().getMillis() <= 0 || getRestLifetime().getMillis() == 0;
 	}
 
 	public boolean isAlive() {

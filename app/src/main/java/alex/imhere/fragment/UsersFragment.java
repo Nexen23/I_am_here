@@ -1,11 +1,8 @@
 package alex.imhere.fragment;
 
-import android.animation.ValueAnimator;
-import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
-import android.widget.FrameLayout;
-import android.widget.LinearLayout;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
@@ -17,26 +14,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 import alex.imhere.R;
+import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
-import alex.imhere.model.AbstractModel;
-import alex.imhere.model.ImhereRoomModel;
-import alex.imhere.util.Resumable;
-import alex.imhere.util.time.UpdatingTimer;
+import alex.imhere.exception.ApiException;
+import alex.imhere.exception.BroadcastChannelException;
+import alex.imhere.service.ImhereServiceManager;
+import alex.imhere.service.ServiceManager;
+import alex.imhere.service.api.UserApi;
+import alex.imhere.service.channel.Channel;
+import alex.imhere.service.UpdatingTimer;
+import alex.imhere.service.parser.UserParser;
 import alex.imhere.view.adapter.UsersAdapter;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
-public class UsersFragment extends ListFragment
-		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, Resumable {
+public class UsersFragment extends ListFragment implements UpdatingTimer.TimerListener {
 	Logger l = LoggerFactory.getLogger(UsersFragment.class);
 
-	ImhereRoomModel model;
-	ImhereRoomModel.EventListener eventsListener;
+	ServiceManager serviceManager = new ImhereServiceManager();
+	UserApi userApi;
+	Channel channel;
+	UserParser userParser;
 
-	InteractionListener interactionsListener;
-	boolean isShown = false;
+	DyingUser currentUser;
+	TemporarySet<DyingUser> usersTempSet = new TemporarySet<>();
+
+	TemporarySet.EventListener usersTempSetListener;
+	Channel.EventListener channelListener;
 
 	UsersAdapter usersAdapter;
-	List<DyingUser> dyingUsers = new ArrayList<>();
+	List<DyingUser> usersList = new ArrayList<>();
 
 	UpdatingTimer updatingTimer;
 
@@ -50,45 +56,33 @@ public class UsersFragment extends ListFragment
 	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
-
 		setListAdapter(usersAdapter);
 	}
 
 	@AfterViews
-	public void onViewsInjected() {
-		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, dyingUsers);
+	public void onAfterViews() {
+		userApi = serviceManager.getApiService().getUserApi();
+		channel = serviceManager.getChannelService().getChannel();
+		userParser = serviceManager.getParserService().getUserParser();
+
+		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
 
 		updatingTimer = new UpdatingTimer(this);
 		updatingTimer.start();
 	}
 
 	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		try {
-			interactionsListener = (InteractionListener) activity;
-		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString()
-					+ " must implement InteractionListener");
-		}
-	}
-
-	@Override
-	public void onDetach() {
-		super.onDetach();
-		interactionsListener = null;
-	}
-
-	@Override
 	public void onResume() {
 		super.onResume();
-		resume();
+		if (isCurrentUserAlive()) {
+			startListeningEvents();
+		}
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		pause();
+		stopListeningEvents();
 	}
 
 	@UiThread
@@ -116,90 +110,112 @@ public class UsersFragment extends ListFragment
 		notifyUsersDataChanged();
 	}
 
-	@Override
-	public void setModel(AbstractModel abstractModel) {
-		this.model = (ImhereRoomModel) abstractModel;
+	public void updateOnlineUsers() {
+		l.info("updateing online users");
+		if (isCurrentUserAlive()) {
+			List<DyingUser> onlineUsers = null;
+			try {
+				onlineUsers = userApi.getOnlineUsers(currentUser);
+				for (DyingUser dyingUser : onlineUsers) {
+					boolean wasAdded = usersTempSet.add(dyingUser, dyingUser.getAliveTo());
+					l.info("User: {} was added ({})", dyingUser.getUdid(), Boolean.valueOf(wasAdded).toString());
+				}
+			} catch (ApiException e) {
+				e.printStackTrace();
+			}
+		}
+		//notifier.onUsersUpdate();
 	}
 
-	@UiThread
-	public void showFragment(final boolean doShow) {
-		if (isShown != doShow) {
-			final FrameLayout usersView = (FrameLayout) getActivity().findViewById(R.id.fl_fragment_users);
-			final LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) usersView.getLayoutParams();
-			final int marginInPx = (int) getResources().getDimension(R.dimen.fragment_users_margin);
-			ValueAnimator animator = ValueAnimator.ofInt(marginInPx, 0);
-			if (!doShow) {
-				animator = ValueAnimator.ofInt(0, marginInPx);
-			}
-			animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-				@Override
-				public void onAnimationUpdate(ValueAnimator valueAnimator) {
-					params.rightMargin = (Integer) valueAnimator.getAnimatedValue();
-					usersView.requestLayout();
-				}
-			});
-			animator.setDuration(getResources().getInteger(R.integer.duration_users_fragment_sliding));
-			animator.start();
+	public boolean isCurrentUserAlive() {
+		DyingUser currentUser = getCurrentUser();
+		return currentUser != null && currentUser.isAlive();
+	}
 
-			isShown = doShow;
+	public DyingUser getCurrentUser() {
+		return currentUser;
+	}
+
+	public void clearCurrentUser() {
+		stopListeningEvents();
+		setCurrentUser(null);
+	}
+
+	public void setCurrentUser(@Nullable DyingUser user) {
+		currentUser = user;
+		startListeningEvents();
+	}
+
+	//region Listening helpers
+	void startListeningEvents() {
+		usersTempSetListener = new TemporarySet.EventListener() {
+			@Override
+			public void onClear() {
+				UsersFragment.this.clearUsers();
+			}
+
+			@Override
+			public void onAdd(Object item) {
+				UsersFragment.this.addUser((DyingUser) item);
+			}
+
+			@Override
+			public void onRemove(Object item) {
+				UsersFragment.this.removeUser((DyingUser) item);
+			}
+		};
+		usersTempSet.addListener(usersTempSetListener);
+		usersTempSet.resume();
+
+		channelListener = new Channel.EventListener() {
+			@Override
+			public void onConnect(String channel, String greeting) {
+			}
+
+			@Override
+			public void onDisconnect(String channel, String reason) {
+			}
+
+			@Override
+			public void onReconnect(String channel, String reason) {
+			}
+
+			@Override
+			public void onMessageRecieve(String channel, String message, String timetoken) {
+				// TODO: 03.09.2015 too cool for Controller. Make LoginLougoutChannel Service
+				DyingUser dyingUser = userParser.fromJson(message, DyingUser.class);
+				Boolean wasRemoved = false, wasAdded = false;
+				if (dyingUser.isDead()) {
+					wasRemoved = usersTempSet.remove(dyingUser);
+				} else {
+					wasAdded = usersTempSet.add(dyingUser, dyingUser.getAliveTo());
+				}
+				l.info("[{} : dead({})] wasRemoved == {}, wasAdded == {}",
+						dyingUser.getUdid(), Boolean.valueOf(dyingUser.isDead()), wasAdded.toString(), wasRemoved.toString());
+			}
+
+			@Override
+			public void onErrorOccur(String channel, String error) {
+			}
+		};
+		channel.setListener(channelListener);
+		channel.resume();
+		try {
+			channel.connect();
+		} catch (BroadcastChannelException e) {
+			e.printStackTrace();
 		}
 	}
 
-	@Override
-	public void resume() {
-		eventsListener = new ImhereRoomModel.EventListener() {
-			@Override
-			public void onModelDataChanged(AbstractModel abstractModel) {
+	void stopListeningEvents() {
+		channel.clearListener();
+		channelListener = null;
+		channel.disconnect();
+		channel.pause();
 
-			}
-
-			@Override
-			public void onUserLogin(DyingUser dyingUser) {
-				addUser(dyingUser);
-			}
-
-			@Override
-			public void onUserLogout(DyingUser dyingUser) {
-				removeUser(dyingUser);
-			}
-
-			@Override
-			public void onUsersUpdate() {
-				notifyUsersDataChanged();
-			}
-
-			@Override
-			public void onClearUsers() {
-				clearUsers();
-			}
-
-			@Override
-			public void onLogin(DyingUser currentUser) {
-				notifyUsersDataChanged();
-				showFragment(true);
-			}
-
-			@Override
-			public void onCurrentUserTimeout() {
-				showFragment(false);
-			}
-
-			@Override
-			public void onLogout() {
-				showFragment(false);
-				notifyUsersDataChanged();
-			}
-		};
-
-		model.addListener(eventsListener);
+		usersTempSet.removeListener(usersTempSetListener);
+		usersTempSetListener = null;
+		usersTempSet.pause();
 	}
-
-	@Override
-	public void pause() {
-		model.removeListener(eventsListener);
-		eventsListener = null;
-	}
-
-	public interface InteractionListener {
-	}
+	//endregion
 }

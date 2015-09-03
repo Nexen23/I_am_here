@@ -1,15 +1,15 @@
 package alex.imhere.service.domain;
 
-import alex.imhere.service.channel.BroadcastChannel;
+import alex.imhere.service.channel.Channel;
 
 public class ChannelService {
-	BroadcastChannel broadcastChannel;
+	Channel channel;
 
-	public BroadcastChannel getBroadcastChannel() {
-		return broadcastChannel;
+	public Channel getChannel() {
+		return channel;
 	}
 
-	public void setBroadcastChannel(BroadcastChannel broadcastChannel) {
-		this.broadcastChannel = broadcastChannel;
+	public void setChannel(Channel channel) {
+		this.channel = channel;
 	}
 }

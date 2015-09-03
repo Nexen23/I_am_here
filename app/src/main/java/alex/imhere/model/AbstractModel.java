@@ -1,16 +1,16 @@
 package alex.imhere.model;
 
-import alex.imhere.service.Service;
+import alex.imhere.service.ServiceManager;
 import alex.imhere.util.Listenable;
 import alex.imhere.util.Resumable;
 
 public abstract class AbstractModel<TEventsListener extends AbstractModel.EventListener>
 		extends Listenable<TEventsListener> implements Resumable {
 
-	Service service;
+	ServiceManager serviceManager;
 
-	public AbstractModel(Service service) {
-		this.service = service;
+	public AbstractModel(ServiceManager serviceManager) {
+		this.serviceManager = serviceManager;
 	}
 
 	public interface EventListener extends Listenable.EventListener {

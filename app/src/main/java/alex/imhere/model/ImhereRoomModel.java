@@ -13,9 +13,11 @@ import java.util.TimerTask;
 
 import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
-import alex.imhere.service.Service;
+import alex.imhere.exception.ApiException;
+import alex.imhere.exception.BroadcastChannelException;
+import alex.imhere.service.ServiceManager;
 import alex.imhere.service.api.UserApi;
-import alex.imhere.service.channel.BroadcastChannel;
+import alex.imhere.service.channel.Channel;
 import alex.imhere.service.parser.UserParser;
 import alex.imhere.util.Resumable;
 
@@ -99,17 +101,17 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 
 	UserApi api;
 	UserParser userParser;
-	BroadcastChannel channel;
-	BroadcastChannel.EventListener channelListener;
+	Channel channel;
+	Channel.EventListener channelListener;
 
-	public ImhereRoomModel(@NonNull Service service, @NonNull String udid) {
-		super(service);
+	public ImhereRoomModel(@NonNull ServiceManager serviceManager, @NonNull String udid) {
+		super(serviceManager);
 		this.udid = udid;
 
-		api = service.getApiService().getUserApi();
-		userParser = service.getParserService().getUserParser();
+		api = serviceManager.getApiService().getUserApi();
+		userParser = serviceManager.getParserService().getUserParser();
 
-		channel = service.getChannelService().getBroadcastChannel();
+		channel = serviceManager.getChannelService().getChannel();
 	}
 
 	private void scheduleLogoutAtCurrentUserDeath() {
@@ -151,7 +153,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 					boolean wasAdded = this.onlineUsers.add(dyingUser, dyingUser.getAliveTo());
 					l.info("User: {} was added ({})", dyingUser.getUdid(), Boolean.valueOf(wasAdded).toString());
 				}
-			} catch (UserApi.Exception e) {
+			} catch (ApiException e) {
 				e.printStackTrace();
 			}
 		}
@@ -165,9 +167,9 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 		try {
 			currentUser = api.login(udid);
 			channel.connect();
-		} catch (UserApi.Exception e) {
+		} catch (ApiException e) {
 			e.printStackTrace();
-		} catch (BroadcastChannel.Exception e) {
+		} catch (BroadcastChannelException e) {
 			e.printStackTrace();
 			api.logout(currentUser);
 			currentUser = null;
@@ -215,7 +217,7 @@ public class ImhereRoomModel extends AbstractModel<ImhereRoomModel.EventListener
 		onlineUsers.addListener(onlineUsersListener);
 		onlineUsers.resume();
 
-		channelListener = new BroadcastChannel.EventListener() {
+		channelListener = new Channel.EventListener() {
 			@Override
 			public void onConnect(String channel, String greeting) {
 			}

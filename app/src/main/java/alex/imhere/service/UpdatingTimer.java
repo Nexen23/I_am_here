@@ -1,4 +1,4 @@
-package alex.imhere.util.time;
+package alex.imhere.service;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -10,7 +10,7 @@ import java.util.TimerTask;
 
 public class UpdatingTimer {
 	private static final long UPDATING_PERIOD_MS_DEFAULT = 500;
-	// TODO: 27.08.2015 should I place it to Model? Or to Service.GlobalTimer? Or model listen to GlobalTimer!
+	// TODO: 27.08.2015 should I place it to Model? Or to ServiceManager.GlobalTimer? Or model listen to GlobalTimer!
 	WeakReference<TimerListener> listenerRef;
 	Handler uiHandler = new Handler(Looper.getMainLooper());
 

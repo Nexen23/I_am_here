@@ -2,6 +2,7 @@ package alex.imhere.fragment;
 
 import android.app.Activity;
 import android.graphics.drawable.TransitionDrawable;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.view.animation.Animation;
@@ -23,14 +24,25 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 import alex.imhere.R;
+import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
+import alex.imhere.exception.ApiException;
+import alex.imhere.exception.BroadcastChannelException;
 import alex.imhere.model.AbstractModel;
 import alex.imhere.model.ImhereRoomModel;
+import alex.imhere.service.ImhereServiceManager;
+import alex.imhere.service.ServiceManager;
+import alex.imhere.service.api.DateApi;
+import alex.imhere.service.api.UserApi;
+import alex.imhere.service.channel.Channel;
 import alex.imhere.util.Resumable;
 import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
-import alex.imhere.util.time.UpdatingTimer;
+import alex.imhere.service.UpdatingTimer;
 
 @EFragment(R.layout.fragment_status)
 public class StatusFragment extends Fragment
@@ -44,13 +56,20 @@ public class StatusFragment extends Fragment
 
 	Logger l = LoggerFactory.getLogger(StatusFragment.class);
 
-	ImhereRoomModel model;
-	ImhereRoomModel.EventListener eventsListener;
+	ServiceManager serviceManager = new ImhereServiceManager();
+	UserApi usersApi;
 
-	InteractionListener interactionsListener;
+	String udid;
+	DyingUser currentUser;
+
+	Timer timer = new Timer();
+	TimerTask logoutTask;
+
+	EventListener eventListener;
 
 	UpdatingTimer updatingTimer;
 
+	//region Injections
 	@ViewById(R.id.ts_status) TextSwitcher tsStatus;
 	@ViewById(R.id.tv_timer) TextView tvTimer;
 	@ViewById(R.id.b_imhere) Button imhereButton;
@@ -68,16 +87,16 @@ public class StatusFragment extends Fragment
 	@StringRes(R.string.ts_status_logouted) String statusLogouted;
 	@StringRes(R.string.ts_status_logining) String statusLogining;
 	@StringRes(R.string.ts_status_logouting) String statusLogouting;
-
-	DateTime currentUserAliveTo = new DateTime(0);
+	//endregion
 
 	public StatusFragment() {
 		// Required empty public constructor
 	}
 
 	@AfterViews
-	public void onViewsInjected() {
-		// TODO: 30.08.2015 make all string non hardcoded
+	public void onAfterViews() {
+		usersApi = serviceManager.getApiService().getUserApi();
+
 		updatingTimer = new UpdatingTimer(this);
 		updatingTimer.start();
 
@@ -95,17 +114,17 @@ public class StatusFragment extends Fragment
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			interactionsListener = (InteractionListener) activity;
+			eventListener = (EventListener) activity;
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
-					+ " must implement InteractionListener");
+					+ " must implement EventListener");
 		}
 	}
 
 	@Override
 	public void onDetach() {
 		super.onDetach();
-		interactionsListener = null;
+		eventListener = null;
 	}
 
 	@Override
@@ -123,7 +142,7 @@ public class StatusFragment extends Fragment
 	@Click(R.id.b_imhere)
 	void imhereButtonClick() {
 		setImhereButtonEnabled(false);
-		interactionsListener.onImhereClick(this);
+		eventListener.onImhereClick(this);
 	}
 
 	void setState(int state) {
@@ -236,7 +255,6 @@ public class StatusFragment extends Fragment
 		this.model = (ImhereRoomModel) abstractModel;
 	}
 
-	@Override
 	public void resume() {
 		eventsListener = new ImhereRoomModel.EventListener() {
 			@Override
@@ -283,13 +301,180 @@ public class StatusFragment extends Fragment
 		model.addListener(eventsListener);
 	}
 
-	@Override
 	public void pause() {
 		model.removeListener(eventsListener);
 		eventsListener = null;
 	}
 
-	public interface InteractionListener {
-		void onImhereClick(Fragment fragment);
+	@Override
+	public void onImhereClick(Fragment fragment) {
+		if (isCurrentUserAlive()) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					usersApi.logout(currentUser);
+					setCurrentUser(null);
+				}
+			}).start();
+		} else {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						setCurrentUser( usersApi.login(udid));
+					} catch (ApiException e) {
+						e.printStackTrace();
+					}
+				}
+			}).start();
+		}
+	}
+
+	public void setCurrentUser(@Nullable DyingUser user) {
+		currentUser = user;
+	}
+
+	public DyingUser getCurrentUser() {
+		return currentUser;
+	}
+
+	public boolean isCurrentUserAlive() {
+		return currentUser != null && currentUser.isAlive();
+	}
+
+	public void scheduleLogoutAtCurrentUserDeath() {
+		if (isCurrentUserAlive()) {
+			logoutTask = new TimerTask() {
+				@Override
+				public void run() {
+					logout();
+				}
+			};
+			timer.schedule(logoutTask, getCurrentUser().getAliveTo().toDate());
+		}
+	}
+
+	public void cancelLogoutAtCurrentUserDeath() {
+		if (logoutTask != null) {
+			logoutTask.cancel();
+			logoutTask = null;
+		}
+		timer.purge();
+	}
+
+	@Nullable
+	public synchronized final DyingUser login() {
+		currentUser = null;
+		// TODO: 30.08.2015 log exceptions
+		try {
+			currentUser = api.login(udid);
+			channel.connect();
+		} catch (ApiException e) {
+			e.printStackTrace();
+		} catch (BroadcastChannelException e) {
+			e.printStackTrace();
+			api.logout(currentUser);
+			currentUser = null;
+		}
+		scheduleLogoutAtCurrentUserDeath();
+
+		updateOnlineUsers();
+
+		notifier.onLogin(currentUser);
+		return currentUser;
+	}
+
+	public synchronized void logout() {
+		if (currentUser != null) {
+			cancelLogoutAtCurrentUserDeath();
+
+			channel.disconnect();
+			api.logout(currentUser);
+			currentUser = null;
+			notifier.onLogout();
+
+			onlineUsers.clear();
+			notifier.onClearUsers();
+		}
+	}
+
+	public void resume() {
+		onlineUsersListener = new TemporarySet.EventListener() {
+			@Override
+			public void onClear() {
+				notifier.onClearUsers();
+			}
+
+			@Override
+			public void onAdd(Object item) {
+				notifier.onUserLogin((DyingUser) item);
+			}
+
+			@Override
+			public void onRemove(Object item) {
+				notifier.onUserLogout((DyingUser) item);
+			}
+		};
+		onlineUsers.addListener(onlineUsersListener);
+		onlineUsers.resume();
+
+		channelListener = new Channel.EventListener() {
+			@Override
+			public void onConnect(String channel, String greeting) {
+			}
+
+			@Override
+			public void onDisconnect(String channel, String reason) {
+			}
+
+			@Override
+			public void onReconnect(String channel, String reason) {
+			}
+
+			@Override
+			public void onMessageRecieve(String channel, String message, String timetoken) {
+				DyingUser dyingUser = userParser.fromJson(message, DyingUser.class);
+				Boolean wasRemoved = false, wasAdded = false;
+				if (dyingUser.isDead()) {
+					wasRemoved = onlineUsers.remove(dyingUser);
+				} else {
+					wasAdded = onlineUsers.add(dyingUser, dyingUser.getAliveTo());
+				}
+				l.info("[{} : dead({})] wasRemoved == {}, wasAdded == {}",
+						dyingUser.getUdid(), Boolean.valueOf(dyingUser.isDead()), wasAdded.toString(), wasRemoved.toString());
+			}
+
+			@Override
+			public void onErrorOccur(String channel, String error) {
+			}
+		};
+		channel.setListener(channelListener);
+		channel.resume();
+
+		onlineUsers.clear();
+
+		if (isCurrentUserAlive())
+		{
+			notifier.onLogin(currentUser);
+			updateOnlineUsers();
+		}
+		scheduleLogoutAtCurrentUserDeath();
+	}
+
+	public void pause() {
+		cancelLogoutAtCurrentUserDeath();
+
+		channel.clearListener();
+		channelListener = null;
+
+		onlineUsers.removeListener(onlineUsersListener);
+		onlineUsersListener = null;
+	}
+
+	public interface EventListener {
+		void onPreLogin();
+		void onLogin(DyingUser currentUser);
+		void onPreLogout();
+		void onLogout();
 	}
 }

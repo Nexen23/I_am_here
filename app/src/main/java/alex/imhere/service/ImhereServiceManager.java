@@ -8,8 +8,8 @@ import alex.imhere.service.domain.ChannelService;
 import alex.imhere.service.domain.ParserService;
 import alex.imhere.service.parser.UserParser;
 
-public class ImhereService extends Service {
-	public ImhereService() {
+public class ImhereServiceManager extends ServiceManager {
+	public ImhereServiceManager() {
 		constructParserService();
 		constructChannelService();
 		constructApiService(getParserService());
@@ -23,7 +23,7 @@ public class ImhereService extends Service {
 
 	protected void constructChannelService() {
 		ChannelService channelService = new ChannelService();
-		channelService.setBroadcastChannel(new PubnubBroadcastChannel());
+		channelService.setChannel(new PubnubBroadcastChannel());
 		setChannelService(channelService);
 	}
 

@@ -4,7 +4,7 @@ import alex.imhere.service.domain.ApiService;
 import alex.imhere.service.domain.ChannelService;
 import alex.imhere.service.domain.ParserService;
 
-public abstract class Service {
+public abstract class ServiceManager {
 	ApiService apiService;
 	ChannelService channelService;
 	ParserService parserService;

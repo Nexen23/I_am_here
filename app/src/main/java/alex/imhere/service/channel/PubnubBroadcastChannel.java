@@ -7,7 +7,7 @@ import com.pubnub.api.PubnubException;
 
 import alex.imhere.exception.BroadcastChannelException;
 
-public class PubnubBroadcastChannel extends BroadcastChannel {
+public class PubnubBroadcastChannel extends Channel {
 	static private final String CHANNEL_NAME = "events"; // TODO: 29.08.2015 get name from Server & sub-key
 	static private final String SUBSCRIBE_KEY = "sub-c-a3d06db8-410b-11e5-8bf2-0619f8945a4f";
 

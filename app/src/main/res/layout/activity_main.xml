@@ -14,7 +14,7 @@
         android:layout_weight="1">
 
         <fragment android:id="@+id/fragment_status"
-				  android:name="alex.imhere.fragment.StatusFragment_"
+				  android:name="alex.imhere.fragment.ImhereLoginFragment_"
 				  tools:layout="@layout/fragment_status"
 				  android:layout_width="match_parent"
 				  android:layout_height="match_parent"/>

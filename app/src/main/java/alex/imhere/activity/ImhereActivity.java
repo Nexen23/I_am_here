@@ -16,14 +16,14 @@ import org.slf4j.LoggerFactory;
 
 import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
-import alex.imhere.fragment.StatusFragment;
+import alex.imhere.fragment.ImhereLoginFragment;
 import alex.imhere.fragment.UsersFragment;
 import alex.imhere.service.ImhereServiceManager;
 import alex.imhere.service.ServiceManager;
 import alex.imhere.service.api.UserApi;
 
 @EActivity(R.layout.activity_main)
-public class ImhereActivity extends AppCompatActivity implements StatusFragment.EventListener {
+public class ImhereActivity extends AppCompatActivity implements ImhereLoginFragment.EventListener {
 	Logger l = LoggerFactory.getLogger(ImhereActivity.class);
 
 	ServiceManager serviceManager = new ImhereServiceManager();

@@ -23,6 +23,7 @@ public class UserApi extends Api {
 		super(parserService);
 	}
 
+	// TODO: 03.09.2015 must be in another AuthApi
 	public DyingUser login(@NonNull final String udid) throws ApiException {
 		DyingUser dyingUser = null;
 		try {

@@ -28,25 +28,19 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 import alex.imhere.R;
-import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.exception.BroadcastChannelException;
 import alex.imhere.model.AbstractModel;
 import alex.imhere.model.ImhereRoomModel;
 import alex.imhere.service.ImhereServiceManager;
 import alex.imhere.service.ServiceManager;
-import alex.imhere.service.api.DateApi;
 import alex.imhere.service.api.UserApi;
-import alex.imhere.service.channel.Channel;
-import alex.imhere.util.Resumable;
 import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
 import alex.imhere.service.UpdatingTimer;
 
 @EFragment(R.layout.fragment_status)
-public class StatusFragment extends Fragment
-		implements AbstractModel.ModelListener, UpdatingTimer.TimerListener, Resumable {
+public class ImhereLoginFragment extends Fragment implements UpdatingTimer.TimerListener {
 	// TODO: 02.09.2015 place it to Model?
 	static final int LOGINNED_STATE = 1;
 	static final int LOGOUTED_STATE = 2;
@@ -54,10 +48,10 @@ public class StatusFragment extends Fragment
 	static final int LOGOUTING_STATE = 4;
 	int state = LOGOUTED_STATE, prevState = LOGOUTED_STATE;
 
-	Logger l = LoggerFactory.getLogger(StatusFragment.class);
+	Logger l = LoggerFactory.getLogger(ImhereLoginFragment.class);
 
 	ServiceManager serviceManager = new ImhereServiceManager();
-	UserApi usersApi;
+	UserApi userApi;
 
 	String udid;
 	DyingUser currentUser;
@@ -89,13 +83,13 @@ public class StatusFragment extends Fragment
 	@StringRes(R.string.ts_status_logouting) String statusLogouting;
 	//endregion
 
-	public StatusFragment() {
+	public ImhereLoginFragment() {
 		// Required empty public constructor
 	}
 
 	@AfterViews
 	public void onAfterViews() {
-		usersApi = serviceManager.getApiService().getUserApi();
+		userApi = serviceManager.getApiService().getUserApi();
 
 		updatingTimer = new UpdatingTimer(this);
 		updatingTimer.start();
@@ -130,19 +124,34 @@ public class StatusFragment extends Fragment
 	@Override
 	public void onResume() {
 		super.onResume();
-		resume();
+		scheduleLogoutAtCurrentUserDeath();
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		pause();
+		cancelLogoutAtCurrentUserDeath();
 	}
 
 	@Click(R.id.b_imhere)
 	void imhereButtonClick() {
 		setImhereButtonEnabled(false);
-		eventListener.onImhereClick(this);
+		if (isCurrentUserAlive()) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					logout();
+					setCurrentUser(null);
+				}
+			}).start();
+		} else {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					login();
+				}
+			}).start();
+		}
 	}
 
 	void setState(int state) {
@@ -154,6 +163,7 @@ public class StatusFragment extends Fragment
 		updateTimer();
 	}
 
+	//region Updating UiThreads
 	@UiThread
 	void updateStatus() {
 		String status = nonInitialized;
@@ -181,12 +191,12 @@ public class StatusFragment extends Fragment
 	void updateImhereButton() {
 		TransitionDrawable drawable = (TransitionDrawable) imhereButton.getBackground();
 		switch (state) {
-			case LOGINNED_STATE :
+			case LOGINNED_STATE:
 				imhereButton.setText(imhereButtonLogined);
 				drawable.startTransition(0);
 				break;
 
-			case LOGOUTED_STATE :
+			case LOGOUTED_STATE:
 				imhereButton.setText(imhereButtonLogouted);
 				drawable.resetTransition();
 				break;
@@ -239,97 +249,14 @@ public class StatusFragment extends Fragment
 
 	@UiThread
 	void updateTimerTick() {
-		// TODO: 27.08.2015 really bad hack
-		Duration restTime = TimeUtils.GetNonNegativeDuration(new DateTime(), currentUserAliveTo);
+		// TODO: 27.08.2015 really bad hack because of UpdatingTimer
+		Duration restTime = TimeUtils.GetNonNegativeDuration(new DateTime(), getCurrentUser().getAliveTo());
 		String durationMsString = TimeFormatter.DurationToMSString(restTime);
 		tvTimer.setText(durationMsString);
 	}
+	//endregion
 
-	@Override
-	public void onTimerTick() {
-		updateTimerTick();
-	}
-
-	@Override
-	public void setModel(AbstractModel abstractModel) {
-		this.model = (ImhereRoomModel) abstractModel;
-	}
-
-	public void resume() {
-		eventsListener = new ImhereRoomModel.EventListener() {
-			@Override
-			public void onModelDataChanged(AbstractModel abstractModel) {
-
-			}
-
-			@Override
-			public void onUserLogin(DyingUser dyingUser) {
-			}
-
-			@Override
-			public void onUserLogout(DyingUser dyingUser) {
-
-			}
-
-			@Override
-			public void onUsersUpdate() {
-
-			}
-
-			@Override
-			public void onClearUsers() {
-
-			}
-
-			@Override
-			public void onLogin(DyingUser currentUser) {
-				currentUserAliveTo = currentUser.getAliveTo();
-				setImhereButtonEnabled(true);
-			}
-
-			@Override
-			public void onCurrentUserTimeout() {
-				setImhereButtonEnabled(false);
-			}
-
-			@Override
-			public void onLogout() {
-				setImhereButtonEnabled(true);
-			}
-		};
-
-		model.addListener(eventsListener);
-	}
-
-	public void pause() {
-		model.removeListener(eventsListener);
-		eventsListener = null;
-	}
-
-	@Override
-	public void onImhereClick(Fragment fragment) {
-		if (isCurrentUserAlive()) {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					usersApi.logout(currentUser);
-					setCurrentUser(null);
-				}
-			}).start();
-		} else {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						setCurrentUser( usersApi.login(udid));
-					} catch (ApiException e) {
-						e.printStackTrace();
-					}
-				}
-			}).start();
-		}
-	}
-
+	//region CurrentUser accessors
 	public void setCurrentUser(@Nullable DyingUser user) {
 		currentUser = user;
 	}
@@ -339,7 +266,40 @@ public class StatusFragment extends Fragment
 	}
 
 	public boolean isCurrentUserAlive() {
+		DyingUser currentUser = getCurrentUser();
 		return currentUser != null && currentUser.isAlive();
+	}
+	//endregion
+
+	//region Login/Logout/TimeoutLogout helpers
+	public synchronized final void login() {
+		eventListener.onPreLogin();
+
+		try {
+			setCurrentUser( userApi.login(udid) );
+		} catch (ApiException e) {
+			e.printStackTrace();
+		}
+		scheduleLogoutAtCurrentUserDeath();
+
+		eventListener.onLogin(currentUser);
+		setImhereButtonEnabled(true);
+	}
+
+	public synchronized void logout() {
+		DyingUser currentUser = getCurrentUser();
+		if (currentUser != null) {
+			setImhereButtonEnabled(false);
+			eventListener.onPreLogout();
+
+			cancelLogoutAtCurrentUserDeath();
+
+			userApi.logout(currentUser);
+			setCurrentUser(null);
+
+			eventListener.onLogout();
+			setImhereButtonEnabled(true);
+		}
 	}
 
 	public void scheduleLogoutAtCurrentUserDeath() {
@@ -361,114 +321,11 @@ public class StatusFragment extends Fragment
 		}
 		timer.purge();
 	}
+	//endregion
 
-	@Nullable
-	public synchronized final DyingUser login() {
-		currentUser = null;
-		// TODO: 30.08.2015 log exceptions
-		try {
-			currentUser = api.login(udid);
-			channel.connect();
-		} catch (ApiException e) {
-			e.printStackTrace();
-		} catch (BroadcastChannelException e) {
-			e.printStackTrace();
-			api.logout(currentUser);
-			currentUser = null;
-		}
-		scheduleLogoutAtCurrentUserDeath();
-
-		updateOnlineUsers();
-
-		notifier.onLogin(currentUser);
-		return currentUser;
-	}
-
-	public synchronized void logout() {
-		if (currentUser != null) {
-			cancelLogoutAtCurrentUserDeath();
-
-			channel.disconnect();
-			api.logout(currentUser);
-			currentUser = null;
-			notifier.onLogout();
-
-			onlineUsers.clear();
-			notifier.onClearUsers();
-		}
-	}
-
-	public void resume() {
-		onlineUsersListener = new TemporarySet.EventListener() {
-			@Override
-			public void onClear() {
-				notifier.onClearUsers();
-			}
-
-			@Override
-			public void onAdd(Object item) {
-				notifier.onUserLogin((DyingUser) item);
-			}
-
-			@Override
-			public void onRemove(Object item) {
-				notifier.onUserLogout((DyingUser) item);
-			}
-		};
-		onlineUsers.addListener(onlineUsersListener);
-		onlineUsers.resume();
-
-		channelListener = new Channel.EventListener() {
-			@Override
-			public void onConnect(String channel, String greeting) {
-			}
-
-			@Override
-			public void onDisconnect(String channel, String reason) {
-			}
-
-			@Override
-			public void onReconnect(String channel, String reason) {
-			}
-
-			@Override
-			public void onMessageRecieve(String channel, String message, String timetoken) {
-				DyingUser dyingUser = userParser.fromJson(message, DyingUser.class);
-				Boolean wasRemoved = false, wasAdded = false;
-				if (dyingUser.isDead()) {
-					wasRemoved = onlineUsers.remove(dyingUser);
-				} else {
-					wasAdded = onlineUsers.add(dyingUser, dyingUser.getAliveTo());
-				}
-				l.info("[{} : dead({})] wasRemoved == {}, wasAdded == {}",
-						dyingUser.getUdid(), Boolean.valueOf(dyingUser.isDead()), wasAdded.toString(), wasRemoved.toString());
-			}
-
-			@Override
-			public void onErrorOccur(String channel, String error) {
-			}
-		};
-		channel.setListener(channelListener);
-		channel.resume();
-
-		onlineUsers.clear();
-
-		if (isCurrentUserAlive())
-		{
-			notifier.onLogin(currentUser);
-			updateOnlineUsers();
-		}
-		scheduleLogoutAtCurrentUserDeath();
-	}
-
-	public void pause() {
-		cancelLogoutAtCurrentUserDeath();
-
-		channel.clearListener();
-		channelListener = null;
-
-		onlineUsers.removeListener(onlineUsersListener);
-		onlineUsersListener = null;
+	@Override
+	public void onTimerTick() {
+		updateTimerTick();
 	}
 
 	public interface EventListener {

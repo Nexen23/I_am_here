@@ -76,6 +76,7 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 		super.onResume();
 		if (isCurrentUserAlive()) {
 			startListeningEvents();
+			updateOnlineUsers();
 		}
 	}
 
@@ -144,6 +145,7 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 	public void setCurrentUser(@Nullable DyingUser user) {
 		currentUser = user;
 		startListeningEvents();
+		updateOnlineUsers();
 	}
 
 	//region Listening helpers

@@ -12,10 +12,10 @@ import org.joda.time.DateTime;
 
 import java.lang.reflect.Type;
 
-public class UserParser {
+public class GsonJsonParser implements JsonParser {
 	private Gson gson;
 
-	public UserParser() {
+	public GsonJsonParser() {
 		JsonDeserializer<DateTime> deserializer = new JsonDeserializer<DateTime>() {
 			@Override
 			public DateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {

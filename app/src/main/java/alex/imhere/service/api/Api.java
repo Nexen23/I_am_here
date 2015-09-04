@@ -5,21 +5,14 @@ import android.support.annotation.NonNull;
 import java.util.HashMap;
 import java.util.Map;
 
-import alex.imhere.service.domain.ParserService;
-import alex.imhere.service.parser.UserParser;
+import javax.inject.Inject;
+
+import alex.imhere.service.parser.JsonParser;
 
 public abstract class Api {
-	UserParser parser;
+	JsonParser parser;
 
-	public Api(@NonNull ParserService parserService) {
-		this.parser = parserService.getUserParser();
-	}
-
-	public UserParser getParser() {
-		return parser;
-	}
-
-	public void setParser(UserParser parser) {
+	Api(JsonParser parser) {
 		this.parser = parser;
 	}
 

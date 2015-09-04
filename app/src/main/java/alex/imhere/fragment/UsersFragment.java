@@ -1,5 +1,6 @@
 package alex.imhere.fragment;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
@@ -13,27 +14,27 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import alex.imhere.R;
 import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
 import alex.imhere.exception.BroadcastChannelException;
-import alex.imhere.service.ImhereServiceManager;
-import alex.imhere.service.ServiceManager;
+import alex.imhere.service.ComponentOwner;
+import alex.imhere.service.UpdatingTimer;
 import alex.imhere.service.api.UserApi;
 import alex.imhere.service.channel.Channel;
-import alex.imhere.service.UpdatingTimer;
-import alex.imhere.service.parser.UserParser;
+import alex.imhere.service.parser.JsonParser;
 import alex.imhere.view.adapter.UsersAdapter;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment implements UpdatingTimer.TimerListener {
 	Logger l = LoggerFactory.getLogger(UsersFragment.class);
 
-	ServiceManager serviceManager = new ImhereServiceManager();
-	UserApi userApi;
-	Channel channel;
-	UserParser userParser;
+	@Inject	UserApi userApi;
+	@Inject Channel channel;
+	@Inject JsonParser jsonParser;
 
 	DyingUser currentUser;
 	TemporarySet<DyingUser> usersTempSet = new TemporarySet<>();
@@ -54,6 +55,17 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 	}
 
 	@Override
+	public void onAttach(Activity activity) {
+		super.onAttach(activity);
+		try {
+			((ComponentOwner) activity).getServicesComponent().inject(this);
+		} catch (ClassCastException e) {
+			throw new ClassCastException(activity.toString()
+					+ " must implement ComponentOwner");
+		}
+	}
+
+	@Override
 	public void onActivityCreated(Bundle savedInstanceState) {
 		super.onActivityCreated(savedInstanceState);
 		setListAdapter(usersAdapter);
@@ -61,20 +73,16 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 
 	@AfterViews
 	public void onAfterViews() {
-		userApi = serviceManager.getApiService().getUserApi();
-		channel = serviceManager.getChannelService().getChannel();
-		userParser = serviceManager.getParserService().getUserParser();
-
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
 
 		updatingTimer = new UpdatingTimer(this);
-		updatingTimer.start();
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
 		if (isCurrentUserAlive()) {
+			updatingTimer.start();
 			startListeningEvents();
 			updateOnlineUsers();
 		}
@@ -84,6 +92,7 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 	public void onPause() {
 		super.onPause();
 		stopListeningEvents();
+		updatingTimer.stop();
 	}
 
 	@UiThread
@@ -139,13 +148,19 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 
 	public void clearCurrentUser() {
 		stopListeningEvents();
-		setCurrentUser(null);
+		currentUser = null;
+		usersTempSet.clear();
+		clearUsers();
+
+		updatingTimer.stop();
 	}
 
 	public void setCurrentUser(@Nullable DyingUser user) {
 		currentUser = user;
 		startListeningEvents();
 		updateOnlineUsers();
+
+		updatingTimer.start();
 	}
 
 	//region Listening helpers
@@ -185,7 +200,7 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 			@Override
 			public void onMessageRecieve(String channel, String message, String timetoken) {
 				// TODO: 03.09.2015 too cool for Controller. Make LoginLougoutChannel Service
-				DyingUser dyingUser = userParser.fromJson(message, DyingUser.class);
+				DyingUser dyingUser = jsonParser.fromJson(message, DyingUser.class);
 				Boolean wasRemoved = false, wasAdded = false;
 				if (dyingUser.isDead()) {
 					wasRemoved = usersTempSet.remove(dyingUser);

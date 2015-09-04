@@ -9,9 +9,11 @@ import com.parse.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.inject.Inject;
+
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.service.domain.ParserService;
+import alex.imhere.service.parser.JsonParser;
 
 public class UserApi extends Api {
 	static final String
@@ -19,8 +21,9 @@ public class UserApi extends Api {
 			API_Logout = "Logout",
 			API_GetOnlineUsers = "GetOnlineUsers";
 
-	public UserApi(@NonNull ParserService parserService) {
-		super(parserService);
+	@Inject
+	public UserApi(JsonParser parser) {
+		super(parser);
 	}
 
 	// TODO: 03.09.2015 must be in another AuthApi

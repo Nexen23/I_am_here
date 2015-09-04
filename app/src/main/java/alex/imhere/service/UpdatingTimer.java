@@ -16,22 +16,7 @@ public class UpdatingTimer {
 
 	long updatingPeriodMs;
 	final Timer timer = new Timer();
-	final TimerTask updateTask = new TimerTask() {
-		@Override
-		public void run() {
-			uiHandler.post(new Runnable() {
-				@Override
-				public void run() {
-					TimerListener listener = listenerRef.get();
-					if (listener != null) {
-						listener.onTimerTick();
-					} else {
-						stop();
-					}
-				}
-			});
-		}
-	};
+	TimerTask updateTask;
 
 	public UpdatingTimer() {
 		this(null, UPDATING_PERIOD_MS_DEFAULT);
@@ -55,11 +40,31 @@ public class UpdatingTimer {
 	}
 
 	public synchronized void start() {
+		if (updateTask != null) {
+			stop();
+		}
+		updateTask = new TimerTask() {
+			@Override
+			public void run() {
+				uiHandler.post(new Runnable() {
+					@Override
+					public void run() {
+						TimerListener listener = listenerRef.get();
+						if (listener != null) {
+							listener.onTimerTick();
+						} else {
+							stop();
+						}
+					}
+				});
+			}
+		};
 		timer.scheduleAtFixedRate(updateTask, 0, updatingPeriodMs);
 	}
 
 	public synchronized void stop() {
 		updateTask.cancel();
+		updateTask = null;
 		timer.purge();
 	}
 

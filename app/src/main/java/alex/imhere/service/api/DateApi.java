@@ -7,16 +7,19 @@ import com.parse.ParseException;
 
 import org.joda.time.DateTime;
 
+import javax.inject.Inject;
+
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.service.domain.ParserService;
+import alex.imhere.service.parser.JsonParser;
 
 public class DateApi extends Api {
 	static final String
 			API_GetNow = "GetNow";
 
-	public DateApi(@NonNull ParserService parserService) {
-		super(parserService);
+	@Inject
+	public DateApi(JsonParser parser) {
+		super(parser);
 	}
 
 	public DateTime getNow(@NonNull final DyingUser dyingUser) throws ApiException {

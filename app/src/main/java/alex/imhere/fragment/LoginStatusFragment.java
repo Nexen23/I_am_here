@@ -2,6 +2,7 @@ package alex.imhere.fragment;
 
 import android.app.Activity;
 import android.graphics.drawable.TransitionDrawable;
+import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -27,20 +28,19 @@ import org.slf4j.LoggerFactory;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javax.inject.Inject;
+
 import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.model.AbstractModel;
-import alex.imhere.model.ImhereRoomModel;
-import alex.imhere.service.ImhereServiceManager;
-import alex.imhere.service.ServiceManager;
+import alex.imhere.service.ComponentOwner;
+import alex.imhere.service.UpdatingTimer;
 import alex.imhere.service.api.UserApi;
 import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
-import alex.imhere.service.UpdatingTimer;
 
 @EFragment(R.layout.fragment_status)
-public class ImhereLoginFragment extends Fragment implements UpdatingTimer.TimerListener {
+public class LoginStatusFragment extends Fragment implements UpdatingTimer.TimerListener {
 	// TODO: 02.09.2015 place it to Model?
 	static final int LOGINNED_STATE = 1;
 	static final int LOGOUTED_STATE = 2;
@@ -48,10 +48,9 @@ public class ImhereLoginFragment extends Fragment implements UpdatingTimer.Timer
 	static final int LOGOUTING_STATE = 4;
 	int state = LOGOUTED_STATE, prevState = LOGOUTED_STATE;
 
-	Logger l = LoggerFactory.getLogger(ImhereLoginFragment.class);
+	Logger l = LoggerFactory.getLogger(LoginStatusFragment.class);
 
-	ServiceManager serviceManager = new ImhereServiceManager();
-	UserApi userApi;
+	@Inject	UserApi userApi;
 
 	String udid;
 	DyingUser currentUser;
@@ -83,16 +82,15 @@ public class ImhereLoginFragment extends Fragment implements UpdatingTimer.Timer
 	@StringRes(R.string.ts_status_logouting) String statusLogouting;
 	//endregion
 
-	public ImhereLoginFragment() {
+	public LoginStatusFragment() {
 		// Required empty public constructor
 	}
 
 	@AfterViews
 	public void onAfterViews() {
-		userApi = serviceManager.getApiService().getUserApi();
+		udid = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
 
 		updatingTimer = new UpdatingTimer(this);
-		updatingTimer.start();
 
 		tsStatus.setAnimateFirstView(false);
 		TextView tv1 = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
@@ -109,9 +107,10 @@ public class ImhereLoginFragment extends Fragment implements UpdatingTimer.Timer
 		super.onAttach(activity);
 		try {
 			eventListener = (EventListener) activity;
+			((ComponentOwner) activity).getServicesComponent().inject(this);
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
-					+ " must implement EventListener");
+					+ " must implement EventListener & ComponentOwner");
 		}
 	}
 
@@ -124,6 +123,7 @@ public class ImhereLoginFragment extends Fragment implements UpdatingTimer.Timer
 	@Override
 	public void onResume() {
 		super.onResume();
+		updatingTimer.start();
 		scheduleLogoutAtCurrentUserDeath();
 	}
 
@@ -131,6 +131,7 @@ public class ImhereLoginFragment extends Fragment implements UpdatingTimer.Timer
 	public void onPause() {
 		super.onPause();
 		cancelLogoutAtCurrentUserDeath();
+		updatingTimer.stop();
 	}
 
 	@Click(R.id.b_imhere)
@@ -250,9 +251,11 @@ public class ImhereLoginFragment extends Fragment implements UpdatingTimer.Timer
 	@UiThread
 	void updateTimerTick() {
 		// TODO: 27.08.2015 really bad hack because of UpdatingTimer
-		Duration restTime = TimeUtils.GetNonNegativeDuration(new DateTime(), getCurrentUser().getAliveTo());
-		String durationMsString = TimeFormatter.DurationToMSString(restTime);
-		tvTimer.setText(durationMsString);
+		if (isCurrentUserAlive()) {
+			Duration restTime = TimeUtils.GetNonNegativeDuration(new DateTime(), getCurrentUser().getAliveTo());
+			String durationMsString = TimeFormatter.DurationToMSString(restTime);
+			tvTimer.setText(durationMsString);
+		}
 	}
 	//endregion
 

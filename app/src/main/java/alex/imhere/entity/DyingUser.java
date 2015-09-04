@@ -6,11 +6,8 @@ import com.google.gson.annotations.SerializedName;
 
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
-import org.parceler.Parcel;
-
 import alex.imhere.util.time.TimeUtils;
 
-@Parcel
 public class DyingUser {
 	@SerializedName("udid")
 	String udid = "";

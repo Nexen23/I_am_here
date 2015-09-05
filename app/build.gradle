@@ -116,4 +116,6 @@ dependencies {
 	compile ('com.android.support:support-v4:22.2.1') {
         exclude group: 'com.android.support', module: 'support-v4'
     }
+    compile 'ch.acra:acra:4.6.2'
+    compile 'com.google.android.gms:play-services-analytics:7.5.0'
 }

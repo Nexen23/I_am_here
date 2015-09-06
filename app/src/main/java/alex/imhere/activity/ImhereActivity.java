@@ -26,13 +26,16 @@ import alex.imhere.service.ServicesComponent;
 @EActivity(R.layout.activity_main)
 public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
 		LoginStatusFragment.EventListener {
+	//region Fields
 	Logger l = LoggerFactory.getLogger(ImhereActivity.class);
 
+	ServicesComponent servicesComponent;
+
 	@InstanceState boolean usersFragmentIsShown = false;
-
 	@FragmentById(R.id.fragment_users) UsersFragment usersFragment;
-	private ServicesComponent servicesComponent;
+	//endregion
 
+	//region Lifecycle
 	public ImhereActivity() {
 		super();
 		servicesComponent = DaggerServicesComponent.builder().build();
@@ -53,7 +56,9 @@ public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
 	public boolean onCreateOptionsMenu(Menu menu) {
 		return false;
 	}
+	//endregion
 
+	//region Ui helpers
 	@UiThread
 	public void showUsersFragment(final boolean needShow) {
 		final FrameLayout usersView = (FrameLayout) findViewById(R.id.fl_fragment_users);
@@ -83,7 +88,9 @@ public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
 
 		usersFragmentIsShown = needShow;
 	}
+	//endregion
 
+	//region Fragments callbacks
 	@Override
 	public void onPreLogin() {}
 
@@ -102,6 +109,7 @@ public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
 	public void onLogout() {
 		usersFragment.clearCurrentUser();
 	}
+	//endregion
 
 	@Override
 	public ServicesComponent getServicesComponent() {

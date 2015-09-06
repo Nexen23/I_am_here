@@ -9,17 +9,20 @@ import org.joda.time.Duration;
 import alex.imhere.util.time.TimeUtils;
 
 public class DyingUser {
+	//region Fields
 	@SerializedName("udid")
 	String udid = "";
 	@SerializedName("loginedAt")
 	DateTime loginedAt = new DateTime(0);
 	@SerializedName("aliveTo")
 	DateTime aliveTo = new DateTime(0);
+	//endregion
 
+	//region Ctors
 	public DyingUser() {
 	}
 
-	//region Protected
+
 	protected DyingUser(DyingUser dyingUser) {
 		this(dyingUser.udid, dyingUser.loginedAt, dyingUser.aliveTo);
 	}
@@ -29,7 +32,9 @@ public class DyingUser {
 		setLoginedAt(loginedAt);
 		setAliveTo(aliveTo);
 	}
+	//endregion
 
+	//region Setters/getters
 	protected void setLoginedAt(DateTime loginedAt) {
 		this.loginedAt = loginedAt;
 	}
@@ -37,9 +42,7 @@ public class DyingUser {
 	protected void setAliveTo(DateTime aliveTo) {
 		this.aliveTo = aliveTo;
 	}
-	//endregion
 
-	//region Public
 	public String getUdid() {
 		return udid;
 	}
@@ -55,7 +58,9 @@ public class DyingUser {
 	public DateTime getLoginedAt() {
 		return loginedAt;
 	}
+	//endregion
 
+	//region Public helpers
 	@NonNull
 	public Duration getRestLifetime() {
 		return TimeUtils.GetNonNegativeDuration(new DateTime(), aliveTo);

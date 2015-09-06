@@ -34,6 +34,7 @@ import alex.imhere.view.adapter.UsersAdapter;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment implements UpdatingTimer.TimerListener {
+	//region Fields
 	Logger l = LoggerFactory.getLogger(UsersFragment.class);
 	Tracker tracker;
 
@@ -51,7 +52,9 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 	List<DyingUser> usersList = new ArrayList<>();
 
 	UpdatingTimer updatingTimer;
+	//endregion
 
+	//region Lifecycle
 	public static UsersFragment newInstance() {
 		UsersFragment fragment = new UsersFragment_();
 		Bundle args = new Bundle();
@@ -104,7 +107,9 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 
 		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
+	//endregion
 
+	//region Ui helpers
 	@UiThread
 	public void addUser(DyingUser dyingUser) {
 		usersAdapter.add(dyingUser);
@@ -124,11 +129,7 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 	public void notifyUsersDataChanged() {
 		usersAdapter.notifyDataSetChanged();
 	}
-
-	@Override
-	public void onTimerTick() {
-		notifyUsersDataChanged();
-	}
+	//endregion
 
 	public void updateOnlineUsers() {
 		l.info("updateing online users");
@@ -173,7 +174,6 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 		updatingTimer.start();
 	}
 
-	//region Listening helpers
 	void startListeningEvents() {
 		usersTempSetListener = new TemporarySet.EventListener() {
 			@Override
@@ -243,6 +243,12 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 		usersTempSet.removeListener(usersTempSetListener);
 		usersTempSetListener = null;
 		usersTempSet.pause();
+	}
+
+	//region Interfaces impls
+	@Override
+	public void onTimerTick() {
+		notifyUsersDataChanged();
 	}
 	//endregion
 }

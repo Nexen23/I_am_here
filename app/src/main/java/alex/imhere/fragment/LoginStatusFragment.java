@@ -44,29 +44,11 @@ import alex.imhere.util.time.TimeUtils;
 
 @EFragment(R.layout.fragment_status)
 public class LoginStatusFragment extends Fragment implements UpdatingTimer.TimerListener {
+	//region Fields
 	Logger l = LoggerFactory.getLogger(LoginStatusFragment.class);
 	Tracker tracker;
 
-	// TODO: 02.09.2015 place it to Model?
-	static final int LOGINNED_STATE = 1;
-	static final int LOGOUTED_STATE = 2;
-	static final int LOGINING_STATE = 3;
-	static final int LOGOUTING_STATE = 4;
-	int state = LOGOUTED_STATE, prevState = LOGOUTED_STATE;
-
-	@Inject	UserApi userApi;
-
-	String udid;
-	DyingUser currentUser;
-
-	Timer timer = new Timer();
-	TimerTask logoutTask;
-
-	EventListener eventListener;
-
-	UpdatingTimer updatingTimer;
-
-	//region Injections
+	//region Resources
 	@ViewById(R.id.ts_status) TextSwitcher tsStatus;
 	@ViewById(R.id.tv_timer) TextView tvTimer;
 	@ViewById(R.id.b_imhere) Button imhereButton;
@@ -86,6 +68,25 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 	@StringRes(R.string.ts_status_logouting) String statusLogouting;
 	//endregion
 
+	// TODO: 02.09.2015 place it to Model?
+	static final int LOGINNED_STATE = 1;
+	static final int LOGOUTED_STATE = 2;
+	static final int LOGINING_STATE = 3;
+	static final int LOGOUTING_STATE = 4;
+	int state = LOGOUTED_STATE, prevState = LOGOUTED_STATE;
+
+	String udid;
+	DyingUser currentUser;
+
+	@Inject	UserApi userApi;
+	UpdatingTimer updatingTimer;
+	Timer timer = new Timer();
+	TimerTask logoutTask;
+
+	EventListener eventListener;
+	//endregion
+
+	//region Lifecycle
 	public LoginStatusFragment() {
 		// Required empty public constructor
 	}
@@ -143,38 +144,9 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 
 		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
+	//endregion
 
-	@Click(R.id.b_imhere)
-	void imhereButtonClick() {
-		setImhereButtonEnabled(false);
-		if (isCurrentUserAlive()) {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					logout();
-					setCurrentUser(null);
-				}
-			}).start();
-		} else {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					login();
-				}
-			}).start();
-		}
-	}
-
-	void setState(int state) {
-		prevState = this.state;
-		this.state = state;
-
-		updateStatus();
-		updateImhereButton();
-		updateTimer();
-	}
-
-	//region Updating UiThreads
+	//region Ui helpers
 	@UiThread
 	void updateStatus() {
 		String status = nonInitialized;
@@ -269,7 +241,36 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 	}
 	//endregion
 
-	//region CurrentUser accessors
+	@Click(R.id.b_imhere)
+	void imhereButtonClick() {
+		setImhereButtonEnabled(false);
+		if (isCurrentUserAlive()) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					logout();
+					setCurrentUser(null);
+				}
+			}).start();
+		} else {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					login();
+				}
+			}).start();
+		}
+	}
+
+	void setState(int state) {
+		prevState = this.state;
+		this.state = state;
+
+		updateStatus();
+		updateImhereButton();
+		updateTimer();
+	}
+
 	public void setCurrentUser(@Nullable DyingUser user) {
 		currentUser = user;
 	}
@@ -282,9 +283,27 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 		DyingUser currentUser = getCurrentUser();
 		return currentUser != null && currentUser.isAlive();
 	}
-	//endregion
 
-	//region Login/Logout/TimeoutLogout helpers
+	public void scheduleLogoutAtCurrentUserDeath() {
+		if (isCurrentUserAlive()) {
+			logoutTask = new TimerTask() {
+				@Override
+				public void run() {
+					logout();
+				}
+			};
+			timer.schedule(logoutTask, getCurrentUser().getAliveTo().toDate());
+		}
+	}
+
+	public void cancelLogoutAtCurrentUserDeath() {
+		if (logoutTask != null) {
+			logoutTask.cancel();
+			logoutTask = null;
+		}
+		timer.purge();
+	}
+
 	public synchronized final void login() {
 		eventListener.onPreLogin();
 
@@ -315,31 +334,12 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 		}
 	}
 
-	public void scheduleLogoutAtCurrentUserDeath() {
-		if (isCurrentUserAlive()) {
-			logoutTask = new TimerTask() {
-				@Override
-				public void run() {
-					logout();
-				}
-			};
-			timer.schedule(logoutTask, getCurrentUser().getAliveTo().toDate());
-		}
-	}
-
-	public void cancelLogoutAtCurrentUserDeath() {
-		if (logoutTask != null) {
-			logoutTask.cancel();
-			logoutTask = null;
-		}
-		timer.purge();
-	}
-	//endregion
-
+	//region Interfaces impls
 	@Override
 	public void onTimerTick() {
 		updateTimerTick();
 	}
+	//endregion
 
 	public interface EventListener {
 		void onPreLogin();

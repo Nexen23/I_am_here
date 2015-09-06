@@ -16,7 +16,6 @@ import alex.imhere.util.Listenable;
 import alex.imhere.util.time.TimeUtils;
 
 public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> {
-	// TODO: 18.08.2015 make sure it's thread-safe implementation
 	protected SortedSet<TemporaryElement<TItem>> sortedElementsSet = new TreeSet<>();
 	protected List<TItem> list = new ArrayList<>();
 
@@ -77,7 +76,6 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 
 
 	private synchronized boolean _add(TemporaryElement<TItem> insertingElement) {
-		// TODO: 18.08.2015 implement unique add to List
 		boolean wasInserted = _insertElementUnique(insertingElement);
 
 		if (wasInserted) {
@@ -97,7 +95,6 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 	}
 
 	private synchronized boolean _remove(TemporaryElement<TItem> deletingElement) {
-		// TODO: 18.08.2015 implement unique add to List
 		boolean wasDeleted = _deleteElementByObject(deletingElement);
 
 		if (wasDeleted) {

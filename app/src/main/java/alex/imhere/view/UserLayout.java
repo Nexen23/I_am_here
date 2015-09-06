@@ -19,7 +19,7 @@ import alex.imhere.util.ArrayUtils;
 
 public class UserLayout extends FrameLayout {
 	static public final int LIFETIME_DEAFULT = 2300;
-	static public final int[] COLORS_DEFAULT = {Color.WHITE, Color.BLACK};
+	static public final int[] COLORS_DEFAULT = {Color.GRAY, Color.WHITE, Color.BLACK};
 	static public final float SIDES_GAP_DEFAULT = 0f;
 	static public final boolean START_ANIMATION_ON_CREATION_DEFAULT = false;
 
@@ -31,29 +31,59 @@ public class UserLayout extends FrameLayout {
 	float sidesGap;
 
 	boolean startAnimationOnCreation;
-	TimeAnimator gradientAnimation = new TimeAnimator();
+	TimeAnimator gradientAnimation;
 
 	long lifetime;
 	long timeElapsed = 0, accumulatorMs = 0, updateTickMs = 25;
 	float gradientOffset = 0f;
 
 	public UserLayout(Context context, AttributeSet attrs) {
-		super(context, attrs);
-
-		if (!isInEditMode()) {
-			parseAttrs(attrs, 0);
-			onInitialize();
-		}
+		this(context, attrs, 0);
 	}
 
 	public UserLayout(Context context, AttributeSet attrs, int defStyleAttr) {
 		super(context, attrs, defStyleAttr);
 
 		if (!isInEditMode()) {
+			gradientAnimation = new TimeAnimator();
+			TimeAnimator.TimeListener gradientAnimationTickListener = new TimeAnimator.TimeListener() {
+				@Override
+				public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
+					final float gradientOffsetCoef = (float) (updateTickMs) / lifetime;
+					final int colorsCount = colors.length - 1;
+					final long gradientWidth = width * colorsCount;
+
+					if (totalTime > (lifetime - timeElapsed)) {
+						animation.cancel();
+						gradientOffset = gradientWidth;
+						invalidate();
+					} else {
+						accumulatorMs += deltaTime;
+
+						final long gradientOffsetsCount = accumulatorMs / updateTickMs;
+						gradientOffset += (gradientOffsetsCount * gradientWidth) * gradientOffsetCoef;
+						accumulatorMs %= updateTickMs;
+
+						boolean gradientOffsetChanged = (gradientOffsetsCount > 0);
+						if (gradientOffsetChanged) {
+							invalidate();
+						}
+					}
+				}
+			};
+			gradientAnimation.setTimeListener(gradientAnimationTickListener); // comment this to use preview
+
 			parseAttrs(attrs, defStyleAttr);
 			onInitialize();
+		} else {
+			setLifetime(LIFETIME_DEAFULT);
+			setSidesGap(SIDES_GAP_DEFAULT);
+			setGradientStatesColors(COLORS_DEFAULT.clone());
+			setStartAnimationOnCreation(START_ANIMATION_ON_CREATION_DEFAULT);
+			onInitialize();
+
+			setBackgroundColor(colors[0]);
 		}
-		// TODO: 26.08.2015 make it previewable (must use constant params instead of runtime)
 	}
 
 	public void parseAttrs(AttributeSet attrs, int defStyleAttr) {
@@ -196,32 +226,9 @@ public class UserLayout extends FrameLayout {
 		stopGradientAnimation();
 		resolveTimeElapsed();
 
-		final float gradientOffsetCoef = (float) (updateTickMs) / lifetime;
-		final int colorsCount = this.colors.length - 1;
-		gradientAnimation.setTimeListener(new TimeAnimator.TimeListener() {
-			@Override
-			public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
-				final long gradientWidth = width * colorsCount;
-				if (totalTime > (lifetime - timeElapsed)) {
-					animation.cancel();
-					gradientOffset = gradientWidth;
-					invalidate();
-				} else {
-					accumulatorMs += deltaTime;
-
-					final long gradientOffsetsCount = accumulatorMs / updateTickMs;
-					gradientOffset += (gradientOffsetsCount * gradientWidth) * gradientOffsetCoef;
-					accumulatorMs %= updateTickMs;
-
-					boolean gradientOffsetChanged = (gradientOffsetsCount > 0) ? true : false;
-					if (gradientOffsetChanged) {
-						invalidate();
-					}
-				}
-			}
-		});
-
-		gradientAnimation.start();
+		if (!isInEditMode()) {
+			gradientAnimation.start();
+		}
 	}
 
 	public void stopGradientAnimation() {

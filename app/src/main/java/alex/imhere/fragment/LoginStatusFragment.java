@@ -38,7 +38,7 @@ import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
 import alex.imhere.service.ComponentOwner;
 import alex.imhere.service.UpdatingTimer;
-import alex.imhere.service.api.UserApi;
+import alex.imhere.service.api.AuthApi;
 import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
 
@@ -78,7 +78,7 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 	String udid;
 	DyingUser currentUser;
 
-	@Inject	UserApi userApi;
+	@Inject AuthApi authApi;
 	UpdatingTimer updatingTimer;
 	Timer timer = new Timer();
 	TimerTask logoutTask;
@@ -308,7 +308,7 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 		eventListener.onPreLogin();
 
 		try {
-			setCurrentUser( userApi.login(udid) );
+			setCurrentUser(authApi.login(udid));
 		} catch (ApiException e) {
 			e.printStackTrace();
 		}
@@ -326,7 +326,7 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 
 			cancelLogoutAtCurrentUserDeath();
 
-			userApi.logout(currentUser);
+			authApi.logout(currentUser);
 			setCurrentUser(null);
 
 			eventListener.onLogout();

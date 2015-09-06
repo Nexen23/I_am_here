@@ -63,7 +63,9 @@ public class UpdatingTimer {
 	}
 
 	public synchronized void stop() {
-		updateTask.cancel();
+		if (updateTask != null) {
+			updateTask.cancel();
+		}
 		updateTask = null;
 		timer.purge();
 	}

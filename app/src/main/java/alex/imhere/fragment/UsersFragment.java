@@ -5,6 +5,9 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
+
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
@@ -16,6 +19,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import alex.imhere.ImhereApplication;
 import alex.imhere.R;
 import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
@@ -31,6 +35,7 @@ import alex.imhere.view.adapter.UsersAdapter;
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment implements UpdatingTimer.TimerListener {
 	Logger l = LoggerFactory.getLogger(UsersFragment.class);
+	Tracker tracker;
 
 	@Inject	UserApi userApi;
 	@Inject Channel channel;
@@ -73,8 +78,9 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 
 	@AfterViews
 	public void onAfterViews() {
-		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
+		tracker = ImhereApplication.newScreenTracker("LoginStatusFragment");
 
+		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
 		updatingTimer = new UpdatingTimer(this);
 	}
 
@@ -86,6 +92,8 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 			startListeningEvents();
 			updateOnlineUsers();
 		}
+
+		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 
 	@Override
@@ -93,6 +101,8 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 		super.onPause();
 		stopListeningEvents();
 		updatingTimer.stop();
+
+		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 
 	@UiThread

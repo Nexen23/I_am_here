@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 
+import com.google.android.gms.analytics.HitBuilders;
+import com.google.android.gms.analytics.Tracker;
 import com.skyfishjy.library.RippleBackground;
 
 import org.androidannotations.annotations.AfterViews;
@@ -30,6 +32,7 @@ import java.util.TimerTask;
 
 import javax.inject.Inject;
 
+import alex.imhere.ImhereApplication;
 import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
@@ -41,14 +44,15 @@ import alex.imhere.util.time.TimeUtils;
 
 @EFragment(R.layout.fragment_status)
 public class LoginStatusFragment extends Fragment implements UpdatingTimer.TimerListener {
+	Logger l = LoggerFactory.getLogger(LoginStatusFragment.class);
+	Tracker tracker;
+
 	// TODO: 02.09.2015 place it to Model?
 	static final int LOGINNED_STATE = 1;
 	static final int LOGOUTED_STATE = 2;
 	static final int LOGINING_STATE = 3;
 	static final int LOGOUTING_STATE = 4;
 	int state = LOGOUTED_STATE, prevState = LOGOUTED_STATE;
-
-	Logger l = LoggerFactory.getLogger(LoginStatusFragment.class);
 
 	@Inject	UserApi userApi;
 
@@ -88,6 +92,8 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 
 	@AfterViews
 	public void onAfterViews() {
+		tracker = ImhereApplication.newScreenTracker("LoginStatusFragment");
+
 		udid = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
 
 		updatingTimer = new UpdatingTimer(this);
@@ -125,6 +131,8 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 		super.onResume();
 		updatingTimer.start();
 		scheduleLogoutAtCurrentUserDeath();
+
+		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 
 	@Override
@@ -132,6 +140,8 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 		super.onPause();
 		cancelLogoutAtCurrentUserDeath();
 		updatingTimer.stop();
+
+		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 
 	@Click(R.id.b_imhere)

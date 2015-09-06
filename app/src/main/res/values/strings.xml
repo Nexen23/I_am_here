@@ -1,8 +1,10 @@
 <resources>
+    <string name="ga_tracker_ua">UA-67232439-1</string>
     <string name="app_name">I_am_here</string>
     <string name="action_settings">Settings</string>
 
     <string name="non_initialized">_ERROR_</string>
+    <string name="crash_message">App has just crashed.. Sorry!</string>
 
     <string name="b_imhere_logouted">I\'m here!</string>
     <string name="b_imhere_logined">I\'m out!</string>

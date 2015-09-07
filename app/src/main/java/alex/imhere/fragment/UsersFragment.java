@@ -24,7 +24,7 @@ import alex.imhere.R;
 import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.exception.BroadcastChannelException;
+import alex.imhere.exception.ChannelException;
 import alex.imhere.service.ComponentOwner;
 import alex.imhere.service.UpdatingTimer;
 import alex.imhere.service.api.UserApi;
@@ -229,7 +229,7 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 		channel.resume();
 		try {
 			channel.connect();
-		} catch (BroadcastChannelException e) {
+		} catch (ChannelException e) {
 			e.printStackTrace();
 		}
 	}

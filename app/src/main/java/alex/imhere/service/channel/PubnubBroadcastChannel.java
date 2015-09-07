@@ -5,7 +5,7 @@ import com.pubnub.api.Pubnub;
 import com.pubnub.api.PubnubError;
 import com.pubnub.api.PubnubException;
 
-import alex.imhere.exception.BroadcastChannelException;
+import alex.imhere.exception.ChannelException;
 
 public class PubnubBroadcastChannel extends Channel {
 	static private final String CHANNEL_NAME = "events"; // TODO: 29.08.2015 get name from Server & sub-key
@@ -54,12 +54,12 @@ public class PubnubBroadcastChannel extends Channel {
 	}
 
 	@Override
-	public void connect() throws BroadcastChannelException {
+	public void connect() throws ChannelException {
 		try {
 			pubnub.subscribe(CHANNEL_NAME, pubnubCallback);
 		} catch (PubnubException e) {
 			e.printStackTrace();
-			throw new BroadcastChannelException("cannot connect", e);
+			throw new ChannelException("cannot connect", e);
 		}
 	}
 

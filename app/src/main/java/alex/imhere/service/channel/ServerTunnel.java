@@ -15,7 +15,7 @@ import alex.imhere.util.AbstractResumable;
 
 public abstract class ServerTunnel extends AbstractResumable {
 	JsonParser jsonParser;
-	private Channel serverChannel;
+	Channel serverChannel;
 	private final Channel.EventListener listenerAdapter = new Channel.EventListener() {
 		@Override
 		public void onConnect(String channel, String greeting) {
@@ -81,7 +81,7 @@ public abstract class ServerTunnel extends AbstractResumable {
 
 	public interface EventListener {
 		void onDisconnect(String reason);
-		void onUserLogin(DyingUser user);
-		void onUserLogout(DyingUser user);
+		void onUserLogin(DyingUser dyingUser);
+		void onUserLogout(DyingUser dyingUser);
 	}
 }

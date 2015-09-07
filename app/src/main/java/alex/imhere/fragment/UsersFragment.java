@@ -25,10 +25,12 @@ import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
 import alex.imhere.exception.ChannelException;
+import alex.imhere.exception.ServerTunnelException;
 import alex.imhere.service.ComponentOwner;
 import alex.imhere.service.UpdatingTimer;
 import alex.imhere.service.api.UserApi;
 import alex.imhere.service.channel.Channel;
+import alex.imhere.service.channel.ServerTunnel;
 import alex.imhere.service.parser.JsonParser;
 import alex.imhere.view.adapter.UsersAdapter;
 
@@ -39,14 +41,14 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 	Tracker tracker;
 
 	@Inject	UserApi userApi;
-	@Inject Channel channel;
+	@Inject ServerTunnel serverTunnel;
 	@Inject JsonParser jsonParser;
 
 	DyingUser currentUser;
 	TemporarySet<DyingUser> usersTempSet = new TemporarySet<>();
 
 	TemporarySet.EventListener usersTempSetListener;
-	Channel.EventListener channelListener;
+	ServerTunnel.EventListener serverTunnelListener;
 
 	UsersAdapter usersAdapter;
 	List<DyingUser> usersList = new ArrayList<>();
@@ -194,51 +196,36 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 		usersTempSet.addListener(usersTempSetListener);
 		usersTempSet.resume();
 
-		channelListener = new Channel.EventListener() {
+		serverTunnelListener = new ServerTunnel.EventListener() {
 			@Override
-			public void onConnect(String channel, String greeting) {
+			public void onDisconnect(String reason) {
+
 			}
 
 			@Override
-			public void onDisconnect(String channel, String reason) {
+			public void onUserLogin(DyingUser dyingUser) {
+				boolean wasAdded = usersTempSet.add(dyingUser, dyingUser.getAliveTo());
 			}
 
 			@Override
-			public void onReconnect(String channel, String reason) {
-			}
-
-			@Override
-			public void onMessageRecieve(String channel, String message, String timetoken) {
-				// TODO: 03.09.2015 too cool for Controller. Make LoginLougoutChannel Service
-				DyingUser dyingUser = jsonParser.fromJson(message, DyingUser.class);
-				Boolean wasRemoved = false, wasAdded = false;
-				if (dyingUser.isDead()) {
-					wasRemoved = usersTempSet.remove(dyingUser);
-				} else {
-					wasAdded = usersTempSet.add(dyingUser, dyingUser.getAliveTo());
-				}
-				l.info("[{} : dead({})] wasRemoved == {}, wasAdded == {}",
-						dyingUser.getUdid(), Boolean.valueOf(dyingUser.isDead()), wasAdded.toString(), wasRemoved.toString());
-			}
-
-			@Override
-			public void onErrorOccur(String channel, String error) {
+			public void onUserLogout(DyingUser dyingUser) {
+				boolean wasRemoved = usersTempSet.remove(dyingUser);
 			}
 		};
-		channel.setListener(channelListener);
-		channel.resume();
+		serverTunnel.setListener(serverTunnelListener);
+		serverTunnel.resume();
 		try {
-			channel.connect();
-		} catch (ChannelException e) {
+			serverTunnel.connect();
+		} catch (ServerTunnelException e) {
 			e.printStackTrace();
 		}
 	}
 
 	void stopListeningEvents() {
-		channel.clearListener();
-		channelListener = null;
-		channel.disconnect();
-		channel.pause();
+		serverTunnel.clearListener();
+		serverTunnelListener = null;
+		serverTunnel.disconnect();
+		serverTunnel.pause();
 
 		usersTempSet.removeListener(usersTempSetListener);
 		usersTempSetListener = null;

@@ -22,10 +22,10 @@ public abstract class Listenable<TEventListener extends Listenable.EventListener
 		listeners.clear();
 	}
 
-	public void forEachListener(@NonNull final ListenerRunnable<TEventListener> listenerRunnable) {
+	public void forEachListener(@NonNull final ListenerExecutor<TEventListener> listenerExecutor) {
 		if (isResumed()) {
 			for (TEventListener listener : listeners.keySet()) {
-				listenerRunnable.runWith(listener);
+				listenerExecutor.runWith(listener);
 			}
 		}
 	}
@@ -37,7 +37,7 @@ public abstract class Listenable<TEventListener extends Listenable.EventListener
 	public interface EventListener {
 	}
 
-	static public abstract class ListenerRunnable<TEventListener> implements Runnable {
+	static public abstract class ListenerExecutor<TEventListener> {
 		TEventListener listener;
 
 		public void setListener(TEventListener listener) {
@@ -47,6 +47,8 @@ public abstract class Listenable<TEventListener extends Listenable.EventListener
 		public TEventListener getListener() {
 			return listener;
 		}
+
+		public abstract void run();
 
 		private void runWith(TEventListener listener) {
 			setListener(listener);

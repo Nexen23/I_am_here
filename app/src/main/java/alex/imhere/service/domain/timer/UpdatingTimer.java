@@ -1,4 +1,4 @@
-package alex.imhere.service;
+package alex.imhere.service.domain.timer;
 
 import android.os.Handler;
 import android.os.Looper;

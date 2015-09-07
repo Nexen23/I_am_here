@@ -1,4 +1,4 @@
-package alex.imhere.service.channel;
+package alex.imhere.service.domain.channel;
 
 import android.support.annotation.NonNull;
 

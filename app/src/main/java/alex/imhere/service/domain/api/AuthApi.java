@@ -1,19 +1,15 @@
-package alex.imhere.service.api;
+package alex.imhere.service.domain.api;
 
 import android.support.annotation.NonNull;
 
-import com.google.gson.reflect.TypeToken;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
 
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.service.parser.JsonParser;
+import alex.imhere.service.domain.parser.JsonParser;
 
 public class AuthApi extends Api {
 	static final String

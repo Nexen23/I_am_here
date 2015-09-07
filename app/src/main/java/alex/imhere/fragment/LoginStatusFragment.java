@@ -36,9 +36,9 @@ import alex.imhere.ImhereApplication;
 import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.service.ComponentOwner;
-import alex.imhere.service.UpdatingTimer;
-import alex.imhere.service.api.AuthApi;
+import alex.imhere.service.component.ComponentOwner;
+import alex.imhere.service.domain.timer.UpdatingTimer;
+import alex.imhere.service.domain.api.AuthApi;
 import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
 

@@ -24,14 +24,12 @@ import alex.imhere.R;
 import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.exception.ChannelException;
 import alex.imhere.exception.ServerTunnelException;
-import alex.imhere.service.ComponentOwner;
-import alex.imhere.service.UpdatingTimer;
-import alex.imhere.service.api.UserApi;
-import alex.imhere.service.channel.Channel;
-import alex.imhere.service.channel.ServerTunnel;
-import alex.imhere.service.parser.JsonParser;
+import alex.imhere.service.component.ComponentOwner;
+import alex.imhere.service.domain.timer.UpdatingTimer;
+import alex.imhere.service.domain.api.UserApi;
+import alex.imhere.service.domain.channel.ServerTunnel;
+import alex.imhere.service.domain.parser.JsonParser;
 import alex.imhere.view.adapter.UsersAdapter;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)

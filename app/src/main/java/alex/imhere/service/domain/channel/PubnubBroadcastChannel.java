@@ -1,4 +1,4 @@
-package alex.imhere.service.channel;
+package alex.imhere.service.domain.channel;
 
 import com.pubnub.api.Callback;
 import com.pubnub.api.Pubnub;

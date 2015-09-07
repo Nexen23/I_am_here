@@ -1,4 +1,4 @@
-package alex.imhere.service.parser;
+package alex.imhere.service.domain.parser;
 
 import java.lang.reflect.Type;
 

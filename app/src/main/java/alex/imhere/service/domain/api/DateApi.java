@@ -1,4 +1,4 @@
-package alex.imhere.service.api;
+package alex.imhere.service.domain.api;
 
 import android.support.annotation.NonNull;
 
@@ -11,7 +11,7 @@ import javax.inject.Inject;
 
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.service.parser.JsonParser;
+import alex.imhere.service.domain.parser.JsonParser;
 
 public class DateApi extends Api {
 	static final String

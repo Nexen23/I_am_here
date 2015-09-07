@@ -1,13 +1,11 @@
-package alex.imhere.service.api;
+package alex.imhere.service.domain.api;
 
 import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.inject.Inject;
-
-import alex.imhere.service.parser.JsonParser;
+import alex.imhere.service.domain.parser.JsonParser;
 
 public abstract class Api {
 	JsonParser parser;

@@ -1,16 +1,11 @@
-package alex.imhere.service.channel;
+package alex.imhere.service.domain.channel;
 
 import android.support.annotation.NonNull;
-
-import com.pubnub.api.Callback;
-import com.pubnub.api.PubnubError;
-
-import javax.inject.Inject;
 
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ChannelException;
 import alex.imhere.exception.ServerTunnelException;
-import alex.imhere.service.parser.JsonParser;
+import alex.imhere.service.domain.parser.JsonParser;
 import alex.imhere.util.AbstractResumable;
 
 public abstract class ServerTunnel extends AbstractResumable {

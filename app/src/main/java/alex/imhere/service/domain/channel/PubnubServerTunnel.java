@@ -1,10 +1,9 @@
-package alex.imhere.service.channel;
+package alex.imhere.service.domain.channel;
 
 import javax.inject.Inject;
 
 import alex.imhere.entity.DyingUser;
-import alex.imhere.exception.ServerTunnelException;
-import alex.imhere.service.parser.JsonParser;
+import alex.imhere.service.domain.parser.JsonParser;
 
 public class PubnubServerTunnel extends ServerTunnel {
 	@Inject

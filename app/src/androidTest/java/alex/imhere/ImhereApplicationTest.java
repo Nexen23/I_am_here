@@ -3,7 +3,7 @@ package alex.imhere;
 import android.provider.Settings;
 import android.test.ApplicationTestCase;
 
-import alex.imhere.service.api.UserApi;
+import alex.imhere.service.domain.api.UserApi;
 
 /**
  * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>

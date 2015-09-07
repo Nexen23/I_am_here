@@ -1,13 +1,11 @@
 package alex.imhere.activity;
 
 import android.animation.ValueAnimator;
-import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
-import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.FragmentById;
 import org.androidannotations.annotations.InstanceState;
@@ -15,13 +13,15 @@ import org.androidannotations.annotations.UiThread;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.inject.Inject;
+
 import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.fragment.LoginStatusFragment;
 import alex.imhere.fragment.UsersFragment;
-import alex.imhere.service.ComponentOwner;
+import alex.imhere.service.component.ComponentOwner;
 import alex.imhere.service.DaggerServicesComponent;
-import alex.imhere.service.ServicesComponent;
+import alex.imhere.service.component.ServicesComponent;
 
 @EActivity(R.layout.activity_main)
 public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
@@ -30,6 +30,7 @@ public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
 	Logger l = LoggerFactory.getLogger(ImhereActivity.class);
 
 	ServicesComponent servicesComponent;
+	@Inject
 
 	@InstanceState boolean usersFragmentIsShown = false;
 	@FragmentById(R.id.fragment_users) UsersFragment usersFragment;

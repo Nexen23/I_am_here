@@ -4,6 +4,7 @@ import alex.imhere.service.channel.Channel;
 import alex.imhere.service.channel.PubnubBroadcastChannel;
 import alex.imhere.service.channel.PubnubServerTunnel;
 import alex.imhere.service.channel.ServerTunnel;
+import alex.imhere.service.parser.JsonParser;
 import dagger.Module;
 import dagger.Provides;
 
@@ -15,7 +16,7 @@ public class ChannelModule {
 	}
 
 	@Provides
-	public ServerTunnel provideServerTunnel() {
-		return new PubnubServerTunnel();
+	public ServerTunnel provideServerTunnel(Channel serverChannel, JsonParser jsonParser) {
+		return new PubnubServerTunnel(serverChannel, jsonParser);
 	}
 }

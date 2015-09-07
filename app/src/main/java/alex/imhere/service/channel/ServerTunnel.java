@@ -64,17 +64,31 @@ public abstract class ServerTunnel extends AbstractResumable {
 		listener = null;
 	}
 
+	@Override
+	public void pause() {
+		super.pause();
+		serverChannel.pause();
+	}
+
+	@Override
+	public void resume() {
+		super.resume();
+		serverChannel.resume();
+	}
+
 	public final void connect() throws ServerTunnelException {
-		serverChannel.setListener(listenerAdapter);
 		try {
+			serverChannel.setListener(listenerAdapter);
 			serverChannel.connect();
 		} catch (ChannelException e) {
 			e.printStackTrace();
+			serverChannel.clearListener();
 			throw new ServerTunnelException(e);
 		}
 	}
 	public final void disconnect() {
 		serverChannel.disconnect();
+		serverChannel.clearListener();
 	}
 
 	public abstract void onMessageRecieve(String message, String timetoken);

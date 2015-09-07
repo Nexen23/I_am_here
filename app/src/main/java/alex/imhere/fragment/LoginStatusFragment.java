@@ -37,13 +37,13 @@ import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
 import alex.imhere.service.component.ComponentOwner;
-import alex.imhere.service.domain.timer.UpdatingTimer;
+import alex.imhere.service.domain.ticker.TimeTicker;
 import alex.imhere.service.domain.api.AuthApi;
 import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
 
 @EFragment(R.layout.fragment_status)
-public class LoginStatusFragment extends Fragment implements UpdatingTimer.TimerListener {
+public class LoginStatusFragment extends Fragment implements TimeTicker.EventListener {
 	//region Fields
 	Logger l = LoggerFactory.getLogger(LoginStatusFragment.class);
 	Tracker tracker;
@@ -79,7 +79,8 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 	DyingUser currentUser;
 
 	@Inject AuthApi authApi;
-	UpdatingTimer updatingTimer;
+	@Inject TimeTicker timeTicker;
+
 	Timer timer = new Timer();
 	TimerTask logoutTask;
 
@@ -96,8 +97,6 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 		tracker = ImhereApplication.newScreenTracker("LoginStatusFragment");
 
 		udid = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-
-		updatingTimer = new UpdatingTimer(this);
 
 		tsStatus.setAnimateFirstView(false);
 		TextView tv1 = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
@@ -130,7 +129,8 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 	@Override
 	public void onResume() {
 		super.onResume();
-		updatingTimer.start();
+		timeTicker.addListener(this);
+		timeTicker.start();
 		scheduleLogoutAtCurrentUserDeath();
 
 		tracker.send(new HitBuilders.ScreenViewBuilder().build());
@@ -140,7 +140,8 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 	public void onPause() {
 		super.onPause();
 		cancelLogoutAtCurrentUserDeath();
-		updatingTimer.stop();
+		timeTicker.stop();
+		timeTicker.removeListener(this);
 
 		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
@@ -336,7 +337,7 @@ public class LoginStatusFragment extends Fragment implements UpdatingTimer.Timer
 
 	//region Interfaces impls
 	@Override
-	public void onTimerTick() {
+	public void onSecondTick() {
 		updateTimerTick();
 	}
 	//endregion

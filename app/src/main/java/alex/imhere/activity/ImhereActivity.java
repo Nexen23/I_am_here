@@ -20,8 +20,9 @@ import alex.imhere.entity.DyingUser;
 import alex.imhere.fragment.LoginStatusFragment;
 import alex.imhere.fragment.UsersFragment;
 import alex.imhere.service.component.ComponentOwner;
-import alex.imhere.service.DaggerServicesComponent;
+import alex.imhere.service.component.DaggerServicesComponent;
 import alex.imhere.service.component.ServicesComponent;
+import alex.imhere.service.domain.ticker.TimeTicker;
 
 @EActivity(R.layout.activity_main)
 public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
@@ -30,7 +31,6 @@ public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
 	Logger l = LoggerFactory.getLogger(ImhereActivity.class);
 
 	ServicesComponent servicesComponent;
-	@Inject
 
 	@InstanceState boolean usersFragmentIsShown = false;
 	@FragmentById(R.id.fragment_users) UsersFragment usersFragment;

@@ -26,14 +26,14 @@ import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
 import alex.imhere.exception.ServerTunnelException;
 import alex.imhere.service.component.ComponentOwner;
-import alex.imhere.service.domain.timer.UpdatingTimer;
+import alex.imhere.service.domain.ticker.TimeTicker;
 import alex.imhere.service.domain.api.UserApi;
 import alex.imhere.service.domain.channel.ServerTunnel;
 import alex.imhere.service.domain.parser.JsonParser;
 import alex.imhere.view.adapter.UsersAdapter;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
-public class UsersFragment extends ListFragment implements UpdatingTimer.TimerListener {
+public class UsersFragment extends ListFragment implements TimeTicker.EventListener {
 	//region Fields
 	Logger l = LoggerFactory.getLogger(UsersFragment.class);
 	Tracker tracker;
@@ -41,6 +41,7 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 	@Inject	UserApi userApi;
 	@Inject ServerTunnel serverTunnel;
 	@Inject JsonParser jsonParser;
+	@Inject TimeTicker timeTicker;
 
 	DyingUser currentUser;
 	TemporarySet<DyingUser> usersTempSet = new TemporarySet<>();
@@ -50,8 +51,6 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 
 	UsersAdapter usersAdapter;
 	List<DyingUser> usersList = new ArrayList<>();
-
-	UpdatingTimer updatingTimer;
 	//endregion
 
 	//region Lifecycle
@@ -84,14 +83,12 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 		tracker = ImhereApplication.newScreenTracker("LoginStatusFragment");
 
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
-		updatingTimer = new UpdatingTimer(this);
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
 		if (isCurrentUserAlive()) {
-			updatingTimer.start();
 			startListeningEvents();
 			updateOnlineUsers();
 		}
@@ -103,7 +100,6 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 	public void onPause() {
 		super.onPause();
 		stopListeningEvents();
-		updatingTimer.stop();
 
 		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
@@ -163,15 +159,13 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 		usersTempSet.clear();
 		clearUsers();
 
-		updatingTimer.stop();
+		timeTicker.stop();
 	}
 
 	public void setCurrentUser(@Nullable DyingUser user) {
 		currentUser = user;
 		startListeningEvents();
 		updateOnlineUsers();
-
-		updatingTimer.start();
 	}
 
 	void startListeningEvents() {
@@ -217,9 +211,15 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 		} catch (ServerTunnelException e) {
 			e.printStackTrace();
 		}
+
+		timeTicker.addListener(this);
+		timeTicker.start();
 	}
 
 	void stopListeningEvents() {
+		timeTicker.stop();
+		timeTicker.removeListener(this);
+
 		serverTunnel.clearListener();
 		serverTunnelListener = null;
 		serverTunnel.disconnect();
@@ -232,7 +232,7 @@ public class UsersFragment extends ListFragment implements UpdatingTimer.TimerLi
 
 	//region Interfaces impls
 	@Override
-	public void onTimerTick() {
+	public void onSecondTick() {
 		notifyUsersDataChanged();
 	}
 	//endregion

@@ -1,4 +1,4 @@
-package alex.imhere.service.domain.timer;
+package alex.imhere.service.domain.ticker;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -8,20 +8,23 @@ import java.util.TimerTask;
 
 import alex.imhere.util.Listenable;
 
-public class Ticker extends Listenable<Ticker.EventListener> {
-	private static final long TICKING_PERIOD_MS_DEFAULT = 100;
+public class TimeTicker extends Listenable<TimeTicker.EventListener> {
+	private static final long TICKING_PERIOD_MS_DEFAULT = 1000;
+	private static final boolean DO_INSTANT_TICK_ON_START_DEFAULT = true;
 	long tickingPeriodMs;
+	boolean doInstantTickOnStart;
 
 	Handler uiHandler = new Handler(Looper.getMainLooper());
 	final Timer tickingTimer = new Timer();
 	TimerTask tickingTask;
 
-	public Ticker() {
-		this(TICKING_PERIOD_MS_DEFAULT);
+	public TimeTicker() {
+		this(DO_INSTANT_TICK_ON_START_DEFAULT);
 	}
 
-	public Ticker(final long tickingPeriodMs) {
-		setTickingPeriodMs(tickingPeriodMs);
+	public TimeTicker(boolean doInstantTickOnStart) {
+		this.doInstantTickOnStart = doInstantTickOnStart;
+		setTickingPeriodMs(TICKING_PERIOD_MS_DEFAULT);
 	}
 
 	public void setTickingPeriodMs(final long tickingPeriodMs) {
@@ -39,28 +42,32 @@ public class Ticker extends Listenable<Ticker.EventListener> {
 				uiHandler.post(new Runnable() {
 					@Override
 					public void run() {
-						forEachListener(new ListenerExecutor<Ticker.EventListener>() {
+						forEachListener(new ListenerExecutor<TimeTicker.EventListener>() {
 							@Override
 							public void run() {
-								getListener().onTick();
+								getListener().onSecondTick();
 							}
 						});
 					}
 				});
 			}
 		};
-		tickingTimer.scheduleAtFixedRate(tickingTask, 0, tickingPeriodMs);
+
+		long delay = (doInstantTickOnStart) ? 0 : tickingPeriodMs;
+		resume();
+		tickingTimer.scheduleAtFixedRate(tickingTask, delay, tickingPeriodMs);
 	}
 
 	public synchronized void stop() {
 		if (tickingTask != null) {
 			tickingTask.cancel();
 		}
+		pause();
 		tickingTask = null;
 		tickingTimer.purge();
 	}
 
 	public interface EventListener extends Listenable.EventListener {
-		void onTick();
+		void onSecondTick();
 	}
 }

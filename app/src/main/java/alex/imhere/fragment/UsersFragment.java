@@ -30,6 +30,7 @@ import alex.imhere.service.domain.ticker.TimeTicker;
 import alex.imhere.service.domain.api.UserApi;
 import alex.imhere.service.domain.channel.ServerTunnel;
 import alex.imhere.service.domain.parser.JsonParser;
+import alex.imhere.service.domain.ticker.TimeTickerOwner;
 import alex.imhere.view.adapter.UsersAdapter;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
@@ -41,7 +42,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	@Inject	UserApi userApi;
 	@Inject ServerTunnel serverTunnel;
 	@Inject JsonParser jsonParser;
-	@Inject TimeTicker timeTicker;
+	TimeTickerOwner timeTickerOwner;
 
 	DyingUser currentUser;
 	TemporarySet<DyingUser> usersTempSet = new TemporarySet<>();
@@ -65,10 +66,11 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
+			timeTickerOwner = (TimeTickerOwner) activity;
 			((ComponentOwner) activity).getServicesComponent().inject(this);
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
-					+ " must implement ComponentOwner");
+					+ " must implement TimeTickerOwner & ComponentOwner");
 		}
 	}
 
@@ -158,8 +160,6 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		currentUser = null;
 		usersTempSet.clear();
 		clearUsers();
-
-		timeTicker.stop();
 	}
 
 	public void setCurrentUser(@Nullable DyingUser user) {
@@ -212,13 +212,11 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 			e.printStackTrace();
 		}
 
-		timeTicker.addListener(this);
-		timeTicker.start();
+		timeTickerOwner.getTimeTicker().addListener(this);
 	}
 
 	void stopListeningEvents() {
-		timeTicker.stop();
-		timeTicker.removeListener(this);
+		timeTickerOwner.getTimeTicker().removeListener(this);
 
 		serverTunnel.clearListener();
 		serverTunnelListener = null;

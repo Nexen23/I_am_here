@@ -1,5 +1,6 @@
 package alex.imhere.service.component;
 
+import alex.imhere.activity.ImhereActivity;
 import alex.imhere.fragment.LoginStatusFragment;
 import alex.imhere.fragment.UsersFragment;
 import alex.imhere.service.module.ApiModule;
@@ -17,4 +18,6 @@ import dagger.Component;
 public interface ServicesComponent {
 	void inject(UsersFragment fragment);
 	void inject(LoginStatusFragment fragment);
+
+	void inject(ImhereActivity activity);
 }

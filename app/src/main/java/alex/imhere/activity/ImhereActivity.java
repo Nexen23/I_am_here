@@ -23,14 +23,17 @@ import alex.imhere.service.component.ComponentOwner;
 import alex.imhere.service.component.DaggerServicesComponent;
 import alex.imhere.service.component.ServicesComponent;
 import alex.imhere.service.domain.ticker.TimeTicker;
+import alex.imhere.service.domain.ticker.TimeTickerOwner;
 
 @EActivity(R.layout.activity_main)
-public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
+public class ImhereActivity extends AppCompatActivity
+		implements ComponentOwner, TimeTickerOwner,
 		LoginStatusFragment.EventListener {
 	//region Fields
 	Logger l = LoggerFactory.getLogger(ImhereActivity.class);
 
 	ServicesComponent servicesComponent;
+	@Inject	TimeTicker timeTicker;
 
 	@InstanceState boolean usersFragmentIsShown = false;
 	@FragmentById(R.id.fragment_users) UsersFragment usersFragment;
@@ -40,10 +43,12 @@ public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
 	public ImhereActivity() {
 		super();
 		servicesComponent = DaggerServicesComponent.builder().build();
+		servicesComponent.inject(this);
 	}
 
 	@Override
 	protected void onResumeFragments() {
+		timeTicker.start();
 		super.onResumeFragments();
 		showUsersFragment(usersFragmentIsShown);
 	}
@@ -51,6 +56,7 @@ public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
 	@Override
 	protected void onPause() {
 		super.onPause();
+		timeTicker.stop();
 	}
 
 	@Override
@@ -112,8 +118,15 @@ public class ImhereActivity extends AppCompatActivity implements ComponentOwner,
 	}
 	//endregion
 
+	//region Interfaces impls
 	@Override
 	public ServicesComponent getServicesComponent() {
 		return servicesComponent;
 	}
+
+	@Override
+	public TimeTicker getTimeTicker() {
+		return timeTicker;
+	}
+	//endregion
 }

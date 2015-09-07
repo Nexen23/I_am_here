@@ -39,6 +39,7 @@ import alex.imhere.exception.ApiException;
 import alex.imhere.service.component.ComponentOwner;
 import alex.imhere.service.domain.ticker.TimeTicker;
 import alex.imhere.service.domain.api.AuthApi;
+import alex.imhere.service.domain.ticker.TimeTickerOwner;
 import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
 
@@ -79,7 +80,7 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 	DyingUser currentUser;
 
 	@Inject AuthApi authApi;
-	@Inject TimeTicker timeTicker;
+	TimeTickerOwner timeTickerOwner;
 
 	Timer timer = new Timer();
 	TimerTask logoutTask;
@@ -113,10 +114,11 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 		super.onAttach(activity);
 		try {
 			eventListener = (EventListener) activity;
+			timeTickerOwner = (TimeTickerOwner) activity;
 			((ComponentOwner) activity).getServicesComponent().inject(this);
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
-					+ " must implement EventListener & ComponentOwner");
+					+ " must implement EventListener & TimeTickerOwner & ComponentOwner");
 		}
 	}
 
@@ -129,8 +131,7 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 	@Override
 	public void onResume() {
 		super.onResume();
-		timeTicker.addListener(this);
-		timeTicker.start();
+		timeTickerOwner.getTimeTicker().addListener(this);
 		scheduleLogoutAtCurrentUserDeath();
 
 		tracker.send(new HitBuilders.ScreenViewBuilder().build());
@@ -140,8 +141,7 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 	public void onPause() {
 		super.onPause();
 		cancelLogoutAtCurrentUserDeath();
-		timeTicker.stop();
-		timeTicker.removeListener(this);
+		timeTickerOwner.getTimeTicker().removeListener(this);
 
 		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}

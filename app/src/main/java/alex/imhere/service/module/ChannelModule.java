@@ -1,9 +1,8 @@
 package alex.imhere.service.module;
 
 import alex.imhere.service.domain.channel.Channel;
-import alex.imhere.service.domain.channel.PubnubBroadcastChannel;
-import alex.imhere.service.domain.channel.PubnubServerTunnel;
-import alex.imhere.service.domain.channel.ServerTunnel;
+import alex.imhere.service.domain.channel.PubnubChannel;
+import alex.imhere.service.domain.channel.ServerChannel;
 import alex.imhere.service.domain.parser.JsonParser;
 import dagger.Module;
 import dagger.Provides;
@@ -12,11 +11,11 @@ import dagger.Provides;
 public class ChannelModule {
 	@Provides
 	public Channel provideChannel() {
-		return new PubnubBroadcastChannel();
+		return new PubnubChannel();
 	}
 
 	@Provides
-	public ServerTunnel provideServerTunnel(Channel serverChannel, JsonParser jsonParser) {
-		return new PubnubServerTunnel(serverChannel, jsonParser);
+	public ServerChannel provideServerChannel(Channel serverChannel, JsonParser jsonParser) {
+		return new ServerChannel(serverChannel, jsonParser);
 	}
 }

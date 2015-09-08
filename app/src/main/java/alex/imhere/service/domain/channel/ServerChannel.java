@@ -2,15 +2,23 @@ package alex.imhere.service.domain.channel;
 
 import android.support.annotation.NonNull;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ChannelException;
 import alex.imhere.exception.ServerTunnelException;
 import alex.imhere.service.domain.parser.JsonParser;
 import alex.imhere.util.AbstractResumable;
+import alex.imhere.util.Resumable;
 
-public abstract class ServerTunnel extends AbstractResumable {
+public class ServerChannel extends AbstractResumable {
+	Logger l = LoggerFactory.getLogger(ServerChannel.class);
+
 	JsonParser jsonParser;
 	Channel serverChannel;
+
+	ServerChannel.EventListener listener;
 	private final Channel.EventListener listenerAdapter = new Channel.EventListener() {
 		@Override
 		public void onConnect(String channel, String greeting) {
@@ -32,26 +40,25 @@ public abstract class ServerTunnel extends AbstractResumable {
 		@Override
 		public void onMessageRecieve(String channel, String message, String timetoken) {
 			if (listener != null && isResumed()) {
-				ServerTunnel.this.onMessageRecieve(message, timetoken);
+				ServerChannel.this.onMessageRecieve(message, timetoken);
 			}
 		}
 
 		@Override
 		public void onErrorOccur(String channel, String error) {
+			l.warn(String.format("%s : [error] %s", channel, error));
 			if (listener != null && isResumed()) {
-				ServerTunnel.this.disconnect();
-				listener.onDisconnect(error);
+				ServerChannel.this.disconnect();
 			}
 		}
 	};
-	EventListener listener;
 
-	public ServerTunnel(Channel serverChannel, JsonParser jsonParser) {
+	public ServerChannel(Channel serverChannel, JsonParser jsonParser) {
 		this.serverChannel = serverChannel;
 		this.jsonParser = jsonParser;
 	}
 
-	public final void setListener(@NonNull EventListener listener) {
+	public final void setListener(@NonNull ServerChannel.EventListener listener) {
 		this.listener = listener;
 	}
 
@@ -86,7 +93,16 @@ public abstract class ServerTunnel extends AbstractResumable {
 		serverChannel.clearListener();
 	}
 
-	public abstract void onMessageRecieve(String message, String timetoken);
+	public void onMessageRecieve(String userJson, String timetoken) {
+		DyingUser dyingUser = jsonParser.fromJson(userJson, DyingUser.class);
+		if (dyingUser != null) {
+			if (dyingUser.isAlive()) {
+				listener.onUserLogin(dyingUser);
+			} else {
+				listener.onUserLogout(dyingUser);
+			}
+		}
+	}
 
 	public interface EventListener {
 		void onDisconnect(String reason);

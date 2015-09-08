@@ -26,9 +26,9 @@ import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
 import alex.imhere.exception.ServerTunnelException;
 import alex.imhere.service.component.ServicesComponent;
+import alex.imhere.service.domain.channel.ServerChannel;
 import alex.imhere.service.domain.ticker.TimeTicker;
 import alex.imhere.service.domain.api.UserApi;
-import alex.imhere.service.domain.channel.ServerTunnel;
 import alex.imhere.service.domain.parser.JsonParser;
 import alex.imhere.view.adapter.UsersAdapter;
 
@@ -39,7 +39,8 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	Tracker tracker;
 
 	@Inject	UserApi userApi;
-	@Inject ServerTunnel serverTunnel;
+	@Inject
+	ServerChannel serverChannel;
 	@Inject JsonParser jsonParser;
 	TimeTicker.Owner owner;
 
@@ -47,7 +48,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	TemporarySet<DyingUser> usersTempSet = new TemporarySet<>();
 
 	TemporarySet.EventListener usersTempSetListener;
-	ServerTunnel.EventListener serverTunnelListener;
+	ServerChannel.EventListener serverTunnelListener;
 
 	UsersAdapter usersAdapter;
 	List<DyingUser> usersList = new ArrayList<>();
@@ -187,7 +188,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		usersTempSet.addListener(usersTempSetListener);
 		usersTempSet.resume();
 
-		serverTunnelListener = new ServerTunnel.EventListener() {
+		serverTunnelListener = new ServerChannel.EventListener() {
 			@Override
 			public void onDisconnect(String reason) {
 
@@ -203,10 +204,10 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 				boolean wasRemoved = usersTempSet.remove(dyingUser);
 			}
 		};
-		serverTunnel.setListener(serverTunnelListener);
-		serverTunnel.resume();
+		serverChannel.setListener(serverTunnelListener);
+		serverChannel.resume();
 		try {
-			serverTunnel.connect();
+			serverChannel.connect();
 		} catch (ServerTunnelException e) {
 			e.printStackTrace();
 		}
@@ -217,10 +218,10 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	void stopListeningEvents() {
 		owner.getTimeTicker().removeListener(this);
 
-		serverTunnel.clearListener();
+		serverChannel.clearListener();
 		serverTunnelListener = null;
-		serverTunnel.disconnect();
-		serverTunnel.pause();
+		serverChannel.disconnect();
+		serverChannel.pause();
 
 		usersTempSet.removeListener(usersTempSetListener);
 		usersTempSetListener = null;

@@ -18,6 +18,7 @@ import com.skyfishjy.library.RippleBackground;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.res.AnimationRes;
@@ -44,9 +45,9 @@ import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
 
 @EFragment(R.layout.fragment_status)
-public class LoginStatusFragment extends Fragment implements TimeTicker.EventListener {
+public class LoginFragment extends Fragment implements TimeTicker.EventListener {
 	//region Fields
-	Logger l = LoggerFactory.getLogger(LoginStatusFragment.class);
+	Logger l = LoggerFactory.getLogger(LoginFragment.class);
 	Tracker tracker;
 
 	//region Resources
@@ -69,15 +70,14 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 	@StringRes(R.string.ts_status_logouting) String statusLogouting;
 	//endregion
 
-	// TODO: 02.09.2015 place it to Model?
 	static final int LOGINNED_STATE = 1;
 	static final int LOGOUTED_STATE = 2;
 	static final int LOGINING_STATE = 3;
 	static final int LOGOUTING_STATE = 4;
-	int state = LOGOUTED_STATE, prevState = LOGOUTED_STATE;
+	@InstanceState int state = LOGOUTED_STATE, prevState = LOGOUTED_STATE;
 
-	String udid;
-	DyingUser currentUser;
+	@InstanceState String udid;
+	/*@InstanceState */DyingUser currentUser;
 
 	@Inject AuthApi authApi;
 	TimeTickerOwner timeTickerOwner;
@@ -89,24 +89,20 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 	//endregion
 
 	//region Lifecycle
-	public LoginStatusFragment() {
-		// Required empty public constructor
-	}
-
-	@AfterViews
-	public void onAfterViews() {
-		tracker = ImhereApplication.newScreenTracker("LoginStatusFragment");
-
-		udid = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-
+	private void constructStatusTextSwitcher() {
 		tsStatus.setAnimateFirstView(false);
 		TextView tv1 = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
 		tsStatus.addView(tv1);
 		TextView tv2 = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
 		tsStatus.addView(tv2);
 		tsStatus.showNext();
+	}
 
-		setState(LOGOUTED_STATE);
+	@AfterViews
+	public void onAfterViews() {
+		tracker = ImhereApplication.newScreenTracker("LoginFragment");
+		udid = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
+		constructStatusTextSwitcher();
 	}
 
 	@Override
@@ -131,6 +127,7 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 	@Override
 	public void onResume() {
 		super.onResume();
+		setState(state);
 		timeTickerOwner.getTimeTicker().addListener(this);
 		scheduleLogoutAtCurrentUserDeath();
 
@@ -168,7 +165,11 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 				status = statusLogouting;
 				break;
 		}
-		tsStatus.setText(status);
+		if (isStateNotChanged()) {
+			tsStatus.setCurrentText(status);
+		} else {
+			tsStatus.setText(status);
+		}
 	}
 
 	@UiThread
@@ -176,13 +177,23 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 		TransitionDrawable drawable = (TransitionDrawable) imhereButton.getBackground();
 		switch (state) {
 			case LOGINNED_STATE:
+				imhereButtonClickEffect.stopRippleAnimation();
+				imhereButton.setEnabled(true);
 				imhereButton.setText(imhereButtonLogined);
 				drawable.startTransition(0);
 				break;
 
 			case LOGOUTED_STATE:
+				imhereButtonClickEffect.stopRippleAnimation();
+				imhereButton.setEnabled(true);
 				imhereButton.setText(imhereButtonLogouted);
 				drawable.resetTransition();
+				break;
+
+			case LOGINING_STATE:
+			case LOGOUTING_STATE:
+				imhereButton.setEnabled(false);
+				imhereButtonClickEffect.startRippleAnimation();
 				break;
 		}
 	}
@@ -191,75 +202,28 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 	void updateTimer() {
 		switch (state) {
 			case LOGINNED_STATE :
-				tvTimer.startAnimation(fadeInAnim);
+				if (!isStateNotChanged()) {
+					tvTimer.startAnimation(fadeInAnim);
+				}
 				tvTimer.setVisibility(View.VISIBLE);
 				updateTimerTick();
 				break;
 
 			case LOGOUTED_STATE :
-				tvTimer.startAnimation(fadeOutAnim);
+				if (!isStateNotChanged()) {
+					tvTimer.startAnimation(fadeOutAnim);
+				}
 				tvTimer.setVisibility(View.INVISIBLE);
 				break;
 		}
 	}
 
 	@UiThread
-	void setImhereButtonEnabled(boolean isEnabled) {
-		imhereButton.setEnabled(isEnabled);
-		if (isEnabled) {
-			imhereButtonClickEffect.stopRippleAnimation();
-			switch (state) {
-				case LOGOUTING_STATE :
-					setState(LOGOUTED_STATE);
-					break;
-
-				case LOGINING_STATE :
-					setState(LOGINNED_STATE);
-					break;
-			}
-		} else {
-			imhereButtonClickEffect.startRippleAnimation();
-			switch (state) {
-				case LOGINNED_STATE :
-					setState(LOGOUTING_STATE);
-					break;
-
-				case LOGOUTED_STATE :
-					setState(LOGINING_STATE);
-					break;
-			}
-		}
-	}
-
-	@UiThread
 	void updateTimerTick() {
-		// TODO: 27.08.2015 really bad hack because of UpdatingTimer
 		if (isCurrentUserAlive()) {
 			Duration restTime = TimeUtils.GetNonNegativeDuration(new DateTime(), getCurrentUser().getAliveTo());
 			String durationMsString = TimeFormatter.DurationToMSString(restTime);
 			tvTimer.setText(durationMsString);
-		}
-	}
-	//endregion
-
-	@Click(R.id.b_imhere)
-	void imhereButtonClick() {
-		setImhereButtonEnabled(false);
-		if (isCurrentUserAlive()) {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					logout();
-					setCurrentUser(null);
-				}
-			}).start();
-		} else {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					login();
-				}
-			}).start();
 		}
 	}
 
@@ -270,6 +234,30 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 		updateStatus();
 		updateImhereButton();
 		updateTimer();
+	}
+
+	boolean isStateNotChanged() {
+		return prevState == state;
+	}
+	//endregion
+
+	@Click(R.id.b_imhere)
+	void imhereButtonClick() {
+		if (isCurrentUserAlive()) {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					logout();
+				}
+			}).start();
+		} else {
+			new Thread(new Runnable() {
+				@Override
+				public void run() {
+					login();
+				}
+			}).start();
+		}
 	}
 
 	public void setCurrentUser(@Nullable DyingUser user) {
@@ -306,23 +294,25 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 	}
 
 	public synchronized final void login() {
+		setState(LOGINING_STATE);
 		eventListener.onPreLogin();
 
 		try {
 			setCurrentUser(authApi.login(udid));
 		} catch (ApiException e) {
 			e.printStackTrace();
+			setState(LOGOUTED_STATE);
 		}
 		scheduleLogoutAtCurrentUserDeath();
 
 		eventListener.onLogin(currentUser);
-		setImhereButtonEnabled(true);
+		setState(LOGINNED_STATE);
 	}
 
 	public synchronized void logout() {
 		DyingUser currentUser = getCurrentUser();
 		if (currentUser != null) {
-			setImhereButtonEnabled(false);
+			setState(LOGOUTING_STATE);
 			eventListener.onPreLogout();
 
 			cancelLogoutAtCurrentUserDeath();
@@ -331,7 +321,7 @@ public class LoginStatusFragment extends Fragment implements TimeTicker.EventLis
 			setCurrentUser(null);
 
 			eventListener.onLogout();
-			setImhereButtonEnabled(true);
+			setState(LOGOUTED_STATE);
 		}
 	}
 

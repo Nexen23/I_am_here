@@ -82,7 +82,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 
 	@AfterViews
 	public void onAfterViews() {
-		tracker = ImhereApplication.newScreenTracker("LoginStatusFragment");
+		tracker = ImhereApplication.newScreenTracker("LoginFragment");
 
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
 	}

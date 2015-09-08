@@ -15,35 +15,35 @@ public class PubnubChannel extends Channel {
 	Callback pubnubCallback = new Callback() {
 		@Override
 		public void connectCallback(String channel, Object message) {
-			if (listener != null && isResumed()) {
+			if (listener != null) {
 				listener.onConnect(channel, "Connected: " + message.toString());
 			}
 		}
 
 		@Override
 		public void disconnectCallback(String channel, Object message) {
-			if (listener != null && isResumed()) {
+			if (listener != null) {
 				listener.onDisconnect(channel, "Disconnected: " + message.toString());
 			}
 		}
 
 		@Override
 		public void reconnectCallback(String channel, Object message) {
-			if (listener != null && isResumed()) {
+			if (listener != null) {
 				listener.onReconnect(channel, "Reconnected: " + message.toString());
 			}
 		}
 
 		@Override
 		public void successCallback(String channel, Object message, String timetoken) {
-			if (listener != null && isResumed()) {
+			if (listener != null) {
 				listener.onMessageRecieve(channel, message.toString(), timetoken);
 			}
 		}
 
 		@Override
 		public void errorCallback(String channel, PubnubError error) {
-			if (listener != null && isResumed()) {
+			if (listener != null) {
 				listener.onErrorOccur(channel, "Error occured: " + error.toString());
 			}
 		}

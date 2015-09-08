@@ -205,7 +205,6 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 			}
 		};
 		serverChannel.setListener(serverTunnelListener);
-		serverChannel.resume();
 		try {
 			serverChannel.connect();
 		} catch (ServerTunnelException e) {
@@ -219,9 +218,8 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		owner.getTimeTicker().removeListener(this);
 
 		serverChannel.clearListener();
-		serverTunnelListener = null;
 		serverChannel.disconnect();
-		serverChannel.pause();
+		serverTunnelListener = null;
 
 		usersTempSet.removeListener(usersTempSetListener);
 		usersTempSetListener = null;

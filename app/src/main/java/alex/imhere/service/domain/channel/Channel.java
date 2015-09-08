@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import alex.imhere.exception.ChannelException;
 import alex.imhere.util.AbstractResumable;
 
-public abstract class Channel extends AbstractResumable {
+public abstract class Channel {
 	private String name;
 	protected Channel.EventListener listener;
 

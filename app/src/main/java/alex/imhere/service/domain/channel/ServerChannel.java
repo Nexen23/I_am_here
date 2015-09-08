@@ -12,7 +12,7 @@ import alex.imhere.service.domain.parser.JsonParser;
 import alex.imhere.util.AbstractResumable;
 import alex.imhere.util.Resumable;
 
-public class ServerChannel extends AbstractResumable {
+public class ServerChannel {
 	Logger l = LoggerFactory.getLogger(ServerChannel.class);
 
 	JsonParser jsonParser;
@@ -27,7 +27,7 @@ public class ServerChannel extends AbstractResumable {
 
 		@Override
 		public void onDisconnect(String channel, String reason) {
-			if (listener != null && isResumed()) {
+			if (listener != null) {
 				listener.onDisconnect(reason);
 			}
 		}
@@ -39,7 +39,7 @@ public class ServerChannel extends AbstractResumable {
 
 		@Override
 		public void onMessageRecieve(String channel, String message, String timetoken) {
-			if (listener != null && isResumed()) {
+			if (listener != null) {
 				ServerChannel.this.onMessageRecieve(message, timetoken);
 			}
 		}
@@ -47,7 +47,7 @@ public class ServerChannel extends AbstractResumable {
 		@Override
 		public void onErrorOccur(String channel, String error) {
 			l.warn(String.format("%s : [error] %s", channel, error));
-			if (listener != null && isResumed()) {
+			if (listener != null) {
 				ServerChannel.this.disconnect();
 			}
 		}
@@ -64,18 +64,6 @@ public class ServerChannel extends AbstractResumable {
 
 	public final void clearListener() {
 		listener = null;
-	}
-
-	@Override
-	public void pause() {
-		super.pause();
-		serverChannel.pause();
-	}
-
-	@Override
-	public void resume() {
-		super.resume();
-		serverChannel.resume();
 	}
 
 	public final void connect() throws ServerTunnelException {

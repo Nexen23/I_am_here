@@ -54,7 +54,6 @@ public class TimeTicker extends Listenable<TimeTicker.EventListener> {
 		};
 
 		long delay = (doInstantTickOnStart) ? 0 : tickingPeriodMs;
-		resume();
 		tickingTimer.scheduleAtFixedRate(tickingTask, delay, tickingPeriodMs);
 	}
 
@@ -62,7 +61,6 @@ public class TimeTicker extends Listenable<TimeTicker.EventListener> {
 		if (tickingTask != null) {
 			tickingTask.cancel();
 		}
-		pause();
 		tickingTask = null;
 		tickingTimer.purge();
 	}

@@ -13,15 +13,18 @@ import java.util.TimerTask;
 import java.util.TreeSet;
 
 import alex.imhere.util.Listenable;
+import alex.imhere.util.Resumable;
 import alex.imhere.util.time.TimeUtils;
 
-public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> {
+public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> implements Resumable {
 	protected SortedSet<TemporaryElement<TItem>> sortedElementsSet = new TreeSet<>();
 	protected List<TItem> list = new ArrayList<>();
 
 	protected final Timer timer = new Timer();
 	protected TimerTask timerTask = null;
 	protected TemporaryElement<TItem> nextElementToDie = null;
+
+	boolean isResumed = false;
 
 	public TemporarySet() {
 		notifier = new TemporarySet.EventListener() {
@@ -110,6 +113,7 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 	}
 
 	private synchronized void openNextDeath() {
+		cancelNextDeath();
 		if (sortedElementsSet.size() != 0) {
 			nextElementToDie = sortedElementsSet.first();
 			timerTask = new TimerTask() {
@@ -173,14 +177,19 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 
 	@Override
 	public void resume() {
-		super.resume();
+		isResumed = true;
 		openNextDeath();
 	}
 
 	@Override
 	public void pause() {
 		cancelNextDeath();
-		super.pause();
+		isResumed = false;
+	}
+
+	@Override
+	public boolean isResumed() {
+		return isResumed;
 	}
 
 	public interface EventListener extends Listenable.EventListener {

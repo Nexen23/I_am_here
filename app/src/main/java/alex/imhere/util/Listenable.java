@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-public abstract class Listenable<TEventListener extends Listenable.EventListener> extends AbstractResumable {
+public abstract class Listenable<TEventListener extends Listenable.EventListener> {
 	private WeakHashMap<TEventListener, Void> listeners = new WeakHashMap<>();
 	protected TEventListener notifier;
 
@@ -23,10 +23,8 @@ public abstract class Listenable<TEventListener extends Listenable.EventListener
 	}
 
 	public void forEachListener(@NonNull final ListenerExecutor<TEventListener> listenerExecutor) {
-		if (isResumed()) {
-			for (TEventListener listener : listeners.keySet()) {
-				listenerExecutor.runWith(listener);
-			}
+		for (TEventListener listener : listeners.keySet()) {
+			listenerExecutor.runWith(listener);
 		}
 	}
 

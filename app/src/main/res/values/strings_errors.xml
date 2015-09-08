@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="non_initialized">_ERROR_</string>
+
+	<string name="crash_message">App has just crashed.. Sorry!</string>
+
+	<string name="loginning_failed">Failed to login :(</string>
+	<string name="users_channel_connection_failed">Failed to connect to users-server :(</string>
+	<string name="users_channel_disconnection">Disconnected from users-server :(</string>
+</resources>

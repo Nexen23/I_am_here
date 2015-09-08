@@ -45,7 +45,7 @@ public class ServerChannel {
 		public void onErrorOccur(String channel, String error) {
 			l.warn(String.format("%s : [error] %s", channel, error));
 			if (listener != null) {
-				ServerChannel.this.disconnect();
+				ServerChannel.this.unsubscribe();
 			}
 		}
 	};
@@ -63,18 +63,18 @@ public class ServerChannel {
 		listener = null;
 	}
 
-	public final void connect() throws ChannelException {
+	public final void subscribe() throws ChannelException {
 		try {
 			serverChannel.setListener(listenerAdapter);
-			serverChannel.connect();
+			serverChannel.subscribe();
 		} catch (ChannelException e) {
 			e.printStackTrace();
 			serverChannel.clearListener();
 			throw e;
 		}
 	}
-	public final void disconnect() {
-		serverChannel.disconnect();
+	public final void unsubscribe() {
+		serverChannel.unsubscribe();
 		serverChannel.clearListener();
 	}
 

@@ -29,23 +29,23 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 	public TemporarySet() {
 		notifier = new TemporarySet.EventListener() {
 			@Override
-			public void onClear() {
+			public void onCleared() {
 				for (TemporarySet.EventListener listener : getListenersSet()) {
-					listener.onClear();
+					listener.onCleared();
 				}
 			}
 
 			@Override
-			public void onAdd(Object item) {
+			public void onAdded(Object item) {
 				for (TemporarySet.EventListener listener : getListenersSet()) {
-					listener.onAdd(item);
+					listener.onAdded(item);
 				}
 			}
 
 			@Override
-			public void onRemove(Object item) {
+			public void onRemoved(Object item) {
 				for (TemporarySet.EventListener listener : getListenersSet()) {
-					listener.onRemove(item);
+					listener.onRemoved(item);
 				}
 			}
 		};
@@ -74,7 +74,7 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 		list.clear();
 		sortedElementsSet.clear();
 
-		notifier.onClear();
+		notifier.onCleared();
 	}
 
 
@@ -91,7 +91,7 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 				openNextDeath();
 			}
 
-			notifier.onAdd(insertingElement.object);
+			notifier.onAdded(insertingElement.object);
 		}
 
 		return wasInserted;
@@ -106,7 +106,7 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 				openNextDeath();
 			}
 
-			notifier.onRemove(deletingElement.object);
+			notifier.onRemoved(deletingElement.object);
 		}
 
 		return wasDeleted;
@@ -193,8 +193,8 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 	}
 
 	public interface EventListener extends Listenable.EventListener {
-		void onClear();
-		void onAdd(Object item);
-		void onRemove(Object item);
+		void onCleared();
+		void onAdded(Object item);
+		void onRemoved(Object item);
 	}
 }

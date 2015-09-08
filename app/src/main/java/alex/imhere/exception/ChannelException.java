@@ -2,7 +2,7 @@ package alex.imhere.exception;
 
 public class ChannelException extends Exception {
 	static public final String
-			CONNECT_ERROR = "cannot connect";
+			CONNECT_ERROR = "cannot subscribe";
 
 	public ChannelException() {
 		super();
@@ -18,10 +18,5 @@ public class ChannelException extends Exception {
 
 	public ChannelException(Throwable throwable) {
 		super(throwable);
-	}
-
-	@Override
-	public String getMessage() {
-		return String.format("[%s]", super.getMessage());
 	}
 }

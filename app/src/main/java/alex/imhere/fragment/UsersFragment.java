@@ -11,6 +11,7 @@ import com.google.android.gms.analytics.Tracker;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.res.StringRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,6 +31,7 @@ import alex.imhere.service.domain.channel.ServerChannel;
 import alex.imhere.service.domain.ticker.TimeTicker;
 import alex.imhere.service.domain.api.UserApi;
 import alex.imhere.service.domain.parser.JsonParser;
+import alex.imhere.util.wrapper.UiToast;
 import alex.imhere.view.adapter.UsersAdapter;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
@@ -38,11 +40,15 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	final Logger l = LoggerFactory.getLogger(UsersFragment.class);
 	Tracker tracker;
 
+	//region Resources
+	@StringRes(R.string.users_channel_connection_failed) String usersChannelConnectionFailed;
+	@StringRes(R.string.users_channel_disconnection) String usersChannelDisconnection;
+	//endregion
+
 	@Inject	UserApi userApi;
-	@Inject
-	ServerChannel serverChannel;
+	@Inject	ServerChannel serverChannel;
 	@Inject JsonParser jsonParser;
-	TimeTicker.Owner owner;
+	TimeTicker.Owner timeTickerOwner;
 
 	DyingUser currentUser;
 	TemporarySet<DyingUser> usersTempSet = new TemporarySet<>();
@@ -55,23 +61,22 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	//endregion
 
 	//region Lifecycle
-	public static UsersFragment newInstance() {
-		UsersFragment fragment = new UsersFragment_();
-		Bundle args = new Bundle();
-		fragment.setArguments(args);
-		return fragment;
-	}
-
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			owner = (TimeTicker.Owner) activity;
+			timeTickerOwner = (TimeTicker.Owner) activity;
 			((ServicesComponent.Owner) activity).getServicesComponent().inject(this);
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
-					+ " must implement Owner & ComponentOwner");
+					+ " must implement TimeTickerOwner & ComponentOwner");
 		}
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		timeTickerOwner = null;
 	}
 
 	@Override
@@ -171,17 +176,17 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	void startListeningEvents() {
 		usersTempSetListener = new TemporarySet.EventListener() {
 			@Override
-			public void onClear() {
+			public void onCleared() {
 				UsersFragment.this.clearUsers();
 			}
 
 			@Override
-			public void onAdd(Object item) {
+			public void onAdded(Object item) {
 				UsersFragment.this.addUser((DyingUser) item);
 			}
 
 			@Override
-			public void onRemove(Object item) {
+			public void onRemoved(Object item) {
 				UsersFragment.this.removeUser((DyingUser) item);
 			}
 		};
@@ -191,7 +196,8 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		serverTunnelListener = new ServerChannel.EventListener() {
 			@Override
 			public void onDisconnect(String reason) {
-
+				UiToast.Show(getActivity(), usersChannelDisconnection);
+				stopListeningEvents();
 			}
 
 			@Override
@@ -205,20 +211,33 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 			}
 		};
 		serverChannel.setListener(serverTunnelListener);
-		try {
-			serverChannel.connect();
-		} catch (ChannelException e) {
-			e.printStackTrace();
-		}
 
-		owner.getTimeTicker().addListener(this);
+		final UsersFragment usersFragment = this;
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					//Thread.sleep(2500); /*getListView().setEmptyView(view);*/
+					serverChannel.subscribe(); // TODO: 08.09.2015 do it in Loader
+				} catch (ChannelException e) {
+					e.printStackTrace();
+					UiToast.Show(getActivity(), usersChannelConnectionFailed, e.getMessage());
+					stopListeningEvents();
+					return;
+				} /*catch (InterruptedException e) {
+					e.printStackTrace();
+				}*/
+
+				timeTickerOwner.getTimeTicker().addListener(usersFragment);
+			}
+		}).start();
 	}
 
 	void stopListeningEvents() {
-		owner.getTimeTicker().removeListener(this);
+		timeTickerOwner.getTimeTicker().removeListener(this);
 
 		serverChannel.clearListener();
-		serverChannel.disconnect();
+		serverChannel.unsubscribe();
 		serverTunnelListener = null;
 
 		usersTempSet.removeListener(usersTempSetListener);

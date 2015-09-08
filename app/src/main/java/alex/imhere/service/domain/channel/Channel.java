@@ -24,8 +24,8 @@ public abstract class Channel {
 		return name;
 	}
 
-	public abstract void connect() throws ChannelException;
-	public abstract void disconnect();
+	public abstract void subscribe() throws ChannelException;
+	public abstract void unsubscribe();
 
 	public interface EventListener {
 		void onConnect(String channel, String greeting);

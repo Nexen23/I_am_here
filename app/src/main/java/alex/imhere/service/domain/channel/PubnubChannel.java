@@ -54,7 +54,7 @@ public class PubnubChannel extends Channel {
 	}
 
 	@Override
-	public void connect() throws ChannelException {
+	public void subscribe() throws ChannelException {
 		try {
 			pubnub.subscribe(CHANNEL_NAME, pubnubCallback);
 		} catch (PubnubException e) {
@@ -64,7 +64,7 @@ public class PubnubChannel extends Channel {
 	}
 
 	@Override
-	public void disconnect() {
+	public void unsubscribe() {
 		pubnub.unsubscribeAll();
 	}
 }

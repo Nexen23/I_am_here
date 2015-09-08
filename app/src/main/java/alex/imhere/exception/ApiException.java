@@ -21,9 +21,4 @@ public class ApiException extends Exception {
 	public ApiException(Throwable throwable) {
 		super(throwable);
 	}
-
-	@Override
-	public String getMessage() {
-		return String.format("[%s]", super.getMessage());
-	}
 }

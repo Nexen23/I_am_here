@@ -13,7 +13,7 @@
         android:padding="@dimen/padding_default"
         android:layout_weight="1">
 
-        <fragment android:id="@+id/fragment_status"
+        <fragment android:id="@+id/fragment_login"
 				  android:name="alex.imhere.fragment.LoginFragment_"
 				  tools:layout="@layout/fragment_status"
 				  android:layout_width="match_parent"

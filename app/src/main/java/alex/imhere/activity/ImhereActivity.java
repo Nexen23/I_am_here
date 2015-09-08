@@ -1,6 +1,7 @@
 package alex.imhere.activity;
 
 import android.animation.ValueAnimator;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.widget.FrameLayout;
@@ -95,27 +96,6 @@ public class ImhereActivity extends AppCompatActivity
 	}
 	//endregion
 
-	//region Fragments callbacks
-	@Override
-	public void onPreLogin() {}
-
-	@Override
-	public void onLogin(DyingUser currentUser) {
-		usersFragment.setCurrentUser(currentUser);
-		showUsersFragment(true);
-	}
-
-	@Override
-	public void onPreLogout() {
-		showUsersFragment(false);
-	}
-
-	@Override
-	public void onLogout() {
-		usersFragment.clearCurrentUser();
-	}
-	//endregion
-
 	//region Interfaces impls
 	@Override
 	public ServicesComponent getServicesComponent() {
@@ -125,6 +105,24 @@ public class ImhereActivity extends AppCompatActivity
 	@Override
 	public TimeTicker getTimeTicker() {
 		return timeTicker;
+	}
+
+	@Override
+	public void onPreLogin() { showUsersFragment(true); }
+
+	@Override
+	public void onLoginned(DyingUser currentUser) {
+		usersFragment.setCurrentUser(currentUser);
+	}
+
+	@Override
+	public void onPreLogout() {
+		showUsersFragment(false);
+	}
+
+	@Override
+	public void onLogouted() {
+		usersFragment.clearCurrentUser();
 	}
 	//endregion
 }

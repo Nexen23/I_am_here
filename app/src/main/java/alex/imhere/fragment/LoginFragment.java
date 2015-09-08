@@ -10,7 +10,6 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -43,6 +42,7 @@ import alex.imhere.service.domain.ticker.TimeTicker;
 import alex.imhere.service.domain.api.AuthApi;
 import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
+import alex.imhere.util.wrapper.UiToast;
 
 @EFragment(R.layout.fragment_status)
 public class LoginFragment extends Fragment implements TimeTicker.EventListener {
@@ -69,7 +69,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	@StringRes(R.string.ts_status_logining) String statusLogining;
 	@StringRes(R.string.ts_status_logouting) String statusLogouting;
 
-	@StringRes(R.string.login_failed) String loginFailed;
+	@StringRes(R.string.loginning_failed) String loginFailed;
 	//endregion
 
 	static final int LOGINNED_STATE = 1;
@@ -124,6 +124,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	public void onDetach() {
 		super.onDetach();
 		eventListener = null;
+		timeTickerOwner = null;
 	}
 
 	@Override
@@ -305,18 +306,14 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 			e.printStackTrace();
 
 			setState(LOGOUTED_STATE);
-			eventListener.onLogout();
-			getActivity().runOnUiThread(new Runnable() {
-				public void run() {
-					Toast.makeText(getActivity(), loginFailed + "  " + e.getMessage(), Toast.LENGTH_SHORT).show();
-				}
-			});
+			eventListener.onLogouted();
+			UiToast.Show(getActivity(), loginFailed, e.getMessage());
 			return;
 		}
 
 		scheduleLogoutAtCurrentUserDeath();
 		setState(LOGINNED_STATE);
-		eventListener.onLogin(currentUser);
+		eventListener.onLoginned(currentUser);
 	}
 
 	public synchronized void logout() {
@@ -330,7 +327,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 			authApi.logout(currentUser);
 			setCurrentUser(null);
 
-			eventListener.onLogout();
+			eventListener.onLogouted();
 			setState(LOGOUTED_STATE);
 		}
 	}
@@ -344,8 +341,8 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 
 	public interface EventListener {
 		void onPreLogin();
-		void onLogin(DyingUser currentUser);
+		void onLoginned(DyingUser currentUser);
 		void onPreLogout();
-		void onLogout();
+		void onLogouted();
 	}
 }

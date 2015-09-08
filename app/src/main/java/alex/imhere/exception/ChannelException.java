@@ -1,6 +1,9 @@
 package alex.imhere.exception;
 
 public class ChannelException extends Exception {
+	static public final String
+			CONNECT_ERROR = "cannot connect";
+
 	public ChannelException() {
 		super();
 	}

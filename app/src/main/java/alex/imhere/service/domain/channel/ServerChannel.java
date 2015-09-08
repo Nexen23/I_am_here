@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ChannelException;
-import alex.imhere.exception.ServerTunnelException;
 import alex.imhere.service.domain.parser.JsonParser;
 
 public class ServerChannel {
@@ -64,14 +63,14 @@ public class ServerChannel {
 		listener = null;
 	}
 
-	public final void connect() throws ServerTunnelException {
+	public final void connect() throws ChannelException {
 		try {
 			serverChannel.setListener(listenerAdapter);
 			serverChannel.connect();
 		} catch (ChannelException e) {
 			e.printStackTrace();
 			serverChannel.clearListener();
-			throw new ServerTunnelException(e);
+			throw e;
 		}
 	}
 	public final void disconnect() {

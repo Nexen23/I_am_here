@@ -24,7 +24,7 @@ import alex.imhere.R;
 import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.exception.ServerTunnelException;
+import alex.imhere.exception.ChannelException;
 import alex.imhere.service.component.ServicesComponent;
 import alex.imhere.service.domain.channel.ServerChannel;
 import alex.imhere.service.domain.ticker.TimeTicker;
@@ -207,7 +207,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		serverChannel.setListener(serverTunnelListener);
 		try {
 			serverChannel.connect();
-		} catch (ServerTunnelException e) {
+		} catch (ChannelException e) {
 			e.printStackTrace();
 		}
 

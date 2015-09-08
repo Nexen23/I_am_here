@@ -29,7 +29,7 @@ public class DateApi extends Api {
 			date = parser.fromJson(jsonDate, DateTime.class);
 		} catch (ParseException e) {
 			e.printStackTrace();
-			throw new ApiException("cannot get now date", e);
+			throw new ApiException(ApiException.GET_DATE_ERROR, e);
 		}
 		return date;
 	}

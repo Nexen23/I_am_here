@@ -59,7 +59,7 @@ public class PubnubChannel extends Channel {
 			pubnub.subscribe(CHANNEL_NAME, pubnubCallback);
 		} catch (PubnubException e) {
 			e.printStackTrace();
-			throw new ChannelException("cannot connect", e);
+			throw new ChannelException(ChannelException.CONNECT_ERROR, e);
 		}
 	}
 

@@ -31,7 +31,7 @@ public class UserApi extends Api {
 			users = parser.fromJson(jsonUsers, new TypeToken<List<DyingUser>>(){}.getType());
 		} catch (ParseException e) {
 			e.printStackTrace();
-			throw new ApiException("cannot get online users", e);
+			throw new ApiException(ApiException.GET_USERS_ERROR, e);
 		}
 		return users;
 	}

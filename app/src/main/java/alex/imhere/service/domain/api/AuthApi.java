@@ -28,7 +28,7 @@ public class AuthApi extends Api {
 			dyingUser = parser.fromJson(jsonObject, DyingUser.class);
 		} catch (ParseException e) {
 			e.printStackTrace();
-			throw new ApiException("cannot login", e);
+			throw new ApiException(ApiException.LOGIN_ERROR, e);
 		}
 		return dyingUser;
 	}

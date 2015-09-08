@@ -9,8 +9,6 @@ import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ChannelException;
 import alex.imhere.exception.ServerTunnelException;
 import alex.imhere.service.domain.parser.JsonParser;
-import alex.imhere.util.AbstractResumable;
-import alex.imhere.util.Resumable;
 
 public class ServerChannel {
 	Logger l = LoggerFactory.getLogger(ServerChannel.class);

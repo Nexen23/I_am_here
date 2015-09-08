@@ -5,8 +5,8 @@ import android.support.annotation.NonNull;
 import org.joda.time.DateTime;
 
 class TemporaryElement<T> implements Comparable {
-	protected T object = null;
-	protected DateTime deathTime;
+	protected final T object;
+	protected final DateTime deathTime;
 
 	public TemporaryElement(@NonNull T object, @NonNull DateTime deathTime) {
 		this.deathTime = deathTime;
@@ -18,7 +18,7 @@ class TemporaryElement<T> implements Comparable {
 	}
 
 	@Override
-	public boolean equals(@NonNull Object o) {
+	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 

@@ -22,7 +22,7 @@ public class AuthApi extends Api {
 	}
 
 	public DyingUser login(@NonNull final String udid) throws ApiException {
-		DyingUser dyingUser = null;
+		DyingUser dyingUser;
 		try {
 			String jsonObject = ParseCloud.callFunction(API_Login, constructRequestForUser(udid));
 			dyingUser = parser.fromJson(jsonObject, DyingUser.class);

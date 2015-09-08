@@ -7,7 +7,7 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 public abstract class Listenable<TEventListener extends Listenable.EventListener> {
-	private WeakHashMap<TEventListener, Void> listeners = new WeakHashMap<>();
+	private final WeakHashMap<TEventListener, Void> listeners = new WeakHashMap<>();
 	protected TEventListener notifier;
 
 	public void addListener(@Nullable final TEventListener listener) {

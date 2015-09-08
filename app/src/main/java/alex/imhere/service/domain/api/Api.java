@@ -7,8 +7,8 @@ import java.util.Map;
 
 import alex.imhere.service.domain.parser.JsonParser;
 
-public abstract class Api {
-	JsonParser parser;
+abstract class Api {
+	final JsonParser parser;
 
 	Api(JsonParser parser) {
 		this.parser = parser;

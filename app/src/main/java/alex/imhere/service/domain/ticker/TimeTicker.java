@@ -14,7 +14,7 @@ public class TimeTicker extends Listenable<TimeTicker.EventListener> {
 	long tickingPeriodMs;
 	boolean doInstantTickOnStart;
 
-	Handler uiHandler = new Handler(Looper.getMainLooper());
+	final Handler uiHandler = new Handler(Looper.getMainLooper());
 	final Timer tickingTimer = new Timer();
 	TimerTask tickingTask;
 

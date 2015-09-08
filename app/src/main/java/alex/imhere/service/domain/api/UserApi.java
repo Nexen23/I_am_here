@@ -25,7 +25,7 @@ public class UserApi extends Api {
 	}
 
 	public final ArrayList<DyingUser> getOnlineUsers(@NonNull final DyingUser dyingUser) throws ApiException {
-		ArrayList<DyingUser> users = null;
+		ArrayList<DyingUser> users;
 		try {
 			String jsonUsers = ParseCloud.callFunction(API_GetOnlineUsers, constructRequestForUser(dyingUser.getUdid()));
 			users = parser.fromJson(jsonUsers, new TypeToken<List<DyingUser>>(){}.getType());

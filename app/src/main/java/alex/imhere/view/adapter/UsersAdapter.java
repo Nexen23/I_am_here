@@ -16,9 +16,9 @@ import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.view.UserLayout;
 
 public class UsersAdapter extends ArrayAdapter<DyingUser> {
-	private final int resourceId;
-	private Context context;
-	List<DyingUser> items;
+	final int resourceId;
+	final Context context;
+	final List<DyingUser> items;
 
 	public UsersAdapter(Activity activity, int item_user, List<DyingUser> items) {
 		super(activity, item_user, items);

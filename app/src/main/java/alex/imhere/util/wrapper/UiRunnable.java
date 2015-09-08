@@ -7,8 +7,8 @@ import android.support.annotation.Nullable;
 import java.lang.ref.WeakReference;
 
 public class UiRunnable implements Runnable {
-	WeakReference<Runnable> taskRef;
-	Handler uiHandler = new Handler(Looper.getMainLooper());
+	final WeakReference<Runnable> taskRef;
+	final Handler uiHandler = new Handler(Looper.getMainLooper());
 
 	public UiRunnable(@Nullable Runnable task) {
 		this.taskRef = new WeakReference<>(task);

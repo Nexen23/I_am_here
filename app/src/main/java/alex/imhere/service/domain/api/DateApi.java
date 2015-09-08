@@ -23,7 +23,7 @@ public class DateApi extends Api {
 	}
 
 	public DateTime getNow(@NonNull final DyingUser dyingUser) throws ApiException {
-		DateTime date = null;
+		DateTime date;
 		try {
 			String jsonDate = ParseCloud.callFunction(API_GetNow, constructRequestForUser(dyingUser.getUdid()));
 			date = parser.fromJson(jsonDate, DateTime.class);

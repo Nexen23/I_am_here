@@ -13,7 +13,7 @@ import org.joda.time.DateTime;
 import java.lang.reflect.Type;
 
 public class GsonJsonParser implements JsonParser {
-	private Gson gson;
+	private final Gson gson;
 
 	public GsonJsonParser() {
 		JsonDeserializer<DateTime> deserializer = new JsonDeserializer<DateTime>() {

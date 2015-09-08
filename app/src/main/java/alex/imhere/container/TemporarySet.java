@@ -17,8 +17,8 @@ import alex.imhere.util.Resumable;
 import alex.imhere.util.time.TimeUtils;
 
 public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> implements Resumable {
-	protected SortedSet<TemporaryElement<TItem>> sortedElementsSet = new TreeSet<>();
-	protected List<TItem> list = new ArrayList<>();
+	protected final SortedSet<TemporaryElement<TItem>> sortedElementsSet = new TreeSet<>();
+	protected final List<TItem> list = new ArrayList<>();
 
 	protected final Timer timer = new Timer();
 	protected TimerTask timerTask = null;

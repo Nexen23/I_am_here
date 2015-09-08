@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.androidannotations.annotations.EBean;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import alex.imhere.util.time.TimeUtils;
@@ -12,18 +11,14 @@ import alex.imhere.util.time.TimeUtils;
 public class DyingUser {
 	//region Fields
 	@SerializedName("udid")
-	String udid = "";
+	private	String udid = "";
 	@SerializedName("loginedAt")
-	DateTime loginedAt = new DateTime(0);
+	private	DateTime loginedAt = new DateTime(0);
 	@SerializedName("aliveTo")
-	DateTime aliveTo = new DateTime(0);
+	private	DateTime aliveTo = new DateTime(0);
 	//endregion
 
 	//region Ctors
-	public DyingUser() {
-	}
-
-
 	protected DyingUser(DyingUser dyingUser) {
 		this(dyingUser.udid, dyingUser.loginedAt, dyingUser.aliveTo);
 	}
@@ -36,11 +31,11 @@ public class DyingUser {
 	//endregion
 
 	//region Setters/getters
-	protected void setLoginedAt(DateTime loginedAt) {
+	public void setLoginedAt(DateTime loginedAt) {
 		this.loginedAt = loginedAt;
 	}
 
-	protected void setAliveTo(DateTime aliveTo) {
+	public void setAliveTo(DateTime aliveTo) {
 		this.aliveTo = aliveTo;
 	}
 

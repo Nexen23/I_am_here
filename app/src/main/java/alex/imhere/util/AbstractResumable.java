@@ -1,7 +1,7 @@
 package alex.imhere.util;
 
 public abstract class AbstractResumable implements Resumable {
-	boolean isResumed = false;
+	private boolean isResumed = false;
 
 	@Override
 	public boolean isResumed() {

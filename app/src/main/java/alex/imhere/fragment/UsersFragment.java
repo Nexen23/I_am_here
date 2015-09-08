@@ -35,7 +35,7 @@ import alex.imhere.view.adapter.UsersAdapter;
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
 public class UsersFragment extends ListFragment implements TimeTicker.EventListener {
 	//region Fields
-	Logger l = LoggerFactory.getLogger(UsersFragment.class);
+	final Logger l = LoggerFactory.getLogger(UsersFragment.class);
 	Tracker tracker;
 
 	@Inject	UserApi userApi;
@@ -132,7 +132,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	public void updateOnlineUsers() {
 		l.info("updateing online users");
 		if (isCurrentUserAlive()) {
-			List<DyingUser> onlineUsers = null;
+			List<DyingUser> onlineUsers;
 			try {
 				onlineUsers = userApi.getOnlineUsers(currentUser);
 				for (DyingUser dyingUser : onlineUsers) {

@@ -3,11 +3,10 @@ package alex.imhere.service.domain.channel;
 import android.support.annotation.NonNull;
 
 import alex.imhere.exception.ChannelException;
-import alex.imhere.util.AbstractResumable;
 
 public abstract class Channel {
 	private String name;
-	protected Channel.EventListener listener;
+	Channel.EventListener listener;
 
 	public final void setListener(@NonNull Channel.EventListener listener) {
 		this.listener = listener;

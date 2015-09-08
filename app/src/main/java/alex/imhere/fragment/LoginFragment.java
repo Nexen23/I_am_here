@@ -10,6 +10,7 @@ import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -67,6 +68,8 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	@StringRes(R.string.ts_status_logouted) String statusLogouted;
 	@StringRes(R.string.ts_status_logining) String statusLogining;
 	@StringRes(R.string.ts_status_logouting) String statusLogouting;
+
+	@StringRes(R.string.login_failed) String loginFailed;
 	//endregion
 
 	static final int LOGINNED_STATE = 1;
@@ -298,14 +301,22 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 
 		try {
 			setCurrentUser(authApi.login(udid));
-		} catch (ApiException e) {
+		} catch (final ApiException e) {
 			e.printStackTrace();
-			setState(LOGOUTED_STATE);
-		}
-		scheduleLogoutAtCurrentUserDeath();
 
-		eventListener.onLogin(currentUser);
+			setState(LOGOUTED_STATE);
+			eventListener.onLogout();
+			getActivity().runOnUiThread(new Runnable() {
+				public void run() {
+					Toast.makeText(getActivity(), loginFailed + "  " + e.getMessage(), Toast.LENGTH_SHORT).show();
+				}
+			});
+			return;
+		}
+
+		scheduleLogoutAtCurrentUserDeath();
 		setState(LOGINNED_STATE);
+		eventListener.onLogin(currentUser);
 	}
 
 	public synchronized void logout() {

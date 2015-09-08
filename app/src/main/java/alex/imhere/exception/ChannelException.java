@@ -19,4 +19,9 @@ public class ChannelException extends Exception {
 	public ChannelException(Throwable throwable) {
 		super(throwable);
 	}
+
+	@Override
+	public String getMessage() {
+		return String.format("[%s]", super.getMessage());
+	}
 }

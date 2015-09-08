@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="non_initialized">_ERROR_</string>
+
+	<string name="crash_message">App has just crashed.. Sorry!</string>
+	<string name="login_failed">Failed to login :(</string>
+</resources>

@@ -6,7 +6,6 @@ public class ApiException extends Exception {
 			GET_USERS_ERROR = "cannot get online users",
 			GET_DATE_ERROR = "cannot get now date";
 
-
 	public ApiException() {
 		super();
 	}
@@ -21,5 +20,10 @@ public class ApiException extends Exception {
 
 	public ApiException(Throwable throwable) {
 		super(throwable);
+	}
+
+	@Override
+	public String getMessage() {
+		return String.format("[%s]", super.getMessage());
 	}
 }

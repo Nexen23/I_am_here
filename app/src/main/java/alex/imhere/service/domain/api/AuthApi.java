@@ -2,6 +2,7 @@ package alex.imhere.service.domain.api;
 
 import android.support.annotation.NonNull;
 
+import com.parse.Parse;
 import com.parse.ParseCloud;
 import com.parse.ParseException;
 

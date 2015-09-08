@@ -37,10 +37,9 @@ import alex.imhere.ImhereApplication;
 import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.service.component.ComponentOwner;
+import alex.imhere.service.component.ServicesComponent;
 import alex.imhere.service.domain.ticker.TimeTicker;
 import alex.imhere.service.domain.api.AuthApi;
-import alex.imhere.service.domain.ticker.TimeTickerOwner;
 import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
 
@@ -80,7 +79,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	/*@InstanceState */DyingUser currentUser;
 
 	@Inject AuthApi authApi;
-	TimeTickerOwner timeTickerOwner;
+	TimeTicker.Owner timeTickerOwner;
 
 	Timer timer = new Timer();
 	TimerTask logoutTask;
@@ -110,8 +109,8 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 		super.onAttach(activity);
 		try {
 			eventListener = (EventListener) activity;
-			timeTickerOwner = (TimeTickerOwner) activity;
-			((ComponentOwner) activity).getServicesComponent().inject(this);
+			timeTickerOwner = (TimeTicker.Owner) activity;
+			((ServicesComponent.Owner) activity).getServicesComponent().inject(this);
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
 					+ " must implement EventListener & TimeTickerOwner & ComponentOwner");
@@ -199,7 +198,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	}
 
 	@UiThread
-	void updateTimer() {
+	void updateLifetime() {
 		switch (state) {
 			case LOGINNED_STATE :
 				if (!isStateNotChanged()) {
@@ -233,7 +232,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 
 		updateStatus();
 		updateImhereButton();
-		updateTimer();
+		updateLifetime();
 	}
 
 	boolean isStateNotChanged() {

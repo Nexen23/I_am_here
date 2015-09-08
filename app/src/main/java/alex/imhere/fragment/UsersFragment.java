@@ -25,12 +25,11 @@ import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
 import alex.imhere.exception.ServerTunnelException;
-import alex.imhere.service.component.ComponentOwner;
+import alex.imhere.service.component.ServicesComponent;
 import alex.imhere.service.domain.ticker.TimeTicker;
 import alex.imhere.service.domain.api.UserApi;
 import alex.imhere.service.domain.channel.ServerTunnel;
 import alex.imhere.service.domain.parser.JsonParser;
-import alex.imhere.service.domain.ticker.TimeTickerOwner;
 import alex.imhere.view.adapter.UsersAdapter;
 
 @EFragment(value = R.layout.fragment_users, forceLayoutInjection = true)
@@ -42,7 +41,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	@Inject	UserApi userApi;
 	@Inject ServerTunnel serverTunnel;
 	@Inject JsonParser jsonParser;
-	TimeTickerOwner timeTickerOwner;
+	TimeTicker.Owner owner;
 
 	DyingUser currentUser;
 	TemporarySet<DyingUser> usersTempSet = new TemporarySet<>();
@@ -66,11 +65,11 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		try {
-			timeTickerOwner = (TimeTickerOwner) activity;
-			((ComponentOwner) activity).getServicesComponent().inject(this);
+			owner = (TimeTicker.Owner) activity;
+			((ServicesComponent.Owner) activity).getServicesComponent().inject(this);
 		} catch (ClassCastException e) {
 			throw new ClassCastException(activity.toString()
-					+ " must implement TimeTickerOwner & ComponentOwner");
+					+ " must implement Owner & ComponentOwner");
 		}
 	}
 
@@ -212,11 +211,11 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 			e.printStackTrace();
 		}
 
-		timeTickerOwner.getTimeTicker().addListener(this);
+		owner.getTimeTicker().addListener(this);
 	}
 
 	void stopListeningEvents() {
-		timeTickerOwner.getTimeTicker().removeListener(this);
+		owner.getTimeTicker().removeListener(this);
 
 		serverTunnel.clearListener();
 		serverTunnelListener = null;

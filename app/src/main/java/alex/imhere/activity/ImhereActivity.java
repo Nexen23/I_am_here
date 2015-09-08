@@ -19,15 +19,13 @@ import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.fragment.LoginFragment;
 import alex.imhere.fragment.UsersFragment;
-import alex.imhere.service.component.ComponentOwner;
 import alex.imhere.service.component.DaggerServicesComponent;
 import alex.imhere.service.component.ServicesComponent;
 import alex.imhere.service.domain.ticker.TimeTicker;
-import alex.imhere.service.domain.ticker.TimeTickerOwner;
 
 @EActivity(R.layout.activity_main)
 public class ImhereActivity extends AppCompatActivity
-		implements ComponentOwner, TimeTickerOwner,
+		implements ServicesComponent.Owner, TimeTicker.Owner,
 		LoginFragment.EventListener {
 	//region Fields
 	Logger l = LoggerFactory.getLogger(ImhereActivity.class);

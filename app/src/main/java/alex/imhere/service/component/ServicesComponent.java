@@ -20,4 +20,8 @@ public interface ServicesComponent {
 	void inject(LoginFragment fragment);
 
 	void inject(ImhereActivity activity);
+
+	interface Owner {
+		ServicesComponent getServicesComponent();
+	}
 }

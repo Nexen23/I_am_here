@@ -70,4 +70,8 @@ public class TimeTicker extends Listenable<TimeTicker.EventListener> {
 	public interface EventListener extends Listenable.EventListener {
 		void onSecondTick();
 	}
+
+	public interface Owner {
+		TimeTicker getTimeTicker();
+	}
 }

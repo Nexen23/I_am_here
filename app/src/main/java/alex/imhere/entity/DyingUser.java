@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.androidannotations.annotations.EBean;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
 import alex.imhere.util.time.TimeUtils;

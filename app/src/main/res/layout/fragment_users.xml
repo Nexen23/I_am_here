@@ -11,15 +11,61 @@
 			  android:layout_gravity="center_horizontal">
 	</TextView>
 
+	<RelativeLayout
+		android:id="@id/android:empty"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		android:orientation="vertical">
+
+		<TextView
+			android:id="@+id/lv_no_users"
+			android:text="@string/lv_no_users"
+			android:textIsSelectable="false"
+			android:gravity="center"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:visibility="gone"
+			android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
+
+		<TextView
+			android:id="@+id/lv_loading_error"
+			android:text="@string/lv_loading_error"
+			android:textIsSelectable="false"
+			android:gravity="center"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:visibility="gone"
+			android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
+
+		<LinearLayout
+			android:id="@+id/lv_loading_users"
+			android:orientation="vertical"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			android:gravity="center">
+
+			<ProgressBar
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:indeterminate="true"
+				android:layout_gravity="center"/>
+
+			<TextView
+				android:id="@+id/textView"
+				android:text="@string/lv_loading_users"
+				android:textIsSelectable="false"
+				android:gravity="center"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+				android:layout_gravity="center"/>
+		</LinearLayout>
+
+	</RelativeLayout>
+
 	<ListView android:id="@id/android:list"
 			  android:layout_width="match_parent"
 			  android:layout_height="match_parent">
 	</ListView>
-	<TextView android:id="@id/android:empty"
-			  android:layout_width="match_parent"
-			  android:layout_height="match_parent"
-			  android:gravity="center"
-			  android:text="@string/lv_users_empty">
-	</TextView>
 
 </LinearLayout>

@@ -7,4 +7,6 @@
 	<string name="loginning_failed">Failed to login :(</string>
 	<string name="users_channel_connection_failed">Failed to connect to users-server :(</string>
 	<string name="users_channel_disconnection">Disconnected from users-server :(</string>
+
+	<string name="lv_loading_error">Loading users error :(</string>
 </resources>

@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
+import android.view.View;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
@@ -11,6 +12,8 @@ import com.google.android.gms.analytics.Tracker;
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.UiThread;
+import org.androidannotations.annotations.ViewById;
+import org.androidannotations.annotations.ViewsById;
 import org.androidannotations.annotations.res.StringRes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,6 +46,8 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	//region Resources
 	@StringRes(R.string.users_channel_connection_failed) String usersChannelConnectionFailed;
 	@StringRes(R.string.users_channel_disconnection) String usersChannelDisconnection;
+	@ViewsById({R.id.lv_loading_users, R.id.lv_no_users, R.id.lv_loading_error})
+	List<View> emptyListViews;
 	//endregion
 
 	@Inject	UserApi userApi;
@@ -61,6 +66,13 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	//endregion
 
 	//region Lifecycle
+	@AfterViews
+	public void onAfterViews() {
+		tracker = ImhereApplication.newScreenTracker("LoginFragment");
+
+		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
+	}
+
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
@@ -85,17 +97,11 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		setListAdapter(usersAdapter);
 	}
 
-	@AfterViews
-	public void onAfterViews() {
-		tracker = ImhereApplication.newScreenTracker("LoginFragment");
-
-		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
-	}
-
 	@Override
 	public void onResume() {
 		super.onResume();
 		if (isCurrentUserAlive()) {
+			setEmptyListView(R.id.lv_loading_users);
 			startListeningEvents();
 			updateOnlineUsers();
 		}
@@ -132,7 +138,24 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	public void notifyUsersDataChanged() {
 		usersAdapter.notifyDataSetChanged();
 	}
+
+	@UiThread
+	public void setEmptyListView(int resId) {
+		for (View view : emptyListViews) {
+			if (view.getId() == resId) {
+				view.setVisibility(View.VISIBLE);
+			} else {
+				view.setVisibility(View.GONE);
+			}
+		}
+	}
 	//endregion
+
+	public void onErrorOccur(Exception e) {
+		setEmptyListView(R.id.lv_loading_error);
+		UiToast.Show(getActivity(), usersChannelConnectionFailed, e.getMessage());
+		stopListeningEvents();
+	}
 
 	public void updateOnlineUsers() {
 		l.info("updateing online users");
@@ -146,9 +169,9 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 				}
 			} catch (ApiException e) {
 				e.printStackTrace();
+				onErrorOccur(e);
 			}
 		}
-		//notifier.onUsersUpdate();
 	}
 
 	public boolean isCurrentUserAlive() {
@@ -210,27 +233,20 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 				boolean wasRemoved = usersTempSet.remove(dyingUser);
 			}
 		};
-		serverChannel.setListener(serverTunnelListener);
+
 
 		final UsersFragment usersFragment = this;
-		new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					Thread.sleep(2500); /*getListView().setEmptyView(view);*/
-					serverChannel.subscribe(); // TODO: 08.09.2015 do it in Loader
-				} catch (ChannelException e) {
-					e.printStackTrace();
-					UiToast.Show(getActivity(), usersChannelConnectionFailed, e.getMessage());
-					stopListeningEvents();
-					return;
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 
-				timeTickerOwner.getTimeTicker().addListener(usersFragment);
-			}
-		}).start();
+		try {
+			serverChannel.setListener(serverTunnelListener);
+			serverChannel.subscribe(); // TODO: 08.09.2015 do it in Loader
+		} catch (Exception e) {
+			e.printStackTrace();
+			onErrorOccur(e);
+			return;
+		}
+
+		timeTickerOwner.getTimeTicker().addListener(usersFragment);
 	}
 
 	void stopListeningEvents() {

@@ -10,6 +10,7 @@
     <string name="ts_status_logining"> Logining…</string>
     <string name="ts_status_logouting"> Loging out…</string>
 
-    <string name="lv_users_empty">No users</string>
+    <string name="lv_no_users">No users</string>
+    <string name="lv_loading_users">Loading…</string>
     <string name="lv_users_header">Online users</string>
 </resources>

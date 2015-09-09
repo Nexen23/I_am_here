@@ -217,16 +217,16 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 			@Override
 			public void run() {
 				try {
-					//Thread.sleep(2500); /*getListView().setEmptyView(view);*/
+					Thread.sleep(2500); /*getListView().setEmptyView(view);*/
 					serverChannel.subscribe(); // TODO: 08.09.2015 do it in Loader
 				} catch (ChannelException e) {
 					e.printStackTrace();
 					UiToast.Show(getActivity(), usersChannelConnectionFailed, e.getMessage());
 					stopListeningEvents();
 					return;
-				} /*catch (InterruptedException e) {
+				} catch (InterruptedException e) {
 					e.printStackTrace();
-				}*/
+				}
 
 				timeTickerOwner.getTimeTicker().addListener(usersFragment);
 			}

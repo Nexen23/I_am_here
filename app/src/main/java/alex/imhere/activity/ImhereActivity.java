@@ -108,11 +108,13 @@ public class ImhereActivity extends AppCompatActivity
 	}
 
 	@Override
-	public void onPreLogin() { showUsersFragment(true); }
+	public void onPreLogin() {
+	}
 
 	@Override
 	public void onLoginned(DyingUser currentUser) {
 		usersFragment.setCurrentUser(currentUser);
+		showUsersFragment(true);
 	}
 
 	@Override

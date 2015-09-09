@@ -217,15 +217,6 @@ Parse.Cloud.afterSave(sessionObjName, function(request) { // jshint ignore:line
 	SendEvent(request.object);
 });
 
-/*Parse.Cloud.afterDelete(sessionObjName, function(request) { // jshint ignore:line
-    "use strict";
-
-    //request.object.set("aliveTo", request.object.get("loginedAt"));
-	request.object.set("loginedAt", request.object.get("aliveTo"));
-    SendEvent(request.object);
-});*/
-
-
 // API definitions
 Parse.Cloud.define("GetNow", API_GetNow); // jshint ignore:line
 

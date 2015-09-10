@@ -2,6 +2,7 @@ package alex.imhere.fragment;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.view.View;
@@ -10,6 +11,7 @@ import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.UiThread;
@@ -103,7 +105,6 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		super.onResume();
 		if (isCurrentUserExist()) {
 			startListeningEvents();
-			updateOnlineUsers();
 		}
 
 		tracker.send(new HitBuilders.ScreenViewBuilder().build());
@@ -157,19 +158,14 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		stopListeningEvents();
 	}
 
-	public void updateOnlineUsers() {
+	public void updateOnlineUsers() throws ApiException {
 		l.info("updateing online users");
 		if (isCurrentUserAlive()) {
 			List<DyingUser> onlineUsers;
-			try {
-				onlineUsers = userApi.getOnlineUsers(currentUser);
-				for (DyingUser dyingUser : onlineUsers) {
-					boolean wasAdded = usersTempSet.add(dyingUser, dyingUser.getAliveTo());
-					l.info("User: {} was added ({})", dyingUser.getUdid(), Boolean.valueOf(wasAdded).toString());
-				}
-			} catch (ApiException e) {
-				e.printStackTrace();
-				onErrorOccur(e);
+			onlineUsers = userApi.getOnlineUsers(currentUser);
+			for (DyingUser dyingUser : onlineUsers) {
+				boolean wasAdded = usersTempSet.add(dyingUser, dyingUser.getAliveTo());
+				l.info("User: {} was added ({})", dyingUser.getUdid(), Boolean.valueOf(wasAdded).toString());
 			}
 		}
 	}
@@ -180,13 +176,14 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	}
 
 	public boolean isCurrentUserExist() {
-		return currentUser != null;
+		return getCurrentUser() != null;
 	}
 
 	public DyingUser getCurrentUser() {
 		return currentUser;
 	}
 
+	@Background
 	public void clearCurrentUser() {
 		stopListeningEvents();
 		currentUser = null;
@@ -194,12 +191,13 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		clearUsers();
 	}
 
-	public void setCurrentUser(@Nullable DyingUser user) {
+	@Background
+	public void setCurrentUser(@NonNull DyingUser user) {
 		currentUser = user;
 		startListeningEvents();
-		updateOnlineUsers();
 	}
 
+	@Background
 	void startListeningEvents() {
 		timeTickerOwner.getTimeTicker().addListener(this);
 
@@ -230,12 +228,12 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 			}
 
 			@Override
-			public void onUserLogin(DyingUser dyingUser) {
+			public void onUserLogin(@NonNull DyingUser dyingUser) {
 				boolean wasAdded = usersTempSet.add(dyingUser, dyingUser.getAliveTo());
 			}
 
 			@Override
-			public void onUserLogout(DyingUser dyingUser) {
+			public void onUserLogout(@NonNull DyingUser dyingUser) {
 				boolean wasRemoved = usersTempSet.remove(dyingUser);
 			}
 		};
@@ -244,6 +242,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 			setEmptyListView(R.id.lv_loading_users);
 			serverChannel.setListener(serverTunnelListener);
 			serverChannel.subscribe(); // TODO: 08.09.2015 do it in Loader
+			updateOnlineUsers();
 		} catch (Exception e) {
 			e.printStackTrace();
 			onErrorOccur(e);

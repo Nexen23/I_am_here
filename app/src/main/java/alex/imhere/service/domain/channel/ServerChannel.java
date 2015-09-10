@@ -91,7 +91,7 @@ public class ServerChannel {
 
 	public interface EventListener {
 		void onDisconnect(String reason);
-		void onUserLogin(DyingUser dyingUser);
-		void onUserLogout(DyingUser dyingUser);
+		void onUserLogin(@NonNull DyingUser dyingUser);
+		void onUserLogout(@NonNull DyingUser dyingUser);
 	}
 }

@@ -272,7 +272,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	}
 
 	public boolean isCurrentUserExist() {
-		return currentUser != null;
+		return getCurrentUser() != null;
 	}
 
 	public void scheduleLogoutAtCurrentUserDeath() {
@@ -296,7 +296,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	}
 
 	@Background
-	public synchronized final void login() {
+	public void login() {
 		setState(LOGINING_STATE);
 		eventListener.onPreLogin();
 
@@ -317,7 +317,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	}
 
 	@Background
-	public synchronized void logout() {
+	public void logout() {
 		DyingUser currentUser = getCurrentUser();
 		if (currentUser != null) {
 			setState(LOGOUTING_STATE);

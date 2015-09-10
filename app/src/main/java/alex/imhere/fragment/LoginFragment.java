@@ -107,7 +107,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 
 	@AfterViews
 	public void onAfterViews() {
-		tracker = ImhereApplication.newScreenTracker("LoginFragment");
+		tracker = ImhereApplication.newScreenTracker(this.getClass().getSimpleName());
 		udid = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
 		constructStatusTextSwitcher();
 	}
@@ -138,8 +138,6 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 		timeTickerOwner.getTimeTicker().addListener(this);
 		setState(state);
 		scheduleLogoutAtCurrentUserDeath();
-
-		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 
 	@Override
@@ -147,8 +145,6 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 		super.onPause();
 		cancelLogoutAtCurrentUserDeath();
 		timeTickerOwner.getTimeTicker().removeListener(this);
-
-		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 	//endregion
 

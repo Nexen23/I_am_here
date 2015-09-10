@@ -71,7 +71,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	//region Lifecycle
 	@AfterViews
 	public void onAfterViews() {
-		tracker = ImhereApplication.newScreenTracker("LoginFragment");
+		tracker = ImhereApplication.newScreenTracker(this.getClass().getSimpleName());
 
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
 	}
@@ -106,16 +106,12 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		if (isCurrentUserExist()) {
 			startListeningEvents();
 		}
-
-		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
 		stopListeningEvents();
-
-		tracker.send(new HitBuilders.ScreenViewBuilder().build());
 	}
 	//endregion
 

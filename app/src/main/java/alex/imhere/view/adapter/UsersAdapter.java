@@ -30,6 +30,10 @@ public class UsersAdapter extends ArrayAdapter<DyingUser> {
 
 	@Override
 	public void add(DyingUser insertingDyingUser) {
+		sortedInsert(insertingDyingUser);
+	}
+
+	private void sortedInsert(DyingUser insertingDyingUser) {
 		if (getCount() == 0) {
 			super.add(insertingDyingUser);
 		} else {

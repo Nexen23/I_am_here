@@ -80,11 +80,12 @@ public class ServerChannel {
 
 	public void onMessageRecieve(String userJson, String timetoken) {
 		DyingUser dyingUser = jsonParser.fromJson(userJson, DyingUser.class);
-		if (dyingUser != null) {
+		EventListener localListener = listener;
+		if (dyingUser != null && localListener != null) {
 			if (dyingUser.isAlive()) {
-				listener.onUserLogin(dyingUser);
+				localListener.onUserLogin(dyingUser);
 			} else {
-				listener.onUserLogout(dyingUser);
+				localListener.onUserLogout(dyingUser);
 			}
 		}
 	}

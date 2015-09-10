@@ -27,9 +27,9 @@ public class ImhereApplicationTest extends ApplicationTestCase<ImhereApplication
 	}
 
 	public void testGetOnlineUsers() throws Exception {
-		/*DyingUser dyingUser = userApi.login(udid);
+		/*DyingUser dyingUser = userApi.loginInBackground(udid);
 		ArrayList<DyingUser> users = userApi.getOnlineUsers(dyingUser);
-		userApi.logout(dyingUser);
+		userApi.logoutInBackground(dyingUser);
 
 		assertEquals("Must be only one user", 1, users.size());*/
 	}

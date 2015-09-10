@@ -2,19 +2,15 @@ package alex.imhere.fragment;
 
 import android.app.Activity;
 import android.graphics.drawable.TransitionDrawable;
-import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.LoaderManager;
-import android.support.v4.content.Loader;
 import android.view.View;
 import android.view.animation.Animation;
 import android.widget.Button;
 import android.widget.TextSwitcher;
 import android.widget.TextView;
 
-import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.skyfishjy.library.RippleBackground;
 
@@ -32,7 +28,6 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -248,9 +243,9 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	@Click(R.id.b_imhere)
 	void imhereButtonClick() {
 		if (isCurrentUserAlive()) {
-			logout();
+			logoutInBackground();
 		} else {
-			login();
+			loginInBackground();
 		}
 	}
 
@@ -276,7 +271,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 			logoutTask = new TimerTask() {
 				@Override
 				public void run() {
-					logout();
+					logoutInBackground();
 				}
 			};
 			timer.schedule(logoutTask, getCurrentUser().getAliveTo().toDate());
@@ -292,7 +287,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	}
 
 	@Background
-	public void login() {
+	public void loginInBackground() {
 		setState(LOGINING_STATE);
 		eventListener.onPreLogin();
 
@@ -313,7 +308,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	}
 
 	@Background
-	public void logout() {
+	public void logoutInBackground() {
 		DyingUser currentUser = getCurrentUser();
 		if (currentUser != null) {
 			setState(LOGOUTING_STATE);

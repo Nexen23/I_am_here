@@ -3,7 +3,6 @@ package alex.imhere.activity;
 import alex.imhere.service.component.DaggerServicesComponent;
 import alex.imhere.service.component.ServicesComponent;
 import android.animation.ValueAnimator;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.widget.FrameLayout;
@@ -114,7 +113,7 @@ public class ImhereActivity extends AppCompatActivity
 
 	@Override
 	public void onLoginned(DyingUser currentUser) {
-		usersFragment.setCurrentUser(currentUser);
+		usersFragment.setCurrentUserAndStart(currentUser);
 		showUsersFragment(true);
 	}
 
@@ -125,7 +124,7 @@ public class ImhereActivity extends AppCompatActivity
 
 	@Override
 	public void onLogouted() {
-		usersFragment.clearCurrentUser();
+		usersFragment.clearCurrentUserAndStop();
 	}
 	//endregion
 }

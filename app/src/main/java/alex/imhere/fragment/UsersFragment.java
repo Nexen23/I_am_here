@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.view.View;
 
-import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 
 import org.androidannotations.annotations.AfterViews;
@@ -15,7 +14,6 @@ import org.androidannotations.annotations.Background;
 import org.androidannotations.annotations.EFragment;
 import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.UiThread;
-import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.ViewsById;
 import org.androidannotations.annotations.res.StringRes;
 import org.slf4j.Logger;
@@ -31,7 +29,6 @@ import alex.imhere.R;
 import alex.imhere.container.TemporarySet;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.exception.ApiException;
-import alex.imhere.exception.ChannelException;
 import alex.imhere.service.component.ServicesComponent;
 import alex.imhere.service.domain.channel.ServerChannel;
 import alex.imhere.service.domain.ticker.TimeTicker;
@@ -49,6 +46,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	//region Resources
 	@StringRes(R.string.users_channel_connection_failed) String usersChannelConnectionFailed;
 	@StringRes(R.string.users_channel_disconnection) String usersChannelDisconnection;
+	@StringRes(R.string.users_querying_failed) String usersQueryingFailed;
 	@ViewsById({R.id.lv_loading_users, R.id.lv_no_users, R.id.lv_loading_error})
 	List<View> emptyListViews;
 	//endregion
@@ -104,14 +102,15 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	public void onResume() {
 		super.onResume();
 		if (isCurrentUserExist()) {
-			startListeningEvents();
+			startListeningServer();
+			queryAndAddOnlineUsersInBackground();
 		}
 	}
 
 	@Override
 	public void onPause() {
 		super.onPause();
-		stopListeningEvents();
+		stopListeningServer();
 	}
 	//endregion
 
@@ -148,20 +147,29 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	}
 	//endregion
 
-	public void onErrorOccur(Exception e) {
+	public void onErrorOccur(String message, @Nullable Exception e) {
 		setEmptyListView(R.id.lv_loading_error);
-		UiToast.Show(getActivity(), usersChannelConnectionFailed, e.getMessage());
-		stopListeningEvents();
+		String exceptionMessage = ((e == null) ? "" : e.getMessage());
+		UiToast.Show(getActivity(), message, exceptionMessage);
+		l.error("message={}; exception={}", message, exceptionMessage);
+
+		stopListeningServer();
 	}
 
-	public void updateOnlineUsers() throws ApiException {
+	@Background
+	public void queryAndAddOnlineUsersInBackground() {
 		l.info("updateing online users");
 		if (isCurrentUserAlive()) {
 			List<DyingUser> onlineUsers;
-			onlineUsers = userApi.getOnlineUsers(currentUser);
-			for (DyingUser dyingUser : onlineUsers) {
-				boolean wasAdded = usersTempSet.add(dyingUser, dyingUser.getAliveTo());
-				l.info("User: {} was added ({})", dyingUser.getUdid(), Boolean.valueOf(wasAdded).toString());
+			try {
+				onlineUsers = userApi.getOnlineUsers(currentUser);
+				for (DyingUser dyingUser : onlineUsers) {
+					boolean wasAdded = usersTempSet.add(dyingUser, dyingUser.getAliveTo());
+					l.info("User: {} was added ({})", dyingUser.getUdid(), Boolean.valueOf(wasAdded).toString());
+				}
+			} catch (ApiException e) {
+				e.printStackTrace();
+				onErrorOccur(usersQueryingFailed, e);
 			}
 		}
 	}
@@ -179,22 +187,18 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		return currentUser;
 	}
 
-	@Background
-	public void clearCurrentUser() {
-		stopListeningEvents();
+	public void clearCurrentUserAndStop() {
+		stopListeningServer();
 		currentUser = null;
-		usersTempSet.clear();
-		clearUsers();
 	}
 
-	@Background
-	public void setCurrentUser(@NonNull DyingUser user) {
+	public void setCurrentUserAndStart(@NonNull DyingUser user) {
 		currentUser = user;
-		startListeningEvents();
+		startListeningServer();
+		queryAndAddOnlineUsersInBackground();
 	}
 
-	@Background
-	void startListeningEvents() {
+	void startListeningServer() {
 		timeTickerOwner.getTimeTicker().addListener(this);
 
 		usersTempSetListener = new TemporarySet.EventListener() {
@@ -219,18 +223,19 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		serverTunnelListener = new ServerChannel.EventListener() {
 			@Override
 			public void onDisconnect(String reason) {
-				UiToast.Show(getActivity(), usersChannelDisconnection);
-				stopListeningEvents();
+				onErrorOccur(usersChannelDisconnection, null);
 			}
 
 			@Override
 			public void onUserLogin(@NonNull DyingUser dyingUser) {
 				boolean wasAdded = usersTempSet.add(dyingUser, dyingUser.getAliveTo());
+				l.info("User: {} was added ({})", dyingUser.getUdid(), Boolean.valueOf(wasAdded).toString());
 			}
 
 			@Override
 			public void onUserLogout(@NonNull DyingUser dyingUser) {
 				boolean wasRemoved = usersTempSet.remove(dyingUser);
+				l.info("User: {} was removed ({})", dyingUser.getUdid(), Boolean.valueOf(wasRemoved).toString());
 			}
 		};
 
@@ -238,15 +243,14 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 			setEmptyListView(R.id.lv_loading_users);
 			serverChannel.setListener(serverTunnelListener);
 			serverChannel.subscribe(); // TODO: 08.09.2015 do it in Loader
-			updateOnlineUsers();
 		} catch (Exception e) {
 			e.printStackTrace();
-			onErrorOccur(e);
+			onErrorOccur(usersChannelConnectionFailed, e);
 			return;
 		}
 	}
 
-	void stopListeningEvents() {
+	void stopListeningServer() {
 		timeTickerOwner.getTimeTicker().removeListener(this);
 
 		serverChannel.clearListener();
@@ -256,6 +260,9 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		usersTempSet.removeListener(usersTempSetListener);
 		usersTempSetListener = null;
 		usersTempSet.pause();
+
+		usersTempSet.clear();
+		clearUsers();
 	}
 
 	//region Interfaces impls

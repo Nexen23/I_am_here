@@ -105,14 +105,15 @@
     <orderEntry type="library" exported="" name="apktool-lib-1.4.4-3" level="project" />
     <orderEntry type="library" exported="" name="aspectjrt-1.8.5" level="project" />
     <orderEntry type="library" exported="" name="gson-2.3.1" level="project" />
-    <orderEntry type="library" exported="" name="javax.annotation-10.0-b28" level="project" />
-    <orderEntry type="library" exported="" name="joda-time-2.8.2" level="project" />
     <orderEntry type="library" exported="" name="logback-android-core-1.1.1-4" level="project" />
+    <orderEntry type="library" exported="" name="joda-time-2.8.2" level="project" />
+    <orderEntry type="library" exported="" name="javax.annotation-10.0-b28" level="project" />
     <orderEntry type="library" exported="" name="support-v4-22.2.1" level="project" />
-    <orderEntry type="library" exported="" name="androidannotations-api-3.3.2" level="project" />
     <orderEntry type="library" exported="" name="slf4j-api-1.7.12" level="project" />
+    <orderEntry type="library" exported="" name="androidannotations-api-3.3.2" level="project" />
     <orderEntry type="library" exported="" name="hugo-runtime-1.2.1" level="project" />
     <orderEntry type="library" exported="" name="javax.inject-1" level="project" />
+    <orderEntry type="library" exported="" name="parceler-api-1.0.3" level="project" />
     <orderEntry type="library" exported="" name="hugo-annotations-1.2.1" level="project" />
     <orderEntry type="library" exported="" name="logback-android-classic-1.1.1-4" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-22.2.1" level="project" />

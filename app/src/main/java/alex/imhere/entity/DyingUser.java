@@ -1,14 +1,20 @@
 package alex.imhere.entity;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.androidannotations.annotations.EBean;
 import org.joda.time.DateTime;
 import org.joda.time.Duration;
+
+import javax.inject.Inject;
+
 import alex.imhere.util.time.TimeUtils;
 
-public class DyingUser {
+public class DyingUser implements Parcelable {
 	//region Fields
 	@SerializedName("udid")
 	private	String udid = "";
@@ -19,11 +25,15 @@ public class DyingUser {
 	//endregion
 
 	//region Ctors
-	protected DyingUser(DyingUser dyingUser) {
+	@Inject
+	public DyingUser() {
+	}
+
+	public DyingUser(DyingUser dyingUser) {
 		this(dyingUser.udid, dyingUser.loginedAt, dyingUser.aliveTo);
 	}
 
-	protected DyingUser(String udid, DateTime loginedAt, DateTime aliveTo) {
+	public DyingUser(String udid, DateTime loginedAt, DateTime aliveTo) {
 		setUdid(udid);
 		setLoginedAt(loginedAt);
 		setAliveTo(aliveTo);
@@ -92,5 +102,35 @@ public class DyingUser {
 	public int hashCode() {
 		return getUdid().hashCode();
 	}
+	//endregion
+
+	//region Parcelable
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(this.udid);
+		dest.writeSerializable(this.loginedAt);
+		dest.writeSerializable(this.aliveTo);
+	}
+
+	protected DyingUser(Parcel in) {
+		this.udid = in.readString();
+		this.loginedAt = (DateTime) in.readSerializable();
+		this.aliveTo = (DateTime) in.readSerializable();
+	}
+
+	public static final Parcelable.Creator<DyingUser> CREATOR = new Parcelable.Creator<DyingUser>() {
+		public DyingUser createFromParcel(Parcel source) {
+			return new DyingUser(source);
+		}
+
+		public DyingUser[] newArray(int size) {
+			return new DyingUser[size];
+		}
+	};
 	//endregion
 }

@@ -11,6 +11,7 @@ import com.google.android.gms.analytics.Tracker;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.EFragment;
+import org.androidannotations.annotations.InstanceState;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.androidannotations.annotations.ViewsById;
@@ -55,7 +56,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	@Inject JsonParser jsonParser;
 	TimeTicker.Owner timeTickerOwner;
 
-	DyingUser currentUser;
+	@InstanceState DyingUser currentUser;
 	TemporarySet<DyingUser> usersTempSet = new TemporarySet<>();
 
 	TemporarySet.EventListener usersTempSetListener;
@@ -100,8 +101,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	@Override
 	public void onResume() {
 		super.onResume();
-		if (isCurrentUserAlive()) {
-			setEmptyListView(R.id.lv_loading_users);
+		if (isCurrentUserExist()) {
 			startListeningEvents();
 			updateOnlineUsers();
 		}
@@ -176,7 +176,11 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 
 	public boolean isCurrentUserAlive() {
 		DyingUser currentUser = getCurrentUser();
-		return currentUser != null && currentUser.isAlive();
+		return isCurrentUserExist() && currentUser.isAlive();
+	}
+
+	public boolean isCurrentUserExist() {
+		return currentUser != null;
 	}
 
 	public DyingUser getCurrentUser() {
@@ -197,6 +201,8 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	}
 
 	void startListeningEvents() {
+		timeTickerOwner.getTimeTicker().addListener(this);
+
 		usersTempSetListener = new TemporarySet.EventListener() {
 			@Override
 			public void onCleared() {
@@ -234,10 +240,8 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 			}
 		};
 
-
-		final UsersFragment usersFragment = this;
-
 		try {
+			setEmptyListView(R.id.lv_loading_users);
 			serverChannel.setListener(serverTunnelListener);
 			serverChannel.subscribe(); // TODO: 08.09.2015 do it in Loader
 		} catch (Exception e) {
@@ -245,8 +249,6 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 			onErrorOccur(e);
 			return;
 		}
-
-		timeTickerOwner.getTimeTicker().addListener(usersFragment);
 	}
 
 	void stopListeningEvents() {

@@ -1,5 +1,7 @@
 package alex.imhere.activity;
 
+import alex.imhere.service.component.DaggerServicesComponent;
+import alex.imhere.service.component.ServicesComponent;
 import android.animation.ValueAnimator;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
@@ -20,8 +22,6 @@ import alex.imhere.R;
 import alex.imhere.entity.DyingUser;
 import alex.imhere.fragment.LoginFragment;
 import alex.imhere.fragment.UsersFragment;
-import alex.imhere.service.component.DaggerServicesComponent;
-import alex.imhere.service.component.ServicesComponent;
 import alex.imhere.service.domain.ticker.TimeTicker;
 
 @EActivity(R.layout.activity_main)
@@ -35,6 +35,7 @@ public class ImhereActivity extends AppCompatActivity
 	@Inject	TimeTicker timeTicker;
 
 	@InstanceState boolean usersFragmentIsShown = false;
+
 	@FragmentById(R.id.fragment_users) UsersFragment usersFragment;
 	//endregion
 
@@ -48,8 +49,8 @@ public class ImhereActivity extends AppCompatActivity
 	@Override
 	protected void onResumeFragments() {
 		timeTicker.start();
-		super.onResumeFragments();
 		showUsersFragment(usersFragmentIsShown);
+		super.onResumeFragments();
 	}
 
 	@Override

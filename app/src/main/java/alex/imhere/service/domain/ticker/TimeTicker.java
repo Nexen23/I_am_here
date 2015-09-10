@@ -3,6 +3,8 @@ package alex.imhere.service.domain.ticker;
 import android.os.Handler;
 import android.os.Looper;
 
+import org.androidannotations.annotations.EBean;
+
 import java.util.Timer;
 import java.util.TimerTask;
 

@@ -28,6 +28,7 @@ import org.joda.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -76,10 +77,10 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	static final int LOGOUTED_STATE = 2;
 	static final int LOGINING_STATE = 3;
 	static final int LOGOUTING_STATE = 4;
-	@InstanceState int state = LOGOUTED_STATE, prevState = LOGOUTED_STATE;
 
+	@InstanceState int state = LOGOUTED_STATE, prevState = LOGOUTED_STATE;
 	@InstanceState String udid;
-	/*@InstanceState */DyingUser currentUser;
+	@InstanceState DyingUser currentUser;
 
 	@Inject AuthApi authApi;
 	TimeTicker.Owner timeTickerOwner;
@@ -130,8 +131,8 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	@Override
 	public void onResume() {
 		super.onResume();
-		setState(state);
 		timeTickerOwner.getTimeTicker().addListener(this);
+		setState(state);
 		scheduleLogoutAtCurrentUserDeath();
 
 		tracker.send(new HitBuilders.ScreenViewBuilder().build());
@@ -273,11 +274,15 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 
 	public boolean isCurrentUserAlive() {
 		DyingUser currentUser = getCurrentUser();
-		return currentUser != null && currentUser.isAlive();
+		return isCurrentUserExist() && currentUser.isAlive();
+	}
+
+	public boolean isCurrentUserExist() {
+		return currentUser != null;
 	}
 
 	public void scheduleLogoutAtCurrentUserDeath() {
-		if (isCurrentUserAlive()) {
+		if (isCurrentUserExist()) {
 			logoutTask = new TimerTask() {
 				@Override
 				public void run() {

@@ -38,9 +38,6 @@ public class ImhereActivity extends AppCompatActivity
 	@FragmentById(R.id.fragment_users) UsersFragment usersFragment;
 	//endregion
 
-	final int MEMORY_MB = 1024*1024;
-	byte[] TEST_MEMORY_LEAK = new byte[5 * MEMORY_MB];
-
 	//region Lifecycle
 	public ImhereActivity() {
 		super();

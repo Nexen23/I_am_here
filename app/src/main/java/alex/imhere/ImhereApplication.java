@@ -1,12 +1,15 @@
 package alex.imhere;
 
 import android.app.Application;
+import android.content.Context;
 
 import com.google.android.gms.analytics.GoogleAnalytics;
 import com.google.android.gms.analytics.Tracker;
 import com.parse.Parse;
 import com.parse.ParseACL;
 import com.parse.ParseUser;
+import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 
 import org.acra.ACRA;
 import org.acra.ReportingInteractionMode;
@@ -29,6 +32,7 @@ import org.androidannotations.annotations.res.StringRes;
 public class ImhereApplication extends Application {
 	static ImhereApplication instance;
 	static Tracker tracker;
+	private RefWatcher refWatcher;
 
 	@StringRes(R.string.ga_tracker_ua) static String GA_TRACKER_UA;
 
@@ -41,6 +45,9 @@ public class ImhereApplication extends Application {
 	public void onCreate() {
 		super.onCreate();
 
+		// LeakCanary
+		LeakCanary.install(this);
+
 		// ACRA
 		ACRA.init(this);
 
@@ -51,6 +58,11 @@ public class ImhereApplication extends Application {
 		ParseACL defaultACL = new ParseACL();
 		defaultACL.setPublicReadAccess(true);
 		ParseACL.setDefaultACL(defaultACL, true);
+	}
+
+	public static RefWatcher getRefWatcher(Context context) {
+		ImhereApplication application = (ImhereApplication) context.getApplicationContext();
+		return application.refWatcher;
 	}
 
 	public synchronized Tracker getGlobalTracker() {

@@ -115,6 +115,11 @@ android {
 }*/
 
 dependencies {
+	debugCompile 'com.squareup.leakcanary:leakcanary-android:1.3.1'
+	releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.3.1'
+}
+
+dependencies {
 	compile 'com.parse.bolts:bolts-android:1.2.0'
 	compile fileTree(dir: 'libs', include: 'Parse-*.jar')
 	compile 'com.pubnub:pubnub-android:3.7.4'

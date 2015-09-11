@@ -54,6 +54,7 @@ public class UserLayout extends FrameLayout {
 					final long gradientWidth = width * colorsCount;
 
 					if (totalTime > (lifetime - timeElapsed)) {
+						animation.setTimeListener(null);
 						animation.cancel();
 						gradientOffset = gradientWidth;
 						invalidate();
@@ -232,6 +233,7 @@ public class UserLayout extends FrameLayout {
 	}
 
 	public void stopGradientAnimation() {
+		gradientAnimation.setTimeListener(null);
 		gradientAnimation.cancel();
 		accumulatorMs = 0;
 		gradientOffset = 0;

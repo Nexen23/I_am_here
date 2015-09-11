@@ -84,7 +84,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	@Inject AuthApi authApi;
 	TimeTicker.Owner timeTickerOwner;
 
-	Timer timer = new Timer();
+	Timer timer;
 	TimerTask logoutTask;
 
 	EventListener eventListener;
@@ -271,6 +271,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 
 	public void scheduleLogoutAtCurrentUserDeath() {
 		if (isCurrentUserExist()) {
+			timer = new Timer();
 			logoutTask = new TimerTask() {
 				@Override
 				public void run() {
@@ -286,7 +287,10 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 			logoutTask.cancel();
 			logoutTask = null;
 		}
-		timer.purge();
+		if (timer != null) {
+			timer.purge();
+			timer = null;
+		}
 	}
 
 	@Background

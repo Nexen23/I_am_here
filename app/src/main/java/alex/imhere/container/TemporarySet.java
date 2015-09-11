@@ -12,11 +12,11 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeSet;
 
-import alex.imhere.util.Listenable;
+import alex.imhere.util.WeakListenable;
 import alex.imhere.util.Resumable;
 import alex.imhere.util.time.TimeUtils;
 
-public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> implements Resumable {
+public class TemporarySet<TItem> extends WeakListenable<TemporarySet.EventListener> implements Resumable {
 	protected final SortedSet<TemporaryElement<TItem>> sortedElementsSet = new TreeSet<>();
 	protected final List<TItem> list = new ArrayList<>();
 
@@ -192,7 +192,7 @@ public class TemporarySet<TItem> extends Listenable<TemporarySet.EventListener> 
 		return isResumed;
 	}
 
-	public interface EventListener extends Listenable.EventListener {
+	public interface EventListener extends WeakListenable.EventListener {
 		void onCleared();
 		void onAdded(Object item);
 		void onRemoved(Object item);

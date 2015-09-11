@@ -6,19 +6,19 @@ import android.support.annotation.Nullable;
 import java.util.Set;
 import java.util.WeakHashMap;
 
-public abstract class Listenable<TEventListener extends Listenable.EventListener> {
+public abstract class WeakListenable<TEventListener extends WeakListenable.EventListener> {
 	private final WeakHashMap<TEventListener, Void> listeners = new WeakHashMap<>();
 	protected TEventListener notifier;
 
-	public void addListener(@Nullable final TEventListener listener) {
+	public void addWeakListener(@Nullable final TEventListener listener) {
 		listeners.put(listener, null);
 	}
 
-	public void removeListener(@Nullable final TEventListener listener) {
+	public void removeWeakListener(@Nullable final TEventListener listener) {
 		listeners.remove(listener);
 	}
 
-	public void clearListeners() {
+	public void clearAllListeners() {
 		listeners.clear();
 	}
 

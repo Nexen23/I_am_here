@@ -90,6 +90,9 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	EventListener eventListener;
 	//endregion
 
+	final int MEMORY_MB = 1024*1024;
+	byte[] TEST_MEMORY_LEAK = new byte[5 * MEMORY_MB];
+
 	//region Lifecycle
 	private void constructStatusTextSwitcher() {
 		tsStatus.setAnimateFirstView(false);
@@ -130,7 +133,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	@Override
 	public void onResume() {
 		super.onResume();
-		timeTickerOwner.getTimeTicker().addListener(this);
+		timeTickerOwner.getTimeTicker().addWeakListener(this);
 		setState(state);
 		scheduleLogoutAtCurrentUserDeath();
 	}
@@ -139,7 +142,7 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	public void onPause() {
 		super.onPause();
 		cancelLogoutAtCurrentUserDeath();
-		timeTickerOwner.getTimeTicker().removeListener(this);
+		timeTickerOwner.getTimeTicker().removeWeakListener(this);
 	}
 	//endregion
 

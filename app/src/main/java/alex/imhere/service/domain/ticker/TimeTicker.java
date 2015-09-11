@@ -3,14 +3,12 @@ package alex.imhere.service.domain.ticker;
 import android.os.Handler;
 import android.os.Looper;
 
-import org.androidannotations.annotations.EBean;
-
 import java.util.Timer;
 import java.util.TimerTask;
 
-import alex.imhere.util.Listenable;
+import alex.imhere.util.WeakListenable;
 
-public class TimeTicker extends Listenable<TimeTicker.EventListener> {
+public class TimeTicker extends WeakListenable<TimeTicker.EventListener> {
 	private static final long TICKING_PERIOD_MS_DEFAULT = 1000;
 	private static final boolean DO_INSTANT_TICK_ON_START_DEFAULT = true;
 	long tickingPeriodMs;
@@ -67,7 +65,7 @@ public class TimeTicker extends Listenable<TimeTicker.EventListener> {
 		tickingTimer.purge();
 	}
 
-	public interface EventListener extends Listenable.EventListener {
+	public interface EventListener extends WeakListenable.EventListener {
 		void onSecondTick();
 	}
 

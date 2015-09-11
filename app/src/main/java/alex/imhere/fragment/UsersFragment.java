@@ -199,7 +199,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	}
 
 	void startListeningServer() {
-		timeTickerOwner.getTimeTicker().addListener(this);
+		timeTickerOwner.getTimeTicker().addWeakListener(this);
 
 		usersTempSetListener = new TemporarySet.EventListener() {
 			@Override
@@ -217,7 +217,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 				UsersFragment.this.removeUser((DyingUser) item);
 			}
 		};
-		usersTempSet.addListener(usersTempSetListener);
+		usersTempSet.addWeakListener(usersTempSetListener);
 		usersTempSet.resume();
 
 		serverTunnelListener = new ServerChannel.EventListener() {
@@ -251,13 +251,13 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	}
 
 	void stopListeningServer() {
-		timeTickerOwner.getTimeTicker().removeListener(this);
+		timeTickerOwner.getTimeTicker().removeWeakListener(this);
 
 		serverChannel.clearListener();
 		serverChannel.unsubscribe();
 		serverTunnelListener = null;
 
-		usersTempSet.removeListener(usersTempSetListener);
+		usersTempSet.removeWeakListener(usersTempSetListener);
 		usersTempSetListener = null;
 		usersTempSet.pause();
 

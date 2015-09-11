@@ -10,6 +10,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Shader;
 import android.util.AttributeSet;
+import android.view.View;
 import android.widget.FrameLayout;
 
 import java.util.ArrayList;
@@ -118,6 +119,12 @@ public class UserLayout extends FrameLayout {
 		} finally {
 			attributes.recycle();
 		}
+	}
+
+	@Override
+	protected void onDetachedFromWindow() {
+		super.onDetachedFromWindow();
+		stopGradientAnimation();
 	}
 
 	protected void onInitialize() {

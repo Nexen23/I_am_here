@@ -44,7 +44,7 @@ import alex.imhere.util.time.TimeFormatter;
 import alex.imhere.util.time.TimeUtils;
 import alex.imhere.util.wrapper.UiToast;
 
-@EFragment(R.layout.fragment_status)
+@EFragment(R.layout.fragment_login)
 public class LoginFragment extends Fragment implements TimeTicker.EventListener {
 	//region Fields
 	Logger l = LoggerFactory.getLogger(LoginFragment.class);

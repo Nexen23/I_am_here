@@ -47,34 +47,6 @@ public class UserLayout extends FrameLayout {
 
 		if (!isInEditMode()) {
 			gradientAnimation = new TimeAnimator();
-			TimeAnimator.TimeListener gradientAnimationTickListener = new TimeAnimator.TimeListener() {
-				@Override
-				public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
-					final float gradientOffsetCoef = (float) (updateTickMs) / lifetime;
-					final int colorsCount = colors.length - 1;
-					final long gradientWidth = width * colorsCount;
-
-					if (totalTime > (lifetime - timeElapsed)) {
-						animation.setTimeListener(null);
-						animation.cancel();
-						gradientOffset = gradientWidth;
-						invalidate();
-					} else {
-						accumulatorMs += deltaTime;
-
-						final long gradientOffsetsCount = accumulatorMs / updateTickMs;
-						gradientOffset += (gradientOffsetsCount * gradientWidth) * gradientOffsetCoef;
-						accumulatorMs %= updateTickMs;
-
-						boolean gradientOffsetChanged = (gradientOffsetsCount > 0);
-						if (gradientOffsetChanged) {
-							invalidate();
-						}
-					}
-				}
-			};
-			gradientAnimation.setTimeListener(gradientAnimationTickListener); // comment this to use preview
-
 			parseAttrs(attrs, defStyleAttr);
 			onInitialize();
 		} else {
@@ -235,6 +207,33 @@ public class UserLayout extends FrameLayout {
 		resolveTimeElapsed();
 
 		if (!isInEditMode()) {
+			TimeAnimator.TimeListener gradientAnimationTickListener = new TimeAnimator.TimeListener() {
+				@Override
+				public void onTimeUpdate(TimeAnimator animation, long totalTime, long deltaTime) {
+					final float gradientOffsetCoef = (float) (updateTickMs) / lifetime;
+					final int colorsCount = colors.length - 1;
+					final long gradientWidth = width * colorsCount;
+
+					if (totalTime > (lifetime - timeElapsed)) {
+						animation.setTimeListener(null);
+						animation.cancel();
+						gradientOffset = gradientWidth;
+						invalidate();
+					} else {
+						accumulatorMs += deltaTime;
+
+						final long gradientOffsetsCount = accumulatorMs / updateTickMs;
+						gradientOffset += (gradientOffsetsCount * gradientWidth) * gradientOffsetCoef;
+						accumulatorMs %= updateTickMs;
+
+						boolean gradientOffsetChanged = (gradientOffsetsCount > 0);
+						if (gradientOffsetChanged) {
+							invalidate();
+						}
+					}
+				}
+			};
+			gradientAnimation.setTimeListener(gradientAnimationTickListener); // comment this to use preview
 			gradientAnimation.start();
 		}
 	}

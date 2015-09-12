@@ -5,16 +5,24 @@
 
     </style>
 
-    <style name="button_imhere">
-        <item name="android:textSize">26sp</item>
-        <!--<item name="android:textStyle">bold</item>-->
-        <item name="android:gravity">center</item>
-
+    <style name="imhere_button">
         <item name="android:layout_width">@dimen/button_imhere_size</item>
         <item name="android:layout_height">@dimen/button_imhere_size</item>
-
-        <item name="android:textColor">@color/button_imhere</item>
         <item name="android:background">@drawable/button_imhere</item>
+
+        <item name="android:textSize">@dimen/button_imehere_text_size</item>
+        <item name="android:textColor">@color/button_imhere</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="time_text">
+        <item name="android:textSize">@dimen/text_medium</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="status_text">
+        <item name="android:textSize">@dimen/text_large</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
     </style>
 
 </resources>

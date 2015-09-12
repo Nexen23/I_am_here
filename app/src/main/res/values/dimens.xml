@@ -1,4 +1,5 @@
 <resources>
+    <!--DP-->
     <dimen name="fragment_users_width">155dp</dimen>
     <dimen name="fragment_users_margin">-155dp</dimen>
 
@@ -9,5 +10,10 @@
 
     <dimen name="button_imhere_size">130dp</dimen>
     <dimen name="button_imhere_ripple_radius">52dp</dimen>
-    <dimen name="status_top_margin">30dp</dimen>
+    <dimen name="status_top_margin">20dp</dimen>
+
+    <!--SP-->
+    <dimen name="button_imehere_text_size">26sp</dimen>
+    <dimen name="text_large">28sp</dimen>
+    <dimen name="text_medium">18sp</dimen>
 </resources>

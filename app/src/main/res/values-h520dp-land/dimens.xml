@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<!--DP-->
+	<dimen name="button_imhere_size">170dp</dimen>
+	<dimen name="button_imhere_ripple_radius">80dp</dimen>
+
+	<!--SP-->
+	<dimen name="button_imehere_text_size">36sp</dimen>
+	<dimen name="text_large">42sp</dimen>
+	<dimen name="text_medium">26sp</dimen>
+</resources>

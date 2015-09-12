@@ -2,7 +2,9 @@ package alex.imhere.fragment;
 
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.LayoutTransition;
+import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -82,14 +84,21 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
 
-		itemAddingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_appearing);
+		/*itemAddingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_appearing);
 		itemsTransitionAnim.setAnimator(LayoutTransition.APPEARING, itemAddingAnim);
-		itemsTransitionAnim.setStartDelay(LayoutTransition.APPEARING, 0);
+		itemsTransitionAnim.setStartDelay(LayoutTransition.APPEARING, 0);*/
 
 		// TODO: 12.09.2015  not work for some reason
-		/*itemRemovingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_disappearing);
-		itemsTransitionAnim.setAnimator(LayoutTransition.DISAPPEARING, itemRemovingAnim);
-		itemsTransitionAnim.setStartDelay(LayoutTransition.DISAPPEARING, 0);*/
+		itemAddingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_appearing);
+		itemsTransitionAnim.enableTransitionType(LayoutTransition.DISAPPEARING);
+		itemsTransitionAnim.setAnimator(LayoutTransition.DISAPPEARING, itemAddingAnim);
+		itemsTransitionAnim.setDuration(LayoutTransition.DISAPPEARING, 100);
+		itemsTransitionAnim.setStartDelay(LayoutTransition.DISAPPEARING, 0);
+
+		/*itemsTransitionAnim.setAnimator(LayoutTransition.CHANGE_APPEARING, itemAddingAnim);
+		itemsTransitionAnim.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
+		itemsTransitionAnim.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, itemAddingAnim);
+		itemsTransitionAnim.setStartDelay(LayoutTransition.CHANGE_DISAPPEARING, 0);*/
 
 		getListView().setLayoutTransition(itemsTransitionAnim);
 	}
@@ -135,7 +144,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	//endregion
 
 	//region Ui helpers
-	@UiThread
+	@UiThread(delay = 200)
 	public void addUser(DyingUser dyingUser) {
 		usersAdapter.add(dyingUser);
 	}

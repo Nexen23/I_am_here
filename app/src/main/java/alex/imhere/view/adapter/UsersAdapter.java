@@ -53,43 +53,32 @@ public class UsersAdapter extends ArrayAdapter<DyingUser> {
 
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
-		UserLayout userView = (UserLayout) convertView;
 		DyingUser dyingUser = getItem(position);
 
-		/*String sessionLoggingString = "null";
-		String userViewLoggingString = "null";
-
-		if (dyingUser != null) {
-			sessionLoggingString = dyingUser.getUdid();
-		}
-
-		if (userView != null) {
-			userViewLoggingString = String.format("%d", userView.hashCode());
-		}
-
-		String loggingString = String.format("[UsersAdapter] [%d - %s] {userView == %s}",
-				position, sessionLoggingString, userViewLoggingString);
-		Log.d("TAG", loggingString);*/
-
-		if (userView == null || userView.getTag() == null || userView.getTag() != dyingUser)
-		{
+		UserLayout userView;
+		if (convertView != null) {
+			userView = (UserLayout) convertView;
+		} else {
 			LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 			userView = (UserLayout) inflater.inflate(resourceId, parent, false);
+		}
+
+		if (userView.getTag() != dyingUser)
+		{
+			/*userView.setTag(null);
+			userView.setVisibility(View.GONE);*/
+
+			Long restLifetimeMs = dyingUser.getRestLifetime().getMillis();
+			Long fullLifetimeMs = dyingUser.getFullLifetime().getMillis();
+			Long timeElapsedMs = fullLifetimeMs - restLifetimeMs;
+
+			userView.setLifetime(fullLifetimeMs, timeElapsedMs);
+			userView.startGradientAnimation();
+
 			userView.setTag(dyingUser);
-
-			if (dyingUser != null) {
-				Long restLifetimeMs = dyingUser.getRestLifetime().getMillis();
-				Long fullLifetimeMs = dyingUser.getFullLifetime().getMillis();
-				Long timeElapsedMs = fullLifetimeMs - restLifetimeMs;
-
-				userView.setLifetime(fullLifetimeMs, timeElapsedMs);
-				userView.startGradientAnimation();
-			}
 		}
 
-		if (dyingUser != null) {
-			fillView(userView, dyingUser);
-		}
+		fillView(userView, dyingUser);
 
 		return userView;
 	}

@@ -2,4 +2,7 @@
 <resources>
 	<integer name="duration_base">300</integer>
 	<integer name="duration_users_fragment_sliding">500</integer>
+
+	<integer name="button_imhere_ripple_duration">500</integer>
+	<integer name="buttom_imhere_ripple_scale">2</integer>
 </resources>

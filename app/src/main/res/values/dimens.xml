@@ -6,4 +6,6 @@
     <dimen name="margin_default">2dp</dimen>
 
     <dimen name="button_imhere_size">130dp</dimen>
+    <dimen name="button_imhere_ripple_radius">52dp</dimen>
+    <dimen name="status_top_margin">30dp</dimen>
 </resources>

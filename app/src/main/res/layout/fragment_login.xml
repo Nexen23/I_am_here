@@ -11,10 +11,10 @@
         android:layout_height="match_parent"
         android:id="@+id/e_b_imhere"
         app:rb_color="@android:color/black"
-        app:rb_radius="52dp"
-        app:rb_rippleAmount="1"
-        app:rb_duration="500"
-        app:rb_scale="2">
+        app:rb_radius="@dimen/button_imhere_ripple_radius"
+        app:rb_scale="@integer/buttom_imhere_ripple_scale"
+        app:rb_duration="@integer/button_imhere_ripple_duration"
+        app:rb_rippleAmount="1">
         <Button
             android:text="@string/b_imhere_logouted"
             android:id="@+id/b_imhere"
@@ -45,7 +45,7 @@
         android:id="@+id/ts_status"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="30dp"
+        android:layout_marginTop="@dimen/status_top_margin"
         android:inAnimation="@anim/push_up_in"
         android:outAnimation="@anim/push_up_out">
 

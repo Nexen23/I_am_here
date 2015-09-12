@@ -1,11 +1,15 @@
 package alex.imhere.fragment;
 
+import android.animation.Animator;
+import android.animation.AnimatorInflater;
+import android.animation.LayoutTransition;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ListFragment;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.google.android.gms.analytics.Tracker;
 
@@ -47,6 +51,11 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	@StringRes(R.string.users_channel_connection_failed) String usersChannelConnectionFailed;
 	@StringRes(R.string.users_channel_disconnection) String usersChannelDisconnection;
 	@StringRes(R.string.users_querying_failed) String usersQueryingFailed;
+
+	Animator itemAddingAnim;
+	Animator itemRemovingAnim;
+	final LayoutTransition itemsTransitionAnim = new LayoutTransition();
+
 	@ViewsById({R.id.lv_loading_users, R.id.lv_no_users, R.id.lv_loading_error})
 	List<View> emptyListViews;
 	//endregion
@@ -72,6 +81,41 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		tracker = ImhereApplication.newScreenTracker(this.getClass().getSimpleName());
 
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
+
+		itemAddingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_appearing);
+		itemsTransitionAnim.setAnimator(LayoutTransition.APPEARING, itemAddingAnim);
+		itemsTransitionAnim.setStartDelay(LayoutTransition.APPEARING, 0);
+
+		/*itemRemovingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_disappearing);
+		itemsTransitionAnim.setAnimator(LayoutTransition.DISAPPEARING, itemRemovingAnim);
+		itemsTransitionAnim.setStartDelay(LayoutTransition.DISAPPEARING, 0);
+
+		itemsTransitionAnim.addTransitionListener(new LayoutTransition.TransitionListener() {
+			@Override
+			public void startTransition(LayoutTransition transition, ViewGroup container, View view, int transitionType) {
+				switch(transitionType){
+					case LayoutTransition.APPEARING:
+						l.info("anim APPEARING: " + view.hashCode());
+						break;
+					case LayoutTransition.DISAPPEARING:
+						l.info("anim DISAPPEARING: " + view.hashCode());
+						break;
+					case LayoutTransition.CHANGE_APPEARING:
+						l.info("anim CHANGE_APPEARING: " + view.hashCode());
+						break;
+					case LayoutTransition.CHANGE_DISAPPEARING:
+						l.info("anim CHANGE_DISAPPEARING: "+view.hashCode());
+						break;
+				}
+			}
+
+			@Override
+			public void endTransition(LayoutTransition transition, ViewGroup container, View view, int transitionType) {
+
+			}
+		});*/
+
+		getListView().setLayoutTransition(itemsTransitionAnim);
 	}
 
 	@Override

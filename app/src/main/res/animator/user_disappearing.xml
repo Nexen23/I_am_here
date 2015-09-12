@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+	<objectAnimator
+		android:propertyName="translationX"
+		android:duration="@integer/duration_base"
+		android:valueTo="@dimen/fragment_users_width"
+		android:valueFrom="0"/>
+</set>

@@ -8,7 +8,7 @@
     <string name="ts_status_loginned">Online</string>
     <string name="ts_status_logouted">Offline</string>
     <string name="ts_status_logining"> Logining…</string>
-    <string name="ts_status_logouting"> Loging out…</string>
+    <string name="ts_status_logouting"> Logouting…</string>
 
     <string name="lv_no_users">No users</string>
     <string name="lv_loading_users">Loading…</string>

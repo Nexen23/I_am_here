@@ -91,20 +91,12 @@ public class LoginFragment extends Fragment implements TimeTicker.EventListener 
 	//endregion
 
 	//region Lifecycle
-	private void constructStatusTextSwitcher() {
-		tsStatus.setAnimateFirstView(false);
-		TextView tv1 = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
-		tsStatus.addView(tv1);
-		TextView tv2 = (TextView) View.inflate(getActivity(), R.layout.textview_status, null);
-		tsStatus.addView(tv2);
-		tsStatus.showNext();
-	}
-
 	@AfterViews
 	public void onAfterViews() {
 		tracker = ImhereApplication.newScreenTracker(this.getClass().getSimpleName());
 		udid = Settings.Secure.getString(getActivity().getContentResolver(), Settings.Secure.ANDROID_ID);
-		constructStatusTextSwitcher();
+		tsStatus.setAnimateFirstView(false);
+		tsStatus.showNext();
 	}
 
 	@Override

@@ -86,34 +86,10 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		itemsTransitionAnim.setAnimator(LayoutTransition.APPEARING, itemAddingAnim);
 		itemsTransitionAnim.setStartDelay(LayoutTransition.APPEARING, 0);
 
+		// TODO: 12.09.2015  not work for some reason
 		/*itemRemovingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_disappearing);
 		itemsTransitionAnim.setAnimator(LayoutTransition.DISAPPEARING, itemRemovingAnim);
-		itemsTransitionAnim.setStartDelay(LayoutTransition.DISAPPEARING, 0);
-
-		itemsTransitionAnim.addTransitionListener(new LayoutTransition.TransitionListener() {
-			@Override
-			public void startTransition(LayoutTransition transition, ViewGroup container, View view, int transitionType) {
-				switch(transitionType){
-					case LayoutTransition.APPEARING:
-						l.info("anim APPEARING: " + view.hashCode());
-						break;
-					case LayoutTransition.DISAPPEARING:
-						l.info("anim DISAPPEARING: " + view.hashCode());
-						break;
-					case LayoutTransition.CHANGE_APPEARING:
-						l.info("anim CHANGE_APPEARING: " + view.hashCode());
-						break;
-					case LayoutTransition.CHANGE_DISAPPEARING:
-						l.info("anim CHANGE_DISAPPEARING: "+view.hashCode());
-						break;
-				}
-			}
-
-			@Override
-			public void endTransition(LayoutTransition transition, ViewGroup container, View view, int transitionType) {
-
-			}
-		});*/
+		itemsTransitionAnim.setStartDelay(LayoutTransition.DISAPPEARING, 0);*/
 
 		getListView().setLayoutTransition(itemsTransitionAnim);
 	}

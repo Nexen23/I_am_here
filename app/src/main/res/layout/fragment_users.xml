@@ -66,10 +66,8 @@
 	<ListView android:id="@id/android:list"
 			  android:layout_width="match_parent"
 			  android:layout_height="match_parent"
-			  android:animateLayoutChanges="true"
 			  android:divider="@android:color/transparent"
-			  android:dividerHeight="@dimen/users_divider_height"
-			  android:drawSelectorOnTop="false">
+			  android:dividerHeight="@dimen/users_divider_height">
 	</ListView>
 
 </LinearLayout>

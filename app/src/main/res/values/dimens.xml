@@ -1,9 +1,11 @@
 <resources>
-     <dimen name="fragment_users_width">155dp</dimen>
+    <dimen name="fragment_users_width">155dp</dimen>
     <dimen name="fragment_users_margin">-155dp</dimen>
 
     <dimen name="padding_default">3dp</dimen>
     <dimen name="margin_default">2dp</dimen>
+
+    <dimen name="users_divider_height">1dp</dimen>
 
     <dimen name="button_imhere_size">130dp</dimen>
     <dimen name="button_imhere_ripple_radius">52dp</dimen>

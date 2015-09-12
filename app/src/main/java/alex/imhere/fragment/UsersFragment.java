@@ -84,21 +84,16 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 
 		usersAdapter = new UsersAdapter(getActivity(), R.layout.item_user, usersList);
 
-		/*itemAddingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_appearing);
+		itemAddingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_appearing);
 		itemsTransitionAnim.setAnimator(LayoutTransition.APPEARING, itemAddingAnim);
-		itemsTransitionAnim.setStartDelay(LayoutTransition.APPEARING, 0);*/
+		itemsTransitionAnim.setStartDelay(LayoutTransition.APPEARING, 0);
 
 		// TODO: 12.09.2015  not work for some reason
-		itemAddingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_appearing);
+		/*itemAddingAnim = AnimatorInflater.loadAnimator(getActivity(), R.animator.user_appearing);
 		itemsTransitionAnim.enableTransitionType(LayoutTransition.DISAPPEARING);
 		itemsTransitionAnim.setAnimator(LayoutTransition.DISAPPEARING, itemAddingAnim);
 		itemsTransitionAnim.setDuration(LayoutTransition.DISAPPEARING, 100);
-		itemsTransitionAnim.setStartDelay(LayoutTransition.DISAPPEARING, 0);
-
-		/*itemsTransitionAnim.setAnimator(LayoutTransition.CHANGE_APPEARING, itemAddingAnim);
-		itemsTransitionAnim.setStartDelay(LayoutTransition.CHANGE_APPEARING, 0);
-		itemsTransitionAnim.setAnimator(LayoutTransition.CHANGE_DISAPPEARING, itemAddingAnim);
-		itemsTransitionAnim.setStartDelay(LayoutTransition.CHANGE_DISAPPEARING, 0);*/
+		itemsTransitionAnim.setStartDelay(LayoutTransition.DISAPPEARING, 0);*/
 
 		getListView().setLayoutTransition(itemsTransitionAnim);
 	}
@@ -144,7 +139,7 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 	//endregion
 
 	//region Ui helpers
-	@UiThread(delay = 200)
+	@UiThread
 	public void addUser(DyingUser dyingUser) {
 		usersAdapter.add(dyingUser);
 	}
@@ -275,7 +270,6 @@ public class UsersFragment extends ListFragment implements TimeTicker.EventListe
 		} catch (Exception e) {
 			e.printStackTrace();
 			onErrorOccur(usersChannelConnectionFailed, e);
-			return;
 		}
 	}
 

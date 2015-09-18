@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <alex.imhere.view.UserLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_marginStart="0dp"
     android:layout_width="fill_parent"
@@ -25,7 +26,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="1q2w3e4r5t6y7u8i"
+                tools:text="1q2w3e4r5t6y7u8i"
                 android:id="@+id/tv_name"
                 android:layout_gravity="center_horizontal"
                 android:textSize="12sp"
@@ -37,7 +38,7 @@
                 android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="lifetime"
+                tools:text="lifetime"
                 android:id="@+id/tv_singed_in_date"
                 android:layout_gravity="center_horizontal"
                 android:textSize="12sp"

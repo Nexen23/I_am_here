@@ -61,6 +61,18 @@ public class TemporarySet<TItem> extends WeakListenable<TemporarySet.EventListen
 		return _remove(element);
 	}
 
+	public boolean killNextElementToDie() {
+		return _remove(nextElementToDie);
+	}
+
+	public int size() {
+		return sortedElementsSet.size();
+	}
+
+	public TItem getNextElementToDie() {
+		return nextElementToDie.object;
+	}
+
 	public void clear() {
 		_clear();
 	}
@@ -119,7 +131,7 @@ public class TemporarySet<TItem> extends WeakListenable<TemporarySet.EventListen
 			timerTask = new TimerTask() {
 				@Override
 				public void run() {
-					_remove(nextElementToDie);
+					killNextElementToDie();
 				}
 			};
 

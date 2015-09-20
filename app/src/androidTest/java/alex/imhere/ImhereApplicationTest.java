@@ -5,9 +5,6 @@ import android.test.ApplicationTestCase;
 
 import alex.imhere.service.domain.api.UserApi;
 
-/**
- * <a href="http://d.android.com/tools/testing/testing_android.html">Testing Fundamentals</a>
- */
 public class ImhereApplicationTest extends ApplicationTestCase<ImhereApplication> {
 	private UserApi userApi;
 	private String udid;
